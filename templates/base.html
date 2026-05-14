@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}ML Dept Portal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% if session.role %}
+    <!-- Top nav appears only after login -->
+    <header class="topnav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <span class="nav-logo">ML Department </span>
+            </div>
+            <div class="nav-right" style="margin-left: 900px;">
+                <span class="user-tag">{{ session.name }}</span>
+                <b><a href="{{ url_for('logout') }}" class="nav-link">Logout</a></b>
+            </div>
+        </div>
+    </header>
+
+    <!-- Layout only for logged‑in users -->
+    <div class="layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>Navigation</h3>
+            </div>
+            <ul class="sidebar-nav-links">
+                {% if session.role == 'student' %}
+                <li><a href="{{ url_for('student_dashboard') }}">Student Dashboard</a></li>
+                <li><a href="{{ url_for('resume_form') }}">Build Resume</a></li>
+                {% endif %}
+                {% if session.role == 'faculty' %}
+                <li><a href="{{ url_for('faculty_dashboard') }}">Faculty Dashboard</a></li>
+                <li><a href="{{ url_for('faculty_department', dept='ACSML') }}">ACSML</a></li>
+                <li><a href="{{ url_for('faculty_department', dept='NCSML') }}">NCSML</a></li>
+                <li><a href="{{ url_for('faculty_department', dept='DCSML') }}">DCSML</a></li>
+                <li><a href="{{ url_for('faculty_resumes') }}">All Resumes</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+            </ul>
+
+            <!-- Resumes in sidebar for student -->
+            {% if session.role == 'student' and resumes %}
+            <div class="sidebar-resumes">
+                <h4>My Resumes</h4>
+                <ul class="resume-nav">
+                    {% for r in resumes %}
+                    <li>
+                        <a href="{{ url_for('download_resume', resume_id=r['id']) }}" target="_blank" download>
+                            📄 {{ r['title'] or 'Resume' }} • {{ r['created_at'].split()[0] }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </nav>
+
+        <!-- Main content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+<!-- Floating chat icon -->
+<div class="chat-icon" id="chat-icon" onclick="openChat()">💬</div>
+
+<!-- Chat panel -->
+<div class="chat-panel" id="chat-panel">
+    <div class="chat-header">
+        <span>Chat Support</span>
+        <button class="chat-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+        <p>Welcome! Ask your doubts here.</p>
+    </div>
+    <div class="chat-input-area">
+        <input type="text"
+               id="chat-input"
+               placeholder="Type a message..."
+               onkeypress="handleChatEnter(event)">
+        <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+</div>
+    {% else %}
+    <div class="please-login">
+        <p>Please <a href="{{ url_for('login') }}">login</a> first.</p>
+    </div>
+    {% endif %}
+
+
+    {% block scripts %}
+    <script>
+        
+    function openChat() {
+        const panel = document.getElementById("chat-panel");
+        const icon  = document.getElementById("chat-icon");
+        panel.classList.add("visible");
+        icon.style.display = "none";
+    }
+
+    function closeChat() {
+        const panel = document.getElementById("chat-panel");
+        const icon  = document.getElementById("chat-icon");
+        panel.classList.remove("visible");
+        icon.style.display = "flex";
+    }
+
+    function handleChatEnter(e) {
+        if (e.key === "Enter") sendChat();
+    }
+
+    function sendChat() {
+        const input     = document.getElementById("chat-input");
+        const messages  = document.getElementById("chat-messages");
+        const userMsg   = input.value.trim();
+        if (!userMsg) return;
+
+        const userP = document.createElement("p");
+        userP.classList.add("user");
+        userP.innerText = "You: " + userMsg;
+        messages.appendChild(userP);
+
+        input.value = "";
+        messages.scrollTop = messages.scrollHeight;
+
+        fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userMsg })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const botP = document.createElement("p");
+                botP.classList.add("bot");
+                botP.innerText = "Bot: " + data.reply;
+                messages.appendChild(botP);
+                messages.scrollTop = messages.scrollHeight;
+            })
+            .catch(err => {
+                const botP = document.createElement("p");
+                botP.classList.add("bot");
+                botP.innerText = "Bot: Failed to reach server.";
+                messages.appendChild(botP);
+                messages.scrollTop = messages.scrollHeight;
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const panel = document.getElementById("chat-panel");
+        const icon  = document.getElementById("chat-icon");
+        panel.classList.remove("visible");
+        icon.style.display = "flex";
+    });
+</script>
+    {% endblock %}
+</body>
+</html>

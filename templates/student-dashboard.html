@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <h2 class="section-title">Student Dashboard</h2>
+
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <!-- Student stats cards -->
+    <div class="card-grid">
+        <div class="card">
+            <h3>Name</h3>
+            <p class="large">{{ name }}</p>
+        </div>
+        <div class="card">
+            <h3>Roll</h3>
+            <p class="large">{{ roll }}</p>
+        </div>
+        <div class="card">
+            <h3>Department</h3>
+            <p class="large">{{ department }}</p>
+        </div>
+        <div class="card">
+            <h3>CGPA</h3>
+            <p class="large">{{ cgpa }}</p>
+        </div>
+        <div class="card">
+            <h3>SGPA</h3>
+            <p class="large">{{ sgpa }}</p>
+        </div>
+        <div class="card">
+            <h3>Attendance</h3>
+            <p class="large">{{ attendance }}%</p>
+        </div>
+    </div>
+
+    <!-- Resumes section -->
+    <section class="resumes-section">
+    <h3>My Resumes</h3>
+
+    {% if resumes %}
+    <div class="resume-grid">
+        {% for r in resumes %}
+        <div class="resume-card">
+            <div class="resume-main">
+                <h4>{{ r['title'] }}</h4>
+                <p class="resume-date">Created: {{ r['created_at'] }}</p>
+                <div class="resume-links">
+                    <a href="{{ url_for('download_resume', resume_id=r['id']) }}" class="btn-download" download>
+                        Download Resume
+                    </a>
+                    <a href="{{ url_for('view_resume', resume_id=r['id']) }}" 
+                       target="_blank" class="btn-view">
+                        View Resume
+                    </a>
+                </div>
+            </div>
+            <div class="resume-actions">
+                <form method="POST" action="{{ url_for('delete_resume') }}" class="inline-form">
+                    <input type="hidden" name="resume_id" value="{{ r['id'] }}">
+                    <button type="submit" class="btn-delete" onclick="return confirm('Delete this resume?');">
+                        🗑️ Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">No resumes uploaded yet.</p>
+    {% endif %}
+</section>
+
+</div>
+{% endblock %}

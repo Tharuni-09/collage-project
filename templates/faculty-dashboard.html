@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h2 class="section-title">Faculty Dashboard</h2>
+    <p class="user-tag">Welcome, {{ session.name }}</p>
+
+    <section class="faculty-actions">
+        <h3>Use the department links in the sidebar to view ACSML, NCSML, or DCSML details.</h3>
+        <p class="muted">Student and resume details are now shown only after clicking the department or resume links.</p>
+    </section>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>ACSML</h3>
+            <p>{{ students_acsml|length }} students</p>
+            <p>{{ resumes_acsml|length }} resumes</p>
+            <a href="{{ url_for('faculty_department', dept='ACSML') }}" class="btn-primary">Open ACSML</a>
+        </div>
+        <div class="card">
+            <h3>NCSML</h3>
+            <p>{{ students_ncsml|length }} students</p>
+            <p>{{ resumes_ncsml|length }} resumes</p>
+            <a href="{{ url_for('faculty_department', dept='NCSML') }}" class="btn-primary">Open NCSML</a>
+        </div>
+        <div class="card">
+            <h3>DCSML</h3>
+            <p>{{ students_dcsml|length }} students</p>
+            <p>{{ resumes_dcsml|length }} resumes</p>
+            <a href="{{ url_for('faculty_department', dept='DCSML') }}" class="btn-primary">Open DCSML</a>
+        </div>
+        <div class="card">
+            <h3>All Resumes</h3>
+            <p>{{ resumes_acsml|length + resumes_ncsml|length + resumes_dcsml|length }} total resumes</p>
+            <a href="{{ url_for('faculty_resumes') }}" class="btn-primary">View Resumes</a>
+        </div>
+    </div>
+
+    <section class="department-section">
+        <h3>NCSML Department</h3>
+        
+        <h4>Students</h4>
+        {% if students_ncsml %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>CGPA</th>
+                    <th>Attendance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students_ncsml %}
+                <tr>
+                    <td>{{ s['roll'] }}</td>
+                    <td>{{ s['name'] }}</td>
+                    <td>{{ s['cgpa'] }}</td>
+                    <td>{{ s['attendance'] }}%</td>
+                    <td>
+                        <a href="{{ url_for('student_details', student_uid=s['uid']) }}" class="btn-view" style="margin-right: 10px;">
+                            👁️ View Details
+                        </a>
+                        <form method="POST"
+                              action="{{ url_for('faculty_delete_student', roll=s['roll']) }}"
+                              style="display:inline;">
+                            <button type="submit" class="btn-delete"
+                                    onclick="return confirm('Delete student {{ s['name'] }} ({{ s['roll'] }})?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No NCSML students found.</p>
+        {% endif %}
+
+        <h4>Resumes</h4>
+        {% if resumes_ncsml %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>Title</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resumes_ncsml %}
+                <tr>
+                    <td>{{ r['roll'] }}</td>
+                    <td>{{ r['name'] }}</td>
+                    <td>{{ r['title'] }}</td>
+                    <td>{{ r['created_at'] }}</td>
+                    <td>
+                        <a href="{{ url_for('download_resume', resume_id=r['id']) }}" title="Download" download>
+                             Download
+                        </a>
+                        <span style="margin: 0 10px;">|</span>
+                        <a href="{{ url_for('view_resume', resume_id=r['id']) }}" 
+                           title="View" 
+                           target="_blank">
+                             View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No NCSML resumes found.</p>
+        {% endif %}
+    </section>
+
+    <!-- DCSML Section -->
+    <section class="department-section">
+        <h3>DCSML Department</h3>
+        
+        <h4>Students</h4>
+        {% if students_dcsml %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>CGPA</th>
+                    <th>Attendance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students_dcsml %}
+                <tr>
+                    <td>{{ s['roll'] }}</td>
+                    <td>{{ s['name'] }}</td>
+                    <td>{{ s['cgpa'] }}</td>
+                    <td>{{ s['attendance'] }}%</td>
+                    <td>
+                        <a href="{{ url_for('student_details', student_uid=s['uid']) }}" class="btn-view" style="margin-right: 10px;">
+                            👁️ View Details
+                        </a>
+                        <form method="POST"
+                              action="{{ url_for('faculty_delete_student', roll=s['roll']) }}"
+                              style="display:inline;">
+                            <button type="submit" class="btn-delete"
+                                    onclick="return confirm('Delete student {{ s['name'] }} ({{ s['roll'] }})?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No DCSML students found.</p>
+        {% endif %}
+
+        <h4>Resumes</h4>
+        {% if resumes_dcsml %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>Title</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resumes_dcsml %}
+                <tr>
+                    <td>{{ r['roll'] }}</td>
+                    <td>{{ r['name'] }}</td>
+                    <td>{{ r['title'] }}</td>
+                    <td>{{ r['created_at'] }}</td>
+                    <td>
+                        <a href="{{ url_for('download_resume', resume_id=r['id']) }}" title="Download" download>
+                            ⬇️ Download
+                        </a>
+                        <span style="margin: 0 10px;">|</span>
+                        <a href="{{ url_for('view_resume', resume_id=r['id']) }}" 
+                           title="View" 
+                           target="_blank">
+                            👁️ View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No DCSML resumes found.</p>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

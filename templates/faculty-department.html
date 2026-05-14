@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ department }} Department{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h2 class="section-title">{{ department }} Department</h2>
+    <p class="muted">Students and resumes are shown after selecting a department.</p>
+
+    <section class="faculty-actions">
+        <h3>Student list</h3>
+        {% if students %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>CGPA</th>
+                    <th>Attendance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s['roll'] }}</td>
+                    <td>{{ s['name'] }}</td>
+                    <td>{{ s['cgpa'] }}</td>
+                    <td>{{ s['attendance'] }}%</td>
+                    <td>
+                        <a href="{{ url_for('student_details', student_uid=s['uid']) }}" class="btn-view">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No students found for {{ department }}.</p>
+        {% endif %}
+    </section>
+
+    <section class="faculty-actions">
+        <h3>Department resumes</h3>
+        {% if resumes %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>Title</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resumes %}
+                <tr>
+                    <td>{{ r['roll'] }}</td>
+                    <td>{{ r['name'] }}</td>
+                    <td>{{ r['title'] }}</td>
+                    <td>{{ r['created_at'] }}</td>
+                    <td>
+                        <a href="{{ url_for('download_resume', resume_id=r['id']) }}" download class="btn-download">
+                            Download
+                        </a>
+                        <a href="{{ url_for('view_resume', resume_id=r['id']) }}" target="_blank" class="btn-view">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No resumes found for {{ department }}.</p>
+        {% endif %}
+    </section>
+
+    <div class="back-link">
+        <a href="{{ url_for('faculty_dashboard') }}" class="btn-secondary">← Back to Faculty Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Build Professional Resume{% endblock %}
+
+{% block content %}
+<div class="resume-form">
+    <h2>Resume Preparation Form</h2>
+    <p class="muted">
+        Fill this form carefully. Your answers will be used to generate a professional PDF resume.
+    </p>
+
+    <form method="POST">
+        <div class = "resume-form">
+        <fieldset class="form-section">
+            <legend class="section-title">1. Personal Information</legend>
+
+            <label class="form-label"><strong>Full Name *</strong></label>
+            <input type="text" name="name" value="{{ name }}" required class="form-input">
+
+            <label class="form-label"><strong>Phone Number *</strong></label>
+            <input type="text" name="phone" value="{{ phone }}" required class="form-input">
+
+            <label class="form-label"><strong>Professional Email Address *</strong></label>
+            <input type="email" name="email" value="{{ email }}" required class="form-input">
+
+            <label class="form-label"><strong>LinkedIn Profile</strong></label>
+            <input type="url" name="linkedin" value="{{ linkedin }}" placeholder="https://linkedin.com/in/..." class="form-input">
+
+            <label class="form-label"><strong>Portfolio / GitHub / Website</strong></label>
+            <input type="url" name="portfolio" value="{{ portfolio }}" placeholder="https://github.com/username" class="form-input">
+
+            <label class="form-label"><strong>City & State / Location</strong></label>
+            <input type="text" name="location" value="{{ location }}" class="form-input">
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">2. Career Objective / Summary</legend>
+
+            <label class="form-label"><strong>Career objective (2–3 lines)</strong></label>
+            <textarea name="objective" rows="4" class="form-textarea" placeholder="
+Recent B.Tech CSE graduate with strong problem-solving skills and proficiency in Python and Machine Learning.
+Seeking a Software Developer / Data Analyst role to apply my academic projects and technical skills.
+            ">{{ objective }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">3. Education Details</legend>
+
+            <label class="form-label"><strong>Education (degree, college, CGPA, etc.)</strong></label>
+            <textarea name="education" rows="6" class="form-textarea" placeholder="
+B.Tech in Computer Science and Engineering
+Mahatma Gandhi Institute of Technology, Hyderabad
+CGPA: 8.7 | Year of Graduation: 2026
+
+Intermediate / 12th in MPC
+ABC Junior College, Hyderabad
+Board: Telangana State Board | 2021 | 9.3 CGPA
+            ">{{ education }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">4. Skills</legend>
+
+            <label class="form-label"><strong>Technical Skills</strong> (one skill per line)</label>
+            <textarea name="technical_skills" rows="4" class="form-textarea" placeholder="
+Python
+Machine Learning
+Flask / FastAPI
+SQL (SQLite, MySQL)
+HTML, CSS, JavaScript
+Git, GitHub
+ReportLab
+            ">{{ technical_skills }}</textarea>
+
+            <label class="form-label"><strong>Soft Skills</strong> (one per line)</label>
+            <textarea name="soft_skills" rows="3" class="form-textarea" placeholder="
+Communication
+Teamwork
+Problem Solving
+Time Management
+Leadership
+            ">{{ soft_skills }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">5. Work Experience</legend>
+
+            <label class="form-label"><strong>Work Experience (if any)</strong> (one role per block)</label>
+            <textarea name="work_experience" rows="6" class="form-textarea" placeholder="
+Junior Software Engineer – ABC Tech Pvt. Ltd.
+June 2024 – Dec 2024
+- Developed and maintained REST APIs in Python Flask.
+- Implemented user authentication and data validation.
+            ">{{ work_experience }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">6. Internship Experience</legend>
+
+            <label class="form-label"><strong>Internship Experience</strong> (one per block)</label>
+            <textarea name="internships" rows="6" class="form-textarea" placeholder="
+Summer Intern – XYZ Solutions
+May 2024 – July 2024
+- Worked on a web‑based student management system.
+- Assisted in backend API design and testing.
+            ">{{ internships }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">7. Projects</legend>
+
+            <label class="form-label"><strong>Projects</strong> (title, description, tech, role, results)</label>
+            <textarea name="projects" rows="8" class="form-textarea" placeholder="
+Online Resume Builder (Python, Flask, ReportLab)
+Built a web application for students to generate professional PDF resumes.
+Backend: Flask, SQLite; PDF: ReportLab; Frontend: HTML/CSS/JS.
+
+Stock Price Prediction (Python, ML)
+Used LSTM neural network to predict stock prices; achieved 78% accuracy.
+            ">{{ projects }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">8. Certifications</legend>
+
+            <label class="form-label"><strong>Certifications</strong> (one per line)</label>
+            <textarea name="certifications" rows="5" class="form-textarea" placeholder="
+Python for Data Science and Machine Learning – Udemy
+Completed: Feb 2024
+
+Google Cloud Fundamentals – Coursera
+Completed: Dec 2023
+            ">{{ certifications }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">9. Achievements / Awards</legend>
+
+            <label class="form-label"><strong>Achievements / Awards</strong> (one per line)</label>
+            <textarea name="achievements" rows="5" class="form-textarea" placeholder="
+Won 1st Prize in Coding Hackathon – 2023
+Received Merit Scholarship for CGPA 8.5+
+Participated in Regional Robotics Competition – 2024
+            ">{{ achievements }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">10. Extracurricular Activities</legend>
+
+            <label class="form-label"><strong>Extracurricular Activities</strong> (clubs, events, volunteering, etc.)</label>
+            <textarea name="extracurriculars" rows="4" class="form-textarea" placeholder="
+Member, Computer Science Club (organized workshops)
+Member, Student Council (event management)
+Volunteer – NSS Group (social campaigns)
+            ">{{ extracurriculars }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">11. Languages Known</legend>
+
+            <label class="form-label"><strong>Languages Known</strong> (one per line)</label>
+            <textarea name="languages" rows="4" class="form-textarea" placeholder="
+English (Professional)
+Telugu (Native)
+Hindi (Conversational)
+            ">{{ languages }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">12. Hobbies / Interests</legend>
+
+            <label class="form-label"><strong>Hobbies / Interests</strong> (optional)</label>
+            <textarea name="hobbies" rows="3" class="form-textarea" placeholder="
+Reading technical blogs
+Competitive coding and problem solving
+Open‑source contribution on GitHub
+Fitness and running
+            ">{{ hobbies }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">13. References (Optional)</legend>
+
+            <label class="form-label"><strong>References</strong> (one per line)</label>
+            <textarea name="references" rows="4" class="form-textarea" placeholder="
+Dr. Suresh Reddy
+Professor, CSE Department
+MGIT, Hyderabad
+Email: suresh.reddy@mgit.ac.in | Phone: +91 98765 12345
+            ">{{ references }}</textarea>
+        </fieldset>
+
+
+        <fieldset class="form-section">
+            <legend class="section-title">14. Additional Details</legend>
+
+            <label class="form-label"><strong>Additional Details</strong> (availability, location, notice period, etc.)</label>
+            <textarea name="additional_details" rows="4" class="form-textarea" placeholder="
+Availability to Join: After July 2026
+Preferred Location: Hyderabad, Bangalore
+Notice Period: 15 days
+Willingness to Relocate: Yes
+Open to remote and on‑site roles.
+            ">{{ additional_details }}</textarea>
+        </fieldset>
+        </div>
+
+        <button type="submit" class="btn-primary">Generate Professional Resume PDF</button>
+    </form>
+</div>
+
+<div class="tips-box">
+    <h3>Resume Tips for Freshers</h3>
+    <ul>
+        <li>Use strong action verbs: <i>Developed, Designed, Implemented, Optimized.</i></li>
+        <li>Keep bullets short; avoid long paragraphs.</li>
+        <li>Place Education, Projects, Skills, and Certifications at the top.</li>
+    </ul>
+</div>
+
+<label class="form-label"><strong>Include References?</strong></label>
+<select name="include_references" class="form-input">
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+</select>
+{% endblock %}

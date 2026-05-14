@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}All Resumes{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h2 class="section-title">All Resumes</h2>
+    <p class="muted">Review all submitted resumes and open them when needed.</p>
+
+    {% if resumes %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Roll</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Title</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in resumes %}
+            <tr>
+                <td>{{ r['roll'] }}</td>
+                <td>{{ r['name'] }}</td>
+                <td>{{ r['department'] }}</td>
+                <td>{{ r['title'] }}</td>
+                <td>{{ r['created_at'] }}</td>
+                <td>
+                    <a href="{{ url_for('download_resume', resume_id=r['id']) }}" download class="btn-download">
+                        Download
+                    </a>
+                    <a href="{{ url_for('view_resume', resume_id=r['id']) }}" target="_blank" class="btn-view">
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="muted">No resumes have been submitted yet.</p>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="{{ url_for('faculty_dashboard') }}" class="btn-secondary">← Back to Faculty Dashboard</a>
+    </div>
+</div>
+{% endblock %}

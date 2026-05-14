@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Department of Machine Learning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<!-- ================= TOP NAVBAR ================= -->
+<nav class="topnav">
+    <div class="nav-left">
+        <img src="{{ url_for('static', filename='logo_ml.jpeg') }}" class="nav-logo">
+        <span>Department of Machine Learning <br>
+            <p>Loyola Academy, Degree and PG College, Old Alwal, Secunderabad</p>
+        </span>
+    </div>
+
+<ul class="nav-links">
+    <li><a href="{{ url_for('index') }}">Home</a></li>
+    <li><a href="{% if session.role == 'faculty' %}{{ url_for('faculty_dashboard') }}{% else %}#faculty{% endif %}">Faculty</a></li>
+    <li><a href="{{ url_for('outreach') }}">Out Reach</a></li>
+    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+    <li><a href="#contact">Contacts</a></li>
+    <li><a href="{{ url_for('login') }}">Login</a></li>
+
+    {% if 'role' in session %}
+        {% if session.role == 'student' %}
+            <li class = "user"><a href="{{ url_for('student_dashboard') }}">Student Dashboard</a></li>
+        {% elif session.role == 'faculty' %}
+            <li class = "user"><a href="{{ url_for('faculty_dashboard') }}">Faculty Dashboard</a></li>
+        {% endif %}
+        <li class="logout"><a href="{{ url_for('logout') }}">Logout</a></li>
+    {% else %}
+    
+    {% endif %}
+</ul>
+</nav>
+
+<!-- ================= HERO SECTION ================= -->
+<section id="hero" class="dept-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h2>Advancing Education in Machine Learning & AI</h2>
+        <p>
+            A dedicated academic department focusing on Machine Learning,
+            Artificial Intelligence, Data Science, and intelligent systems
+            through curriculum-driven and practical learning.
+        </p>
+    </div>
+</section>
+
+<!-- ================= VISION & MISSION ================= -->
+<section id="vision-mission">
+    <!-- VISION -->
+    <h2 class="vision-title">Vision</h2>
+    <p class="vision-text">
+        To shape future-ready professionals by advancing excellence in Machine Learning,
+        Artificial Intelligence, and data-driven innovation.
+    </p>
+
+    <!-- MISSION -->
+    <div class="mission">
+        <h3>Mission</h3>
+        <ul>
+            <li>Deliver industry-aligned education in Machine Learning and AI.</li>
+            <li>Encourage innovation, research, and ethical practices.</li>
+            <li>Bridge academic learning with real-world applications.</li>
+            <li>Develop socially responsible and skilled professionals.</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ================= PROGRAMS OFFERED ================= -->
+<section id="programs">
+    <h2>Programs Offered</h2>
+    <div class="program-card">
+        <h3>B.Sc Computer Science and Machine Learning</h3>
+        <p>Duration: 3 Years</p>
+        <p>Focus: AI, Data Science, Deep Learning</p>
+    </div>
+</section>
+
+<!-- ================= CURRICULUM HIGHLIGHTS ================= -->
+<section id="programs">
+    <h2>Curriculum Highlights</h2>
+    <ul>
+        <li>
+            Industry-aligned Machine Learning curriculum
+        </li>
+        <li>
+            Strong foundation in Python, Mathematics, and Statistics
+        </li>
+        <li>
+            Core concepts of Supervised and Unsupervised Learning
+        </li>
+        <li>
+            Hands-on training through dedicated ML laboratories
+        </li>
+        <li>
+            Exposure to Data Science and Data Visualization
+        </li>
+        <li>
+            Introduction to Artificial Intelligence and Deep Learning
+        </li>
+        <li>
+            Real-world projects and case-based learning
+        </li>
+        <li>
+            Guest lectures, workshops, and industrial visits
+        </li>
+        <li>
+            Internship and certification guidance
+        </li>
+        <li>
+            Focus on innovation, research, and employability
+        </li>
+    </ul>
+</section>
+
+<!-- ================= LABS & INFRASTRUCTURE ================= -->
+<section id="programs">
+    <div class="section-container">
+        <h2>Laboratories & Infrastructure</h2>
+        <div class="lab-list">
+            <p>✔ Machine Learning Lab</p>
+            <p>✔ Artificial Intelligence Lab</p>
+            <p>✔ Data Science Lab</p>
+        </div>
+    </div>
+</section>
+
+<!-- ================= FACULTY SNAPSHOT ================= -->
+<section id="faculty">
+    <h2>Faculty</h2>
+    <div class="faculty_det" id="facultyGrid">
+        <!-- Visible -->
+        <div class="faculty-card">
+            <img src="{{ url_for('static', filename='venugopal sir.jpeg') }}" alt="Venugopal">
+            <h3>Mr. A. Venugopal</h3>
+            <p class="role">Asst. Prof. in Comp. Sci & HoD</p>
+        </div>
+        <div class="faculty-card">
+            <img src="{{ url_for('static', filename='shanthi mam.jpeg') }}" alt="Shanthi">
+            <h3>Dr. C. Shanthi</h3>
+            <p class="role">Asst. Prof. Electronics</p>
+        </div>
+        <div class="faculty-card">
+            <img src="{{ url_for('static', filename='rajini mam.jpeg') }}" alt="Rajini">
+            <h3>Dr. B. Rajini</h3>
+            <p class="role">Asst. Prof. in Comp. Sci</p>
+        </div>
+        <div class="faculty-card">
+            <img src="{{ url_for('static', filename='naveen sir.jpeg') }}" alt="Naveen">
+            <h3>Mr. N. Naveen</h3>
+            <p class="role">Asst. Prof. in Comp. Sci</p>
+        </div>
+        <div class="faculty-card">
+            <img src="{{ url_for('static', filename='kavya mam.jpeg') }}" alt="Kavya">
+            <h3>Mrs. B. Kavya</h3>
+            <p class="role">Asst. Prof. in Comp. Sci</p>
+        </div>
+
+        <!-- Hidden (you can extend this in JS as before) -->
+        <!-- Add more faculty with same pattern when needed -->
+    </div>
+    <div class="faculty-btn-wrap">
+        <button id="viewBtn" class="btn">View All Faculty</button>
+    </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+ 
+<footer class="main-footer">
+    <div class="footer-content">
+        <!-- CENTER : Text + Map -->
+        <div class="footer-center">
+            <p>
+                © 2026 Department of Machine Learning<br>
+                LOYOLA ACADEMY Degree & PG College (Autonomous)
+            </p>
+            <div class="footer-map">
+                <iframe
+                    src="https://www.google.com/maps?q=Loyola%20Academy%20Alwal%20Hyderabad&output=embed"
+                    loading="lazy">
+                </iframe>
+            </div>
+        </div>
+
+        <!-- RIGHT : Social Icons -->
+         <div id = "contact">
+        <div class="footer-right">
+            <a href="tel:+918977012915" title="Call"><i class="fas fa-phone"></i></a>
+            <a href="mailto:Info@loyolaacademy.edu.in" title="Email"><i class="fas fa-envelope"></i></a>
+            <a href="#" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.instagram.com/loyola_cs_ml?igsh=MWU1Z2c3bmFvZnlhNw==" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
