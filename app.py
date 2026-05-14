@@ -687,13 +687,14 @@ def faculty_dashboard():
     
     db.close()
 
-    return render_template("faculty-dashboard.html", 
-                         students_acsml=students_acsml,
-                         students_ncsml=students_ncsml,
-                         students_dcsml=students_dcsml,
-                         resumes_acsml=resumes_acsml,
-                         resumes_ncsml=resumes_ncsml,
-                         resumes_dcsml=resumes_dcsml)
+    return render_template("faculty-dashboard.html",
+                       students_acsml=students_acsml,
+                       students_ncsml=students_ncsml,
+                       students_dcsml=students_dcsml,
+                       resumes_acsml=resumes_acsml,
+                       resumes_ncsml=resumes_ncsml,
+                       resumes_dcsml=resumes_dcsml,
+                       session=session)
 
 
 # =====================================================================
