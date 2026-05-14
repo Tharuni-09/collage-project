@@ -352,13 +352,10 @@ def student_dashboard():
 
     return render_template(
         "student-dashboard.html",
-        roll=roll,
-        name=name,
-        department=department,
-        cgpa=cgpa,
-        sgpa=sgpa,
-        attendance=attendance,
+        roll=roll, name=name, department=department,
+        cgpa=cgpa, sgpa=sgpa, attendance=attendance,
         resumes=resumes,
+        session=session  # ← ADD THIS
     )
 
 
