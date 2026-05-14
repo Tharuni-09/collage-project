@@ -202,6 +202,10 @@ def outreach():
 def gallery():
     return render_template("gallery.html")
 
+@app.route("/previous-year-papers")
+def previous_year_papers():
+    return render_template("previous-year-papers.html")  # Create empty HTML later
+
 
 # =====================================================================
 # LOGIN (UID‑BASED)
