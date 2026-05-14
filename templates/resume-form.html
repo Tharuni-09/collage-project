@@ -1,225 +1,101 @@
 {% extends "base.html" %}
-
-{% block title %}Build Professional Resume{% endblock %}
-
+{% block title %}Build Resume{% endblock %}
 {% block content %}
-<div class="resume-form">
-    <h2>Resume Preparation Form</h2>
-    <p class="muted">
-        Fill this form carefully. Your answers will be used to generate a professional PDF resume.
-    </p>
+<div class="page-container">
+    <h2>Resume Builder</h2>
+    <form method="POST" enctype="multipart/form-data" class="resume-form">
+        <section class="form-section">
+            <h3>Personal Info</h3>
+            <input type="text" name="name" placeholder="Full Name *" required>
+            <input type="email" name="email" placeholder="Email *" required>
+            <input type="tel" name="phone" placeholder="Phone *" required>
+            
+            <!-- Country + Pincode -->
+            <div class="form-row">
+                <div class="radio-group">
+                    <label><input type="radio" name="country" value="India" checked> India</label>
+                    <label><input type="radio" name="country" value="USA"> USA</label>
+                    <label><input type="radio" name="country" value="UK"> UK</label>
+                    <label><input type="radio" name="country" value="Other"> Other</label>
+                </div>
+                <input type="text" name="pincode" placeholder="Pincode">
+                <input type="text" name="city" placeholder="City">
+            </div>
+            
+            <!-- Photo Upload -->
+            <input type="file" name="photo" accept="image/*" class="file-input">
+        </section>
 
-    <form method="POST">
-        <div class = "resume-form">
-        <fieldset class="form-section">
-            <legend class="section-title">1. Personal Information</legend>
+        <section class="form-section">
+            <h3>Professional Summary</h3>
+            <textarea name="objective" rows="4" placeholder="Career objective..."></textarea>
+        </section>
 
-            <label class="form-label"><strong>Full Name *</strong></label>
-            <input type="text" name="name" value="{{ name }}" required class="form-input">
+        <section class="form-section">
+            <h3>Work Experience</h3>
+            <select name="work_experience" class="full-width">
+                <option value="">Select Experience Level</option>
+                <option value="No Experience">No Experience</option>
+                <option value="Less than 1 year">Less than 1 year</option>
+                <option value="1-3 years">1-3 years</option>
+                <option value="3-5 years">3-5 years</option>
+                <option value="5-10 years">5-10 years</option>
+                <option value="10+ years">10+ years</option>
+            </select>
+            <textarea name="work_details" rows="4" placeholder="Work history details..."></textarea>
+        </section>
 
-            <label class="form-label"><strong>Phone Number *</strong></label>
-            <input type="text" name="phone" value="{{ phone }}" required class="form-input">
+        <section class="form-section">
+            <h3>Skills</h3>
+            <textarea name="technical_skills" rows="4" placeholder="Python, Flask, SQL, ML..."></textarea>
+        </section>
+        <h3>Education Details</h3>
 
-            <label class="form-label"><strong>Professional Email Address *</strong></label>
-            <input type="email" name="email" value="{{ email }}" required class="form-input">
+<input type="text" name="school_name" placeholder="School Name" required>
+<input type="text" name="school_location" placeholder="School Location" required>
 
-            <label class="form-label"><strong>LinkedIn Profile</strong></label>
-            <input type="url" name="linkedin" value="{{ linkedin }}" placeholder="https://linkedin.com/in/..." class="form-input">
+<div class="radio-group">
+    <label><input type="radio" name="degree_type" value="High School Diploma"> High School Diploma</label>
+    <label><input type="radio" name="degree_type" value="Science"> Science</label>
+    <label><input type="radio" name="degree_type" value="Bachelor of Science"> Bachelor of Science</label>
+    <label><input type="radio" name="degree_type" value="Bachelor of Technology"> Bachelor of Technology</label>
+    <label><input type="radio" name="degree_type" value="Master of Science"> Master of Science</label>
+</div>
 
-            <label class="form-label"><strong>Portfolio / GitHub / Website</strong></label>
-            <input type="url" name="portfolio" value="{{ portfolio }}" placeholder="https://github.com/username" class="form-input">
+        <div class="radio-group">
+    <label><input type="radio" name="grad_month" value="January"> January</label>
+    <label><input type="radio" name="grad_month" value="February"> February</label>
+    <label><input type="radio" name="grad_month" value="March"> March</label>
+    <label><input type="radio" name="grad_month" value="April"> April</label>
+    <label><input type="radio" name="grad_month" value="May"> May</label>
+    <label><input type="radio" name="grad_month" value="June"> June</label>
+    <label><input type="radio" name="grad_month" value="July"> July</label>
+    <label><input type="radio" name="grad_month" value="August"> August</label>
+    <label><input type="radio" name="grad_month" value="September"> September</label>
+    <label><input type="radio" name="grad_month" value="October"> October</label>
+    <label><input type="radio" name="grad_month" value="November"> November</label>
+    <label><input type="radio" name="grad_month" value="December"> December</label>
+</div>
 
-            <label class="form-label"><strong>City & State / Location</strong></label>
-            <input type="text" name="location" value="{{ location }}" class="form-input">
-        </fieldset>
+<div class="radio-group">
+    <label><input type="radio" name="grad_year" value="2024"> 2024</label>
+    <label><input type="radio" name="grad_year" value="2025"> 2025</label>
+    <label><input type="radio" name="grad_year" value="2026"> 2026</label>
+    <label><input type="radio" name="grad_year" value="2027"> 2027</label>
+</div>
 
+<input type="text" name="field_of_study" placeholder="Field of Study, e.g. Machine Learning" required>
 
-        <fieldset class="form-section">
-            <legend class="section-title">2. Career Objective / Summary</legend>
-
-            <label class="form-label"><strong>Career objective (2–3 lines)</strong></label>
-            <textarea name="objective" rows="4" class="form-textarea" placeholder="
-Recent B.Tech CSE graduate with strong problem-solving skills and proficiency in Python and Machine Learning.
-Seeking a Software Developer / Data Analyst role to apply my academic projects and technical skills.
-            ">{{ objective }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">3. Education Details</legend>
-
-            <label class="form-label"><strong>Education (degree, college, CGPA, etc.)</strong></label>
-            <textarea name="education" rows="6" class="form-textarea" placeholder="
-B.Tech in Computer Science and Engineering
-Mahatma Gandhi Institute of Technology, Hyderabad
-CGPA: 8.7 | Year of Graduation: 2026
-
-Intermediate / 12th in MPC
-ABC Junior College, Hyderabad
-Board: Telangana State Board | 2021 | 9.3 CGPA
-            ">{{ education }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">4. Skills</legend>
-
-            <label class="form-label"><strong>Technical Skills</strong> (one skill per line)</label>
-            <textarea name="technical_skills" rows="4" class="form-textarea" placeholder="
-Python
-Machine Learning
-Flask / FastAPI
-SQL (SQLite, MySQL)
-HTML, CSS, JavaScript
-Git, GitHub
-ReportLab
-            ">{{ technical_skills }}</textarea>
-
-            <label class="form-label"><strong>Soft Skills</strong> (one per line)</label>
-            <textarea name="soft_skills" rows="3" class="form-textarea" placeholder="
-Communication
-Teamwork
-Problem Solving
-Time Management
-Leadership
-            ">{{ soft_skills }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">5. Work Experience</legend>
-
-            <label class="form-label"><strong>Work Experience (if any)</strong> (one role per block)</label>
-            <textarea name="work_experience" rows="6" class="form-textarea" placeholder="
-Junior Software Engineer – ABC Tech Pvt. Ltd.
-June 2024 – Dec 2024
-- Developed and maintained REST APIs in Python Flask.
-- Implemented user authentication and data validation.
-            ">{{ work_experience }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">6. Internship Experience</legend>
-
-            <label class="form-label"><strong>Internship Experience</strong> (one per block)</label>
-            <textarea name="internships" rows="6" class="form-textarea" placeholder="
-Summer Intern – XYZ Solutions
-May 2024 – July 2024
-- Worked on a web‑based student management system.
-- Assisted in backend API design and testing.
-            ">{{ internships }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">7. Projects</legend>
-
-            <label class="form-label"><strong>Projects</strong> (title, description, tech, role, results)</label>
-            <textarea name="projects" rows="8" class="form-textarea" placeholder="
-Online Resume Builder (Python, Flask, ReportLab)
-Built a web application for students to generate professional PDF resumes.
-Backend: Flask, SQLite; PDF: ReportLab; Frontend: HTML/CSS/JS.
-
-Stock Price Prediction (Python, ML)
-Used LSTM neural network to predict stock prices; achieved 78% accuracy.
-            ">{{ projects }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">8. Certifications</legend>
-
-            <label class="form-label"><strong>Certifications</strong> (one per line)</label>
-            <textarea name="certifications" rows="5" class="form-textarea" placeholder="
-Python for Data Science and Machine Learning – Udemy
-Completed: Feb 2024
-
-Google Cloud Fundamentals – Coursera
-Completed: Dec 2023
-            ">{{ certifications }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">9. Achievements / Awards</legend>
-
-            <label class="form-label"><strong>Achievements / Awards</strong> (one per line)</label>
-            <textarea name="achievements" rows="5" class="form-textarea" placeholder="
-Won 1st Prize in Coding Hackathon – 2023
-Received Merit Scholarship for CGPA 8.5+
-Participated in Regional Robotics Competition – 2024
-            ">{{ achievements }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">10. Extracurricular Activities</legend>
-
-            <label class="form-label"><strong>Extracurricular Activities</strong> (clubs, events, volunteering, etc.)</label>
-            <textarea name="extracurriculars" rows="4" class="form-textarea" placeholder="
-Member, Computer Science Club (organized workshops)
-Member, Student Council (event management)
-Volunteer – NSS Group (social campaigns)
-            ">{{ extracurriculars }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">11. Languages Known</legend>
-
-            <label class="form-label"><strong>Languages Known</strong> (one per line)</label>
-            <textarea name="languages" rows="4" class="form-textarea" placeholder="
-English (Professional)
-Telugu (Native)
-Hindi (Conversational)
-            ">{{ languages }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">12. Hobbies / Interests</legend>
-
-            <label class="form-label"><strong>Hobbies / Interests</strong> (optional)</label>
-            <textarea name="hobbies" rows="3" class="form-textarea" placeholder="
-Reading technical blogs
-Competitive coding and problem solving
-Open‑source contribution on GitHub
-Fitness and running
-            ">{{ hobbies }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">13. References (Optional)</legend>
-
-            <label class="form-label"><strong>References</strong> (one per line)</label>
-            <textarea name="references" rows="4" class="form-textarea" placeholder="
-Dr. Suresh Reddy
-Professor, CSE Department
-MGIT, Hyderabad
-Email: suresh.reddy@mgit.ac.in | Phone: +91 98765 12345
-            ">{{ references }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">14. Additional Details</legend>
-
-            <label class="form-label"><strong>Additional Details</strong> (availability, location, notice period, etc.)</label>
-            <textarea name="additional_details" rows="4" class="form-textarea" placeholder="
-Availability to Join: After July 2026
-Preferred Location: Hyderabad, Bangalore
-Notice Period: 15 days
-Willingness to Relocate: Yes
-Open to remote and on‑site roles.
-            ">{{ additional_details }}</textarea>
-        </fieldset>
+        <section class="form-section">
+            <h3>Projects & Education</h3>
+            <textarea name="projects" rows="4" placeholder="Key projects, education..."></textarea>
+        </section>
         </div>
 
         <button type="submit" class="btn-primary">Generate Professional Resume PDF</button>
     </form>
 </div>
+<input type="file" name="photo" accept="image/*">
 
 <div class="tips-box">
     <h3>Resume Tips for Freshers</h3>
