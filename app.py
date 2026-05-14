@@ -355,6 +355,25 @@ def student_dashboard():
 
 # =====================================================================
 # FACULTY DEPARTMENT / RESUMES PAGES
+
+@app.route("/debug-dashboard")
+def debug_dashboard():
+    uid = session.get("uid")
+    if not uid or session.get("role") != "faculty":
+        return "Login as faculty first"
+    
+    try:
+        db = get_db()
+        students_ncsml = db.execute("SELECT * FROM students WHERE department = 'NCSML'").fetchall()
+        print("First NCSML student keys:", students_ncsml[0].keys() if students_ncsml else "NO DATA")
+        print("First student type:", type(students_ncsml[0]) if students_ncsml else "EMPTY")
+        db.close()
+        return f"NCSML students: {len(students_ncsml)}<br>Type: {type(students_ncsml[0]) if students_ncsml else 'empty'}"
+    except Exception as e:
+        import traceback
+        return f"ERROR: {str(e)}<br>{traceback.format_exc()}"
+
+
 @app.route("/faculty/department/<dept>")
 def faculty_department(dept):
     uid = session.get("uid")
