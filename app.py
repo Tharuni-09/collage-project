@@ -180,14 +180,14 @@ def get_db():
 # INIT DB SCHEMA
 # =====================================================================
 
-@app.cli.command("init-db")
+@app.before_first_request
 def init_db():
     db = get_db()
-    with open("schema.sql", "r") as f:
-        db.executescript(f.read())
-    db.commit()
+    if db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").fetchone() is None:
+        with open(os.path.join(BASE_DIR, "schema.sql")) as f:
+            db.executescript(f.read())
+        db.commit()
     db.close()
-    print("Initialized database.")
 
 
 # =====================================================================
