@@ -373,44 +373,53 @@ def debug_dashboard():
         return f"ERROR: {str(e)}<br>{traceback.format_exc()}"
 
 
-@app.route("/faculty/department/<dept>")
-def faculty_department(dept):
-    uid = session.get("uid")
-    if not uid or session.get("role") != "faculty":
-        return redirect("/login")
+@app.route("/faculty-dashboard")
+def faculty_dashboard():
+    try:
+        uid = session.get("uid")
+        if not uid or session.get("role") != "faculty":
+            return redirect("/login")
 
-    valid_departments = ["ACSML", "NCSML", "DCSML"]
-    dept_code = dept.upper()
-    if dept_code not in valid_departments:
-        return "Department not found", 404
+        db = get_db()
+        
+        students_acsml = db.execute("SELECT * FROM students WHERE department = 'ACSML'").fetchall()
+        students_ncsml = db.execute("SELECT * FROM students WHERE department = 'NCSML'").fetchall()
+        students_dcsml = db.execute("SELECT * FROM students WHERE department = 'DCSML'").fetchall()
+        
+        resumes_acsml = db.execute("""
+            SELECT r.id, r.uid, r.title, r.pdf_path, r.created_at, s.roll, s.name 
+            FROM resumes r JOIN students s ON r.uid = s.uid 
+            WHERE s.department = 'ACSML'
+        """).fetchall()
+        
+        resumes_ncsml = db.execute("""
+            SELECT r.id, r.uid, r.title, r.pdf_path, r.created_at, s.roll, s.name 
+            FROM resumes r JOIN students s ON r.uid = s.uid 
+            WHERE s.department = 'NCSML'
+        """).fetchall()
+        
+        resumes_dcsml = db.execute("""
+            SELECT r.id, r.uid, r.title, r.pdf_path, r.created_at, s.roll, s.name 
+            FROM resumes r JOIN students s ON r.uid = s.uid 
+            WHERE s.department = 'DCSML'
+        """).fetchall()
+        
+        db.close()
 
-    db = get_db()
-    db.row_factory = sqlite3.Row
-
-    students = db.execute(
-        "SELECT * FROM students WHERE department = ? ORDER BY name",
-        [dept_code]
-    ).fetchall()
-
-    resumes = db.execute(
-        """
-        SELECT r.id, r.uid, r.title, r.pdf_path, r.created_at, s.roll, s.name
-        FROM resumes r
-        JOIN students s ON r.uid = s.uid
-        WHERE s.department = ?
-        ORDER BY r.created_at DESC
-        """,
-        [dept_code]
-    ).fetchall()
-    db.close()
-
-    return render_template(
-        "faculty-department.html",
-        department=dept_code,
-        students=students,
-        resumes=resumes,
-    )
-
+        return render_template("faculty-dashboard.html", 
+                             students_acsml=students_acsml,
+                             students_ncsml=students_ncsml,
+                             students_dcsml=students_dcsml,
+                             resumes_acsml=resumes_acsml,
+                             resumes_ncsml=resumes_ncsml,
+                             resumes_dcsml=resumes_dcsml,
+                             session=session)
+                             
+    except Exception as e:
+        import traceback
+        error_msg = f"ERROR: {str(e)}\n\n{traceback.format_exc()}"
+        print(error_msg)  # Terminal
+        return f"<pre>{error_msg}</pre>"  # Browser shows exact error
 
 @app.route("/faculty/resumes")
 def faculty_resumes():
