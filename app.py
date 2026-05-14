@@ -15,6 +15,10 @@ from reportlab.platypus import (
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "database", "ml_dept.db")
+
 # =====================================================================
 # HELPER FUNCTIONS
 # =====================================================================
@@ -166,8 +170,10 @@ DB_PATH = "database/ml_dept.db"
 
 
 def get_db():
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)  # Auto-create folder
     conn = sqlite3.connect(DB_PATH, timeout=10)
-    return conn  # ← Missing row_factory
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 # =====================================================================
