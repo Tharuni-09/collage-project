@@ -459,7 +459,7 @@ def resume_form():
         return redirect("/login")
 
     db = get_db()
-    student = db.execute("SELECT roll FROM students WHERE uid = ?", [uid]).fetchone()
+    student = db.execute("SELECT roll, name, department FROM students WHERE uid = ?", [uid]).fetchone()
     db.close()
 
     if not student:
@@ -482,74 +482,84 @@ def resume_form():
             bottomMargin=40
         )
         styles = getSampleStyleSheet()
-        styleName = ParagraphStyle(
-            "Name", parent=styles["Title"], fontSize=24, leading=28, spaceAfter=15
+        
+        # Custom styles
+        name_style = ParagraphStyle(
+            "Name", parent=styles["Title"], 
+            fontSize=24, leading=28, 
+            spaceAfter=20, alignment=1  # Center aligned
         )
-        styleSection = ParagraphStyle(
-            "Section",
-            parent=styles["Heading2"],
-            fontSize=12,
-            spaceBefore=15,
-            spaceAfter=8,
-            textColor=colors.darkblue
+        contact_style = ParagraphStyle(
+            "Contact", parent=styles["Normal"], 
+            fontSize=11, leading=14,
+            spaceAfter=20, alignment=1  # Center aligned
         )
-        styleNormal = ParagraphStyle(
-            "Normal", parent=styles["Normal"], fontSize=10, leading=14
+        section_style = ParagraphStyle(
+            "Section", parent=styles["Heading2"],
+            fontSize=14, leading=18,
+            spaceBefore=20, spaceAfter=8,
+            textColor=colors.darkblue,
+            fontName="Helvetica-Bold"
+        )
+        content_style = ParagraphStyle(
+            "Content", parent=styles["Normal"],
+            fontSize=10, leading=14,
+            leftIndent=10
         )
 
         story = []
-        story.append(Paragraph(request.form.get("name", ""), styleName))
-        story.append(
-            Paragraph(
-                f"{request.form.get('email', '')} | "
-                f"{request.form.get('phone', '')} | "
-                f"{request.form.get('location', '')}",
-                styles["BodyText"]
-            )
-        )
-        story.append(Spacer(1, 10))
-        story.append(
-            HRFlowable(color=colors.black, thickness=1, width="100%")
-        )
+        
+        # 1. NAME (Centered, Large)
+        story.append(Paragraph(request.form.get("name", ""), name_style))
+        
+        # 2. CONTACT INFO (Centered)
+        contact = f"{request.form.get('email', '')} | {request.form.get('phone', '')} | {request.form.get('location', '')}"
+        story.append(Paragraph(contact, contact_style))
+        
+        # 3. Horizontal Line
+        story.append(Spacer(1, 15))
+        story.append(HRFlowable(color=colors.black, thickness=1, width="80%", spaceBefore=5, spaceAfter=5))
+        story.append(Spacer(1, 20))
 
-        left_col = [
-            Paragraph("PROFESSIONAL SUMMARY", styleSection),
-            Paragraph(expand_section(request.form.get("objective", ""), "objective"), styleNormal),
-            Paragraph("WORK HISTORY", styleSection),
-            Paragraph(expand_section(request.form.get("work_experience", ""), "work_experience"), styleNormal),
-            Paragraph("PROJECTS", styleSection),
-            Paragraph(expand_section(request.form.get("projects", ""), "projects"), styleNormal),
-        ]
-        right_col = [
-            Paragraph("SKILLS", styleSection),
-            Paragraph(expand_section(request.form.get("technical_skills", ""), "technical_skills"), styleNormal),
-            Paragraph("CERTIFICATIONS", styleSection),
-            Paragraph(expand_section(request.form.get("certifications", ""), "certifications"), styleNormal),
-            Paragraph("EDUCATION", styleSection),
-            Paragraph(expand_section(request.form.get("education", ""), "education"), styleNormal),
+        # 4. SECTIONS IN ORDER (Single Column)
+        sections_data = [
+            ("OBJECTIVE", request.form.get("objective", "")),
+            ("EDUCATION", request.form.get("education", "")),
+            ("SKILLS", request.form.get("technical_skills", "")),
+            ("PROJECTS", request.form.get("projects", "")),
+            ("WORK EXPERIENCE", request.form.get("work_experience", "")),
+            ("CERTIFICATIONS", request.form.get("certifications", "")),
+            ("INTERNSHIPS", request.form.get("internships", ""))
         ]
 
-        table = Table(
-            [[left_col, right_col]],
-            colWidths=[A4[0] * 0.60, A4[0] * 0.35]
-        )
-        table.setStyle(TableStyle([("VALIGN", (0,0), (-1,-1), "TOP")]))
-        story.append(table)
+        for section_title, content in sections_data:
+            if should_print_section(content, content):
+                # Section Header
+                story.append(Paragraph(section_title, section_style))
+                
+                # Processed Content
+                processed_content = elaborate(content, section_title.lower().replace(" ", "_"))
+                if not processed_content:
+                    processed_content = expand_section(content, section_title.lower().replace(" ", "_"))
+                
+                story.append(Paragraph(processed_content, content_style))
+                story.append(Spacer(1, 12))
 
         doc.build(story)
 
-        student_id = student[0]
+        # Save to database
+        student_id, student_name, student_dept = student
         conn = get_db()
         conn.execute(
             "INSERT INTO resumes (student_id, uid, pdf_path, title, created_at) VALUES (?, ?, ?, ?, ?)",
-            [student_id, uid, pdf_path_disk, "Resume", datetime.now()]
+            [student_id, uid, pdf_path_disk, f"{student_name}'s Resume", datetime.now()]
         )
         conn.commit()
         conn.close()
 
         return redirect("/student-dashboard")
 
-    return render_template("resume-form.html")
+    return render_template("resume-form.html", student=student)
 # =====================================================================
 # DOWNLOAD / VIEW RESUME
 # =====================================================================
