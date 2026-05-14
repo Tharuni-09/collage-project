@@ -210,7 +210,7 @@ def gallery():
 
 @app.route("/previous-year-papers")
 def previous_year_papers():
-    return render_template("previous-year-papers.html")  # Create empty HTML later
+    return render_template("previous-year-papers.html", session=session)
 
 
 # =====================================================================
