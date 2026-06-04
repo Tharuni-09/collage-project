@@ -7,20 +7,27 @@ from flask import url_for
 from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import (
-    SimpleDocTemplate,
+    BaseDocTemplate,
+    PageTemplate,
+    Frame,
     Paragraph,
     Spacer,
     Table,
     TableStyle,
-    Flowable,
     HRFlowable,
-    Image
+    FrameBreak,
+    Image,
+    KeepTogether,
+    PageBreak
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY, TA_RIGHT
 from reportlab.pdfbase import pdfform
+from reportlab.lib.units import mm
+
+
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -183,7 +190,10 @@ COMMON_SPELLING_FIXES = {
 def clean_text(text):
     if not text:
         return ""
-    text = text.strip()
+    # Clean and escape for ReportLab Paragraphs
+    text = str(text).strip()
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    text = text.replace("\n", "<br/>")
     for wrong, right in COMMON_SPELLING_FIXES.items():
         text = re.sub(rf"\b{wrong}\b", right, text, flags=re.IGNORECASE)
     text = re.sub(r"\s+", " ", text)
@@ -193,13 +203,11 @@ def clean_text(text):
 def enhance_objective(objective, field_of_study):
     objective = clean_text(objective)
     if not objective:
-        field = field_of_study or "student"
-        return f"Motivated {field.lower()} seeking opportunities to apply strong technical skills in data science, machine learning, and software development."
-
-    objective = polish_objective(objective)
+        field = field_of_study or "Machine Learning"
+        return f"Results-oriented {field} professional with a focus on delivering high-impact technical solutions through advanced machine learning methodologies and scalable software architecture."
     if len(objective.split()) < 15:
         objective = objective.rstrip('.')
-        objective += ", eager to contribute to data-driven projects and innovative teams."
+        objective += ", eager to contribute to innovative teams and dedicated to leveraging data-driven insights to solve complex challenges."
     return objective
 
 
@@ -219,42 +227,72 @@ def describe_project(project_line):
         bullets.append("Implemented collaborative filtering and content-based algorithms.")
         bullets.append("Achieved 85%+ accuracy using matrix factorization techniques.")
         bullets.append("Designed personalized recommendation engine with real-time predictions.")
+        bullets.append("Architected a sophisticated recommendation system utilizing collaborative filtering and matrix factorization to enhance user engagement.")
+        bullets.append("Optimized model performance to achieve 85%+ predictive accuracy across diverse user datasets.")
+        bullets.append("Engineered real-time prediction pipelines for seamless integration into production environments.")
     elif any(word in lower for word in ["sentiment", "emotion", "opinion"]):
         bullets.append("Built NLP pipeline for sentiment analysis with text preprocessing.")
         bullets.append("Trained classifiers with 90%+ accuracy on labeled datasets.")
         bullets.append("Deployed model for real-time social media monitoring.")
+        bullets.append("Developed an advanced NLP pipeline for multi-class sentiment analysis, incorporating custom text preprocessing and tokenization.")
+        bullets.append("Spearheaded the training of neural classifiers, attaining 90%+ accuracy on large-scale labeled datasets.")
+        bullets.append("Leveraged automated monitoring tools to deploy the model for real-time opinion mining and trend analysis.")
     elif any(word in lower for word in ["image", "vision", "cnn", "object detection"]):
         bullets.append("Designed CNN architecture using TensorFlow/PyTorch.")
         bullets.append("Applied data augmentation and transfer learning techniques.")
         bullets.append("Achieved 92%+ accuracy on image classification benchmarks.")
+        bullets.append("Engineered deep learning architectures using CNNs and Transfer Learning to solve complex computer vision challenges.")
+        bullets.append("Optimized training efficiency by implementing data augmentation and automated hyperparameter tuning.")
+        bullets.append("Surpassed industry benchmarks with a 92%+ accuracy rate on competitive image classification tasks.")
     elif any(word in lower for word in ["chatbot", "conversational", "nlp"]):
         bullets.append("Built NLP pipeline for intent recognition and response generation.")
         bullets.append("Integrated with Flask backend for multi-turn dialogue capability.")
         bullets.append("Deployed with context awareness and 95%+ user satisfaction.")
+        bullets.append("Orchestrated the development of a context-aware conversational AI utilizing state-of-the-art NLP techniques for intent recognition.")
+        bullets.append("Streamlined multi-turn dialogue flows through robust backend integration with Flask and RESTful APIs.")
+        bullets.append("Achieved a 95%+ user satisfaction rating by focusing on response latency and conversational accuracy.")
     elif any(word in lower for word in ["forecasting", "prediction", "time series"]):
         bullets.append("Applied ARIMA and Prophet models for time-series forecasting.")
         bullets.append("Achieved RMSE of 5-8% on validation datasets.")
         bullets.append("Built interactive dashboards for trend visualization and insights.")
+        bullets.append("Leveraged ARIMA and Prophet models to deliver high-precision time-series forecasting for critical business metrics.")
+        bullets.append("Minimized forecasting error, achieving a significantly low RMSE of 5-8% across validation cycles.")
+        bullets.append("Designed interactive visualization dashboards to translate complex data trends into actionable strategic insights.")
     elif any(word in lower for word in ["clustering", "segmentation"]):
         bullets.append("Implemented K-means, DBSCAN, and hierarchical clustering.")
         bullets.append("Optimized using silhouette analysis and elbow method.")
         bullets.append("Discovered actionable customer segments improving ROI by 25%.")
+        bullets.append("Implemented unsupervised learning algorithms, including K-means and DBSCAN, to uncover hidden patterns in large datasets.")
+        bullets.append("Refined clustering accuracy through rigorous silhouette analysis and optimized feature engineering.")
+        bullets.append("Identified high-value customer segments, directly contributing to a 25% projected improvement in targeted marketing ROI.")
     elif any(word in lower for word in ["web", "flask", "django", "frontend", "backend"]):
         bullets.append("Built full-stack web application with responsive UI and scalable backend.")
         bullets.append("Implemented authentication, database management, and REST APIs.")
         bullets.append("Deployed with Docker and integrated GitHub CI/CD pipeline.")
+        bullets.append("Spearheaded the design and deployment of a full-stack web application featuring a responsive UI and scalable backend infrastructure.")
+        bullets.append("Integrated secure authentication protocols, efficient database management, and high-performance REST APIs.")
+        bullets.append("Automated the deployment lifecycle using Docker containers and robust CI/CD pipelines.")
     elif any(word in lower for word in ["machine learning", "ml", "deep learning", "neural"]):
         bullets.append("Designed and trained ML models for real-world problem solving.")
         bullets.append("Implemented data preprocessing, feature engineering, and model evaluation.")
         bullets.append("Optimized hyperparameters achieving 88%+ accuracy on test data.")
+        bullets.append("Developed end-to-end machine learning solutions to address real-world business challenges and operational bottlenecks.")
+        bullets.append("Executed comprehensive data preprocessing, advanced feature engineering, and rigorous model evaluation frameworks.")
+        bullets.append("Optimized model reliability and performance, consistently achieving 88%+ accuracy on unseen test data.")
     elif any(word in lower for word in ["automation", "script", "tool", "pipeline"]):
         bullets.append("Automated critical workflows improving productivity by 40%+.")
         bullets.append("Developed robust scripts with error handling and monitoring.")
         bullets.append("Documented thoroughly for easy maintenance and scalability.")
+        bullets.append("Pioneered workflow automation initiatives, resulting in a documented 40%+ increase in operational productivity.")
+        bullets.append("Developed robust, fault-tolerant scripts with integrated error handling and performance monitoring.")
+        bullets.append("Produced comprehensive technical documentation to ensure long-term scalability and ease of maintenance.")
     else:
         bullets.append("Developed a practical solution with focus on usability and performance.")
         bullets.append("Implemented core features using industry best practices and design patterns.")
         bullets.append("Tested rigorously and optimized for production deployment.")
+        bullets.append("Engineered a practical, performance-driven solution tailored to specific user needs and industry standards.")
+        bullets.append("Leveraged industry best practices and modern design patterns to implement core functional modules.")
+        bullets.append("Conducted rigorous stress testing and optimization to ensure stability in production environments.")
 
     return bullets
 
@@ -327,8 +365,17 @@ def login():
     uid = request.form.get("uid")
     password = request.form.get("password")
     role = request.form.get("role")
+    
+    # Detect if request is from AJAX script.js
+    is_ajax = request.is_json
+    if is_ajax:
+        data = request.get_json()
+        uid = data.get("uid") or data.get("username")
+        password = data.get("password")
+        role = data.get("role") or data.get("mode")
 
     if not all([uid, password, role]):
+        if is_ajax: return jsonify({"success": False, "message": "Missing fields"})
         return render_template("login.html", error="Missing fields")
 
     h = hashlib.sha256(password.encode()).hexdigest()
@@ -364,6 +411,7 @@ def login():
     db.close()
 
     if not row:
+        if is_ajax: return jsonify({"success": False, "message": "Invalid UID or User not found"})
         return render_template("login.html", error="Invalid UID - No such user found")
 
     db_uid = row["uid"]
@@ -375,9 +423,11 @@ def login():
     phone = row["phone"]
 
     if db_hash != h:
+        if is_ajax: return jsonify({"success": False, "message": "Invalid password"})
         return render_template("login.html", error="Invalid password")
 
     if db_role != role:
+        if is_ajax: return jsonify({"success": False, "message": "Role mismatch"})
         return render_template("login.html", error="Role mismatch")
 
     session["uid"] = db_uid
@@ -385,10 +435,13 @@ def login():
     session["role"] = db_role
     session["name"] = full_name
 
+    if is_ajax:
+        return jsonify({"success": True, "message": "Login successful!", "role": db_role})
+
     if db_role == "student":
-        return redirect("/student-dashboard")
+        return redirect(url_for("student_dashboard"))
     else:
-        return redirect("/faculty-dashboard")
+        return redirect(url_for("faculty_dashboard"))
 
 
 # =====================================================================
@@ -501,10 +554,10 @@ def forgot_password():
 def student_dashboard():
     uid = session.get("uid")
     if not uid:
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     if session.get("role") != "student":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     db = get_db()
 
@@ -558,7 +611,11 @@ def student_dashboard():
         session=session  # ← ADD THIS
     )
 
-
+@app.route("/resume-form")
+def resume_form():
+    if "uid" not in session:
+        return redirect(url_for("login"))
+    return render_template("form.html", session=session)
 
 # =====================================================================
 # Debug 
@@ -586,11 +643,17 @@ def debug_dashboard():
 @app.route("/faculty/<dept>")
 def faculty_department(dept):
     if session.get("role") != "faculty":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     db = get_db()
     students = db.execute(
-        "SELECT * FROM students WHERE department = ? ORDER BY roll",
+        """
+        SELECT s.*, u.email, u.phone 
+        FROM students s 
+        JOIN users u ON s.uid = u.uid 
+        WHERE s.department = ? 
+        ORDER BY s.roll
+        """,
         [dept]
     ).fetchall()
     resumes = db.execute(
@@ -620,7 +683,7 @@ def faculty_dashboard():
     try:
         uid = session.get("uid")
         if not uid or session.get("role") != "faculty":
-            return redirect("/login")
+            return redirect(url_for("login"))
 
         dept = request.args.get("dept", None)  # from URL: ?dept=ACSML
 
@@ -629,7 +692,13 @@ def faculty_dashboard():
         def get_students_for(department):
             if dept is None or dept == department:
                 return db.execute(
-                    "SELECT * FROM students WHERE department = ? ORDER BY roll",
+                    """
+                    SELECT s.*, u.email, u.phone
+                    FROM students s
+                    JOIN users u ON s.uid = u.uid
+                    WHERE s.department = ?
+                    ORDER BY s.roll
+                    """,
                     [department]
                 ).fetchall()
             return []
@@ -681,16 +750,18 @@ def faculty_dashboard():
 @app.route("/faculty/edit-student/<int:uid>", methods=["GET", "POST"])
 def faculty_edit_student(uid):
     if session.get("role") != "faculty":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     db = get_db()
 
     if request.method == "GET":
         student = db.execute(
             """
-            SELECT uid, roll, name, department, cgpa, sgpa, attendance
-            FROM students
-            WHERE uid = ?
+            SELECT s.uid, s.roll, s.name, s.department, s.cgpa, s.sgpa, s.attendance,
+                   u.email, u.phone
+            FROM students s
+            JOIN users u ON s.uid = u.uid
+            WHERE s.uid = ?
             """,
             [uid]
         ).fetchone()
@@ -705,6 +776,8 @@ def faculty_edit_student(uid):
     department = request.form.get("department")
     roll = request.form.get("roll")
     name = request.form.get("name")
+    email = request.form.get("email")
+    phone = request.form.get("phone")
     cgpa = float(request.form.get("cgpa", 0.0) or 0.0)
     sgpa = float(request.form.get("sgpa", 0.0) or 0.0)
     attendance = int(request.form.get("attendance", 0) or 0)
@@ -715,6 +788,17 @@ def faculty_edit_student(uid):
         return "Missing required fields", 400
 
     try:
+        # Update users table to keep name, email and phone in sync
+        db.execute(
+            """
+            UPDATE users
+            SET name = ?, email = ?, phone = ?
+            WHERE uid = ?
+            """,
+            [name, email, phone, uid]
+        )
+
+        # Update students table
         db.execute(
             """
             UPDATE students
@@ -730,7 +814,7 @@ def faculty_edit_student(uid):
     finally:
         db.close()
 
-    return redirect("/faculty-dashboard")
+    return redirect(url_for("faculty_dashboard"))
 
 
 # =====================================================================
@@ -740,7 +824,7 @@ def faculty_edit_student(uid):
 def faculty_add_student_form():
 
     if session.get("role") != "faculty":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     return render_template("faculty-add-student.html")
 
@@ -752,7 +836,7 @@ def faculty_add_student_form():
 def faculty_add_student():
 
     if session.get("role") != "faculty":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     username = request.form.get("username")
     password = request.form.get("password")
@@ -811,7 +895,7 @@ def faculty_add_student():
     finally:
         db.close()
 
-    return redirect("/faculty-dashboard")
+    return redirect(url_for("faculty_dashboard"))
 # =====================================================================
 # FACULTY DELETE STUDENT SAVE
 # =====================================================================
@@ -820,7 +904,7 @@ def faculty_add_student():
 def faculty_delete_student(roll):
 
     if session.get("role") != "faculty":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     db = get_db()
 
@@ -851,256 +935,333 @@ def faculty_delete_student(roll):
 
     db.close()
 
-    return redirect("/faculty-dashboard")
-
-
+    return redirect(url_for("faculty_dashboard"))
 
 # =====================================================================
 # RESUME TEMPLATE GENERATORS (5 Styles)
 # =====================================================================
-
-def generate_resume_pdf(template_type, form_data, student, full_pdf_path):
-    """Generate resume in selected template style"""
-    
-    doc = SimpleDocTemplate(
-        full_pdf_path,
-        pagesize=A4,
-        rightMargin=40,
-        leftMargin=40,
-        topMargin=35,
-        bottomMargin=35
-    )
-    
+def split_items(text):
+    if not text:
+        return []
+    return [i.strip() for i in re.split(r'[\n,;]+', text) if i.strip()]
+def make_styles(template_type):
     styles = getSampleStyleSheet()
-    
-    # Template-specific styling
-    template_colors = {
-        "classic": {"primary": "#111827", "secondary": "#4b5563", "accent": "#d1d5db"},
-        "modern": {"primary": "#0066cc", "secondary": "#1a7b3d", "accent": "#e8f0fe"},
-        "minimal": {"primary": "#000000", "secondary": "#666666", "accent": "#cccccc"},
-        "academic": {"primary": "#1b3399", "secondary": "#2d5a8c", "accent": "#d9e3f0"},
-        "creative": {"primary": "#d97706", "secondary": "#7c3aed", "accent": "#fef3c7"}
+    body_font = "Times-Roman" if template_type == "academic" else "Helvetica"
+    bold_font = "Times-Bold" if template_type == "academic" else "Helvetica-Bold"
+
+    palette = {
+        "classic": ("#111827", "#4b5563", "#d1d5db"),
+        "modern": ("#0f172a", "#475569", "#cbd5e1"),
+        "minimal": ("#111111", "#52525b", "#e5e7eb"),
+        "academic": ("#1b3399", "#475569", "#bfd0ff"),
+        "creative": ("#7c3aed", "#6b7280", "#ddd6fe"),
     }
-    
-    colors_scheme = template_colors.get(template_type, template_colors["classic"])
-    
-    header_style = ParagraphStyle(
-        'Header',
-        parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=24 if template_type != "creative" else 26,
-        leading=28,
-        alignment=TA_CENTER,
-        textColor=colors.HexColor(colors_scheme["primary"])
-    )
-    
-    subheader_style = ParagraphStyle(
-        'SubHeader',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=10,
-        leading=15,
-        alignment=TA_CENTER,
-        textColor=colors.HexColor(colors_scheme["secondary"])
-    )
-    
-    section_style = ParagraphStyle(
-        'Section',
-        parent=styles['Heading2'],
-        fontName='Helvetica-Bold',
-        fontSize=12 if template_type != "creative" else 13,
-        leading=16,
-        textColor=colors.HexColor(colors_scheme["primary"]),
-        spaceBefore=10,
-        spaceAfter=6,
-    )
-    
-    content_style = ParagraphStyle(
-        'Content',
-        parent=styles['BodyText'],
-        fontName='Helvetica',
-        fontSize=10,
-        leading=15,
-        textColor=colors.black,
-    )
-    
-    story = []
-    
-    # Header
-    story.append(Paragraph(form_data["name"], header_style))
-    
-    contact_fields = [form_data["field_of_study"], form_data["email"], form_data["phone"]]
-    if form_data["city"] or form_data["country"]:
-        contact_fields.append(f"{form_data['city']}, {form_data['country']}")
-    contact_lines = [f for f in contact_fields if f]
-    if form_data["portfolio"]:
-        contact_lines.append(f"GitHub: {form_data['portfolio']}")
-    if form_data["website"]:
-        contact_lines.append(f"LinkedIn: {form_data['website']}")
-    
-    contact = "<br/>".join(contact_lines)
-    story.append(Paragraph(contact, subheader_style))
-    story.append(Spacer(1, 10))
-    
-    if template_type != "minimal":
-        story.append(HRFlowable(width='100%', thickness=0.8, color=colors.HexColor(colors_scheme["accent"])))
+    primary, muted, line = palette.get(template_type, palette["classic"])
+    primary = colors.HexColor(primary)
+    muted = colors.HexColor(muted)
+    line = colors.HexColor(line)
+
+    return {
+        "title": ParagraphStyle("title", parent=styles["Normal"], fontName=bold_font, fontSize=23, leading=27, textColor=primary, alignment=TA_LEFT, spaceAfter=3),
+        "subtitle": ParagraphStyle("subtitle", parent=styles["Normal"], fontName=body_font, fontSize=10.2, leading=13, textColor=muted, spaceAfter=7),
+        "section": ParagraphStyle("section", parent=styles["Heading2"], fontName=bold_font, fontSize=11.2, leading=14, textColor=primary, spaceBefore=6, spaceAfter=5),
+        "body": ParagraphStyle("body", parent=styles["BodyText"], fontName=body_font, fontSize=9.3, leading=12.6, textColor=colors.black),
+        "small": ParagraphStyle("small", parent=styles["BodyText"], fontName=body_font, fontSize=8.6, leading=11, textColor=muted),
+        "center_title": ParagraphStyle("center_title", parent=styles["Normal"], fontName=bold_font, fontSize=24, leading=28, textColor=primary, alignment=TA_CENTER, spaceAfter=2),
+        "center_sub": ParagraphStyle("center_sub", parent=styles["Normal"], fontName=body_font, fontSize=10, leading=12, textColor=muted, alignment=TA_CENTER),
+        "right_small": ParagraphStyle("right_small", parent=styles["Normal"], fontName=body_font, fontSize=8.7, leading=11, textColor=muted, alignment=TA_RIGHT),
+        "line": line,
+        "primary": primary,
+        "muted": muted,
+    }
+
+def header_band(canvas, doc, form_data, template_type):
+    canvas.saveState()
+    w, h = A4
+    name = clean_text(form_data.get("name"))
+
+    if template_type == "modern":
+        canvas.setFillColor(colors.HexColor("#0f172a"))
+        canvas.rect(0, h - 52, w, 52, stroke=0, fill=1)
+        canvas.setFillColor(colors.white)
+        canvas.setFont("Helvetica-Bold", 18)
+        canvas.drawString(18 * mm, h - 28, name)
+        canvas.setFont("Helvetica", 9)
+        canvas.drawRightString(w - 18 * mm, h - 28, clean_text(form_data.get("field_of_study")))
+
+    elif template_type == "academic":
+        canvas.setStrokeColor(colors.HexColor("#1b3399"))
+        canvas.setLineWidth(1.4)
+        canvas.line(doc.leftMargin, h - 22, w - doc.rightMargin, h - 22)
+        canvas.setFont("Times-Bold", 16)
+        canvas.setFillColor(colors.HexColor("#1b3399"))
+        canvas.drawCentredString(w / 2, h - 15, name)
+
+    elif template_type == "creative":
+        canvas.setFillColor(colors.HexColor("#7c3aed"))
+        canvas.rect(0, h - 60, w, 60, stroke=0, fill=1)
+        canvas.setFillColor(colors.white)
+        canvas.setFont("Helvetica-Bold", 18)
+        canvas.drawString(18 * mm, h - 31, name)
+        canvas.setFont("Helvetica", 9.5)
+        canvas.drawString(18 * mm, h - 44, clean_text(form_data.get("field_of_study")))
+
+    elif template_type == "minimal":
+        canvas.setStrokeColor(colors.HexColor("#111111"))
+        canvas.line(25 * mm, h - 24, w - 25 * mm, h - 24)
+
     else:
-        story.append(HRFlowable(width='100%', thickness=1.0, color=colors.black))
-    
-    story.append(Spacer(1, 10))
-    
-    # Professional Summary
-    summary_text = enhance_objective(form_data["objective"], form_data["field_of_study"])
-    story.append(Paragraph("PROFESSIONAL SUMMARY", section_style))
-    story.append(Paragraph(summary_text, content_style))
-    story.append(Spacer(1, 10))
-    
-    # Education
-    story.append(Paragraph("EDUCATION", section_style))
-    education_text = f"""
-    <b>{form_data['school_name']}</b><br/>
-    {form_data['degree_type'] or 'Bachelor of Science'} in {form_data['field_of_study']}<br/>
-    {form_data['school_location']}<br/>
-    {('Expected Graduation: ' + form_data['grad_year']) if form_data['grad_year'] else ''}
-    {('<br/>Score: ' + form_data['school_percentage']) if form_data['school_percentage'] else ''}
-    """
-    story.append(Paragraph(education_text, content_style))
-    story.append(Spacer(1, 10))
-    
-    # Technical Skills
-    if form_data["technical_skills"].strip():
-        story.append(Paragraph("TECHNICAL SKILLS", section_style))
-        skills_list = [skill.strip() for skill in re.split(r'[\n,]+', form_data["technical_skills"]) if skill.strip()]
-        skills_text = "<br/>".join(f"• {skill}" for skill in skills_list)
-        story.append(Paragraph(skills_text, content_style))
-        story.append(Spacer(1, 10))
-    
-    if form_data["languages"].strip():
-        story.append(Paragraph("LANGUAGES", section_style))
-        language_list = [lang.strip() for lang in re.split(r'[\n,]+', form_data["languages"]) if lang.strip()]
-        story.append(Paragraph("<br/>".join(f"• {lang}" for lang in language_list), content_style))
-        story.append(Spacer(1, 10))
-    
-    # Projects
-    project_lines = parse_projects(form_data["projects"])
-    if project_lines:
-        story.append(Paragraph("PROJECTS", section_style))
-        for index, project in enumerate(project_lines, 1):
-            project_bullets = describe_project(project)
-            project_text = f"<b>{index}. {project}</b><br/>"
-            project_text += "<br/>".join(f"• {bullet}" for bullet in project_bullets)
-            story.append(Paragraph(project_text, content_style))
-            story.append(Spacer(1, 8))
-    
-    # Internships
-    if form_data["internships"].strip():
-        story.append(Paragraph("INTERNSHIPS", section_style))
-        story.append(Paragraph(form_data["internships"].replace("\\n", "<br/>"), content_style))
-        story.append(Spacer(1, 10))
-    
-    # Certifications
-    if form_data["certifications"].strip():
-        story.append(Paragraph("CERTIFICATIONS", section_style))
-        for cert in form_data["certifications"].split("\\n"):
-            cert = cert.strip()
-            if cert:
-                story.append(Paragraph(f"• {cert}", content_style))
-    
+        canvas.setStrokeColor(colors.HexColor("#d1d5db"))
+        canvas.line(doc.leftMargin, h - 26, w - doc.rightMargin, h - 26)
+    canvas.restoreState()
+
+def section_box(title, text, styles, fill=None, width=1):
+    text = text.replace('\n', '<br/>')
+    data = [[Paragraph(f"<b>{title}</b>", styles["body"])], [Paragraph(text, styles["small"])]]
+    t = Table(data, colWidths=[None])
+    ts = [
+        ("BOX", (0, 0), (-1, -1), width, styles["line"]),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+    ]
+    if fill:
+        ts.append(("BACKGROUND", (0, 0), (-1, -1), fill))
+    t.setStyle(TableStyle(ts))
+    return t
+
+def build_story_common(form_data, styles):
+    story = []
+    story.append(Paragraph("PROFESSIONAL SUMMARY", styles["section"]))
+    story.append(Paragraph(enhance_objective(form_data.get("objective"), form_data.get("field_of_study")), styles["body"]))
+    story.append(Spacer(1, 5))
+
+    story.append(Paragraph("EDUCATION", styles["section"]))
+    edu = f"<b>{clean_text(form_data.get('school_name'))}</b><br/>{clean_text(form_data.get('degree_type'))} in {clean_text(form_data.get('field_of_study'))}<br/>{clean_text(form_data.get('school_location'))}<br/>Graduation Year: {clean_text(form_data.get('grad_year'))}"
+    if form_data.get("school_percentage"):
+        edu += f"<br/>Score: {clean_text(form_data.get('school_percentage'))}"
+    story.append(Paragraph(edu, styles["body"]))
+    story.append(Spacer(1, 5))
+    return story
+
+def generate_resume_pdf(template_type, form_data, full_pdf_path):
+    template_type = (template_type or "classic").lower()
+    if template_type not in ["classic", "modern", "minimal", "academic", "creative"]:
+        template_type = "classic"
+
+    styles = make_styles(template_type)
+
+    def on_page(canvas, doc):
+        header_band(canvas, doc, form_data, template_type)
+        canvas.saveState()
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.HexColor("#6b7280"))
+        canvas.drawRightString(A4[0] - doc.rightMargin, 8 * mm, f"Page {doc.page}")
+        canvas.restoreState()
+
+    if template_type == "modern":
+        doc = BaseDocTemplate(
+            full_pdf_path, pagesize=A4,
+            leftMargin=12*mm, rightMargin=12*mm, topMargin=58*mm, bottomMargin=15*mm
+        )
+        sidebar_w = 60 * mm
+        gap = 6 * mm
+        main_w = A4[0] - doc.leftMargin - doc.rightMargin - sidebar_w - gap
+        frame_h = A4[1] - doc.topMargin - doc.bottomMargin
+
+        left_frame = Frame(doc.leftMargin, doc.bottomMargin, sidebar_w, frame_h, id="sidebar", showBoundary=0)
+        right_frame = Frame(doc.leftMargin + sidebar_w + gap, doc.bottomMargin, main_w, frame_h, id="main", showBoundary=0)
+        doc.addPageTemplates([PageTemplate(id="modern", frames=[left_frame, right_frame], onPage=on_page)])
+
+        story = []
+        # Sidebar Content
+        if form_data.get('photo_path') and os.path.exists(form_data['photo_path']):
+            try:
+                img = Image(form_data['photo_path'], width=38*mm, height=38*mm)
+                story.append(img)
+                story.append(Spacer(1, 12))
+            except:
+                pass
+
+        story.append(Paragraph(f"<b>{clean_text(form_data.get('name'))}</b>", styles["title"]))
+        story.append(Paragraph(clean_text(form_data.get("field_of_study") or "Professional"), styles["subtitle"]))
+        
+        story.append(Paragraph("PROFILE", styles["section"]))
+        story.append(Paragraph(enhance_objective(form_data.get("objective"), form_data.get("field_of_study")), styles["body"]))
+        story.append(Spacer(1, 4))
+        story.append(Paragraph("CONTACT", styles["section"]))
+        story.append(Paragraph(
+            "<br/>".join([
+                f"Email: {clean_text(form_data.get('email'))}",
+                f"Phone: {clean_text(form_data.get('phone'))}",
+                f"Location: {clean_text(form_data.get('city'))}, {clean_text(form_data.get('country'))}",
+            ]),
+            styles["small"]
+        ))
+        story.append(Spacer(1, 4))
+        story.append(Paragraph("SKILLS", styles["section"]))
+        skills = "<br/>".join(f"• {clean_text(x)}" for x in split_items(form_data.get("technical_skills")))
+        story.append(Paragraph(skills or "N/A", styles["small"]))
+        story.append(Spacer(1, 4))
+        story.append(Paragraph("LANGUAGES", styles["section"]))
+        langs = "<br/>".join(f"• {clean_text(x)}" for x in split_items(form_data.get("languages")))
+        story.append(Paragraph(langs or "N/A", styles["small"]))
+
+        story.append(FrameBreak())
+        story.extend(build_story_common(form_data, styles))
+
+        projects = parse_projects(form_data.get("projects"))
+        if projects:
+            story.append(Paragraph("PROJECTS", styles["section"]))
+            for p in projects:
+                bullets = describe_project(p)
+                txt = f"<b>{clean_text(p)}</b><br/>" + "<br/>".join(f"• {clean_text(b)}" for b in bullets)
+                story.append(Paragraph(txt, styles["body"]))
+                story.append(Spacer(1, 6))
+
+        if form_data.get("internships"):
+            story.append(Paragraph("INTERNSHIPS", styles["section"]))
+            story.append(Paragraph(clean_text(form_data.get("internships")), styles["body"]))
+
+        if form_data.get("certifications"):
+            story.append(Paragraph("CERTIFICATIONS", styles["section"]))
+            story.append(Paragraph("<br/>".join(f"• {clean_text(x)}" for x in split_items(form_data.get("certifications"))), styles["body"]))
+
+        doc.build(story)
+        return
+
+    doc = BaseDocTemplate(
+        full_pdf_path, pagesize=A4,
+        leftMargin=15*mm, rightMargin=15*mm, topMargin=26*mm, bottomMargin=15*mm
+    )
+    story = []
+
+    # Classic layout photo
+    if template_type in ["classic", "creative"] and form_data.get('photo_path'):
+        try:
+            img = Image(form_data['photo_path'], width=30*mm, height=30*mm)
+            story.append(img)
+            story.append(Spacer(1, 10))
+        except:
+            pass
+
+    # Minimal layout photo support
+    if template_type == "minimal" and form_data.get('photo_path'):
+        try:
+            img = Image(form_data['photo_path'], width=25*mm, height=25*mm)
+            story.append(img)
+            story.append(Spacer(1, 5))
+        except:
+            pass
+
+    if template_type == "classic":
+        story.append(Paragraph(clean_text(form_data.get("name")), styles["title"]))
+        contact_line = f"{clean_text(form_data.get('field_of_study'))} | {clean_text(form_data.get('email'))} | {clean_text(form_data.get('phone'))}"
+        if form_data.get("city"):
+            contact_line += f" | {clean_text(form_data.get('city'))}"
+        story.append(Paragraph(contact_line, styles["subtitle"]))
+        story.append(HRFlowable(width="100%", thickness=0.8, color=styles["line"]))
+        story.append(Spacer(1, 5))
+
+    elif template_type == "minimal":
+        story.append(Paragraph(clean_text(form_data.get("name")), styles["center_title"]))
+        story.append(Paragraph(clean_text(form_data.get("field_of_study")), styles["center_sub"]))
+        story.append(Spacer(1, 5))
+        story.append(HRFlowable(width="42%", thickness=1, color=styles["line"]))
+        story.append(Spacer(1, 7))
+
+    elif template_type == "academic":
+        story.append(Paragraph(clean_text(form_data.get("name")), styles["center_title"]))
+        story.append(Paragraph("Academic Resume", styles["center_sub"]))
+        story.append(Spacer(1, 5))
+        story.append(HRFlowable(width="100%", thickness=1, color=styles["line"]))
+        story.append(Spacer(1, 7))
+
+    elif template_type == "creative":
+        story.append(Paragraph(f"<font color='#7c3aed'><b>{clean_text(form_data.get('name'))}</b></font>", styles["title"]))
+        story.append(Paragraph(clean_text(form_data.get("field_of_study")), styles["subtitle"]))
+        story.append(HRFlowable(width="100%", thickness=1.2, color=styles["line"]))
+        story.append(Spacer(1, 7))
+
+    story.extend(build_story_common(form_data, styles))
+
+    if form_data.get("technical_skills"):
+        if template_type == "creative":
+            story.append(section_box("TECHNICAL SKILLS", " • ".join(clean_text(x) for x in split_items(form_data.get("technical_skills"))), styles, fill=colors.HexColor("#f5f3ff")))
+            story.append(Spacer(1, 5))
+        else:
+            story.append(Paragraph("TECHNICAL SKILLS", styles["section"]))
+            story.append(Paragraph(" • ".join(clean_text(x) for x in split_items(form_data.get("technical_skills"))), styles["body"]))
+            story.append(Spacer(1, 5))
+
+    if form_data.get("languages"):
+        story.append(Paragraph("LANGUAGES", styles["section"]))
+        if template_type == "minimal":
+            data = [[Paragraph("Languages", styles["body"]), Paragraph(" • ".join(clean_text(x) for x in split_items(form_data.get("languages"))), styles["small"])]]
+            t = Table(data, colWidths=[35*mm, None])
+            t.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f8fafc")),
+                ("BOX", (0, 0), (-1, -1), 0.8, styles["line"]),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ]))
+            story.append(t)
+        else:
+            story.append(Paragraph(" • ".join(clean_text(x) for x in split_items(form_data.get("languages"))), styles["body"]))
+        story.append(Spacer(1, 5))
+
+    projects = parse_projects(form_data.get("projects"))
+    if projects:    
+        story.append(Paragraph("PROJECTS", styles["section"]))
+        for i, p in enumerate(projects, 1):
+            bullets = describe_project(p)
+            txt = f"<b>{clean_text(p)}</b><br/>" + "<br/>".join(f"• {clean_text(b)}" for b in bullets)
+            if template_type in ["modern", "creative"]:
+                story.append(section_box(f"Project {i}", txt, styles, fill=colors.HexColor("#eff6ff") if template_type == "modern" else colors.HexColor("#faf5ff")))
+            else:
+                story.append(Paragraph(txt, styles["body"]))
+            story.append(Spacer(1, 4))
+    if form_data.get("internships"):
+        story.append(Paragraph("INTERNSHIPS", styles["section"]))
+        story.append(Paragraph(clean_text(form_data.get("internships")), styles["body"]))
+        story.append(Spacer(1, 5))
+    if form_data.get("certifications"):
+        story.append(Paragraph("CERTIFICATIONS", styles["section"]))
+        certs = "<br/>".join(f"• {clean_text(x)}" for x in split_items(form_data.get("certifications")))
+        story.append(Paragraph(certs, styles["body"]))
+
+    doc.addPageTemplates([
+        PageTemplate(
+            id=template_type, 
+            frames=[Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="main")], 
+            onPage=on_page)
+    ])
     doc.build(story)
 
-# =====================================================================
-# RESUME FORM
-# =====================================================================
-@app.route("/resume-form", methods=["GET", "POST"])
-def resume_form():
+@app.route("/generate", methods=["POST"])
+def generate():
+    form_data = request.form.to_dict(flat=True)
+    template_choice = form_data.get("template", "classic")
+    out_dir = "output"
+    os.makedirs(out_dir, exist_ok=True)
+    filename = f"{clean_text(form_data.get('name') or 'resume').replace(' ', '_')}_{template_choice}.pdf"
+    
+    # Handle optional profile photo
+    photo = request.files.get("profile_photo")
+    if photo and photo.filename:
+        photo_path = os.path.join(out_dir, f"temp_photo_{session.get('uid', 'anon')}.png")
+        photo.save(photo_path)
+        form_data['photo_path'] = photo_path
 
-    uid = session.get("uid")
+    full_pdf_path = os.path.join(out_dir, filename)
+    generate_resume_pdf(template_choice, form_data, full_pdf_path)
+    return send_file(full_pdf_path, as_attachment=True, download_name=filename, mimetype="application/pdf")
 
-    if not uid or session.get("role") != "student":
-        return redirect("/login")
-
-    db = get_db()
-
-    student = db.execute(
-        "SELECT uid, roll, name, department FROM students WHERE uid = ?",
-        [uid]
-    ).fetchone()
-
-    db.close()
-
-    if not student:
-        return "Student profile not found", 404
-
-    if request.method == "POST":
-
-        # Get form data
-        pdf_folder = os.path.join(app.static_folder, "resumes")
-        os.makedirs(pdf_folder, exist_ok=True)
-
-        pdf_name = f"resume_{uid}_{int(datetime.now().timestamp())}.pdf"
-        pdf_path_disk = os.path.join("static", "resumes", pdf_name)
-        full_pdf_path = os.path.join(app.root_path, pdf_path_disk)
-
-        # Collect form data
-        form_data = {
-            "name": clean_text(request.form.get("name", "")),
-            "email": clean_text(request.form.get("email", "")),
-            "phone": clean_text(request.form.get("phone", "")),
-            "city": clean_text(request.form.get("city", "")),
-            "country": clean_text(request.form.get("country", "")),
-            "objective": request.form.get("objective", ""),
-            "technical_skills": clean_text(request.form.get("technical_skills", "")),
-            "projects": request.form.get("projects", ""),
-            "certifications": request.form.get("certifications", ""),
-            "internships": clean_text(request.form.get("internships", "")),
-            "school_name": clean_text(request.form.get("school_name", "")),
-            "school_location": clean_text(request.form.get("school_location", "")),
-            "field_of_study": clean_text(request.form.get("field_of_study", "")),
-            "grad_year": clean_text(request.form.get("graduation_year", "")),
-            "portfolio": clean_text(request.form.get("portfolio", "")),
-            "website": clean_text(request.form.get("website", "")),
-            "degree_type": clean_text(request.form.get("degree_type", "")),
-            "school_percentage": clean_text(request.form.get("school_percentage", "")),
-            "languages": clean_text(request.form.get("languages", "")),
-        }
-
-        # Get selected template (default to classic)
-        template_type = request.form.get("template", "classic").lower()
-        if template_type not in ["classic", "modern", "minimal", "academic", "creative"]:
-            template_type = "classic"
-
-        # Generate PDF with selected template
-        generate_resume_pdf(template_type, form_data, student, full_pdf_path)
-
-        # Save to database
-        student_uid, roll, student_name, dept = student
-
-        conn = get_db()
-
-        conn.execute(
-            """
-            INSERT INTO resumes
-            (student_id, uid, pdf_path, title, created_at)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            [
-                student_uid,
-                uid,
-                pdf_path_disk,
-                f"{student_name}'s Resume ({template_type.title()})",
-                datetime.now()
-            ]
-        )
-
-        conn.commit()
-        conn.close()
-
-        return redirect("/student-dashboard")
-
-    return render_template(
-        "resume-form.html",
-        student=student
-    )
 
 # =====================================================================
 # DOWNLOAD 
@@ -1161,7 +1322,7 @@ def view_resume(resume_id):
 @app.route("/faculty/resumes")
 def faculty_resumes():
     if session.get("role") != "faculty":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     db = get_db()
 
@@ -1189,7 +1350,7 @@ def faculty_resumes():
 @app.route("/delete-resume", methods=["POST"])
 def delete_resume():
     if "uid" not in session:
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     resume_id_str = request.form.get("resume_id")
     if not resume_id_str:
@@ -1222,7 +1383,7 @@ def delete_resume():
     db.commit()
     db.close()
 
-    return redirect("/student-dashboard")
+    return redirect(url_for("student_dashboard"))
 
 # =====================================================================
 # STUDENT DETAILS
@@ -1231,7 +1392,7 @@ def delete_resume():
 @app.route("/student-details/<int:student_uid>")
 def student_details(student_uid):
     if session.get("role") != "faculty":
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     db = get_db()
     db.row_factory = sqlite3.Row
@@ -1287,7 +1448,7 @@ def check_auth():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect("/login")
+    return redirect(url_for("login"))
 
 
 # =====================================================================

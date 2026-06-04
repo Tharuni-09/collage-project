@@ -1,53 +1,90 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Student - ML Dept</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="topnav">
+        <div class="nav-left">
+            <div class="nav-logo">ML Dept</div>
+            <span>Department of Machine Learning <br>
+                <p>Loyola Academy, Degree and PG College</p>
+            </span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="user"><a href="{{ url_for('faculty_dashboard') }}">Faculty Dashboard</a></li>
+            <li class="logout"><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
 
-{% block title %}Edit Student{% endblock %}
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">Faculty Menu</div>
+            <ul class="sidebar-nav-links">
+                <li><a href="{{ url_for('faculty_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('faculty_resumes') }}"><i class="fas fa-file-pdf"></i> View Resumes</a></li>
+                <li><a href="{{ url_for('faculty_add_student_form') }}"><i class="fas fa-user-plus"></i> Add Student</a></li>
+            </ul>
+        </aside>
 
-{% block content %}
-<h1>Edit Student</h1>
-
-<form method="post" action="{{ url_for('faculty_edit_student', uid=student.uid) }}">
-
-    <div>
-        <label>UID</label>
-        <input type="text" value="{{ student.uid }}" disabled>
+        <main class="main-content">
+            <div class="page-container">
+                <h2 class="section-title">Edit Student: {{ student.name }}</h2>
+                
+                <div class="detail-section">
+                    <form action="{{ url_for('faculty_edit_student', uid=student.uid) }}" method="POST" class="form-stacked">
+                        <div class="detail-grid">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" name="name" value="{{ student.name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Roll Number</label>
+                                <input type="text" name="roll" value="{{ student.roll }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <select name="department" required>
+                                    <option value="ACSML" {% if student.department == 'ACSML' %}selected{% endif %}>ACSML</option>
+                                    <option value="NCSML" {% if student.department == 'NCSML' %}selected{% endif %}>NCSML</option>
+                                    <option value="DCSML" {% if student.department == 'DCSML' %}selected{% endif %}>DCSML</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" value="{{ student.email or '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text" name="phone" value="{{ student.phone or '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>CGPA</label>
+                                <input type="number" step="0.01" name="cgpa" value="{{ student.cgpa }}">
+                            </div>
+                            <div class="form-group">
+                                <label>SGPA</label>
+                                <input type="number" step="0.01" name="sgpa" value="{{ student.sgpa }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Attendance (%)</label>
+                                <input type="number" name="attendance" value="{{ student.attendance }}">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn-primary">Update Student</button>
+                            <a href="{{ url_for('faculty_dashboard') }}" class="btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <div>
-        <label>Roll</label>
-        <input type="text" name="roll" value="{{ student.roll }}" required>
-    </div>
-
-    <div>
-        <label>Name</label>
-        <input type="text" name="name" value="{{ student.name }}" required>
-    </div>
-
-    <div>
-        <label>Department</label>
-        <select name="department" required>
-            <option value="ACSML" {% if student.department == "ACSML" %}selected{% endif %}>ACSML</option>
-            <option value="NCSML" {% if student.department == "NCSML" %}selected{% endif %}>NCSML</option>
-            <option value="DCSML" {% if student.department == "DCSML" %}selected{% endif %}>DCSML</option>
-        </select>
-    </div>
-
-    <div>
-        <label>CGPA</label>
-        <input type="number" step="0.01" name="cgpa" value="{{ student.cgpa or 0.0 }}" required>
-    </div>
-
-    <div>
-        <label>SGPA</label>
-        <input type="number" step="0.01" name="sgpa" value="{{ student.sgpa or 0.0 }}" required>
-    </div>
-
-    <div>
-        <label>Attendance</label>
-        <input type="number" name="attendance" value="{{ student.attendance or 0 }}" required>
-    </div>
-
-    <button type="submit">Update Student</button>
-    <a href="{{ url_for('faculty_dashboard') }}">Cancel</a>
-
-</form>
-{% endblock %}
+</body>
+</html>

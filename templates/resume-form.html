@@ -24,23 +24,23 @@
             
             <div class="template-previews">
               <div class="preview" data-template="classic">
-                <img src="{{ url_for('static', filename='images/template_classic.svg') }}" alt="Classic preview">
+                <img src="{{ url_for('static', filename='images/template_classic.svg') }}" alt="Classic preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
                 <div class="preview-label">Classic</div>
               </div>
               <div class="preview" data-template="modern">
-                <img src="{{ url_for('static', filename='images/template_modern.svg') }}" alt="Modern preview">
+                <img src="{{ url_for('static', filename='images/template_modern.svg') }}" alt="Modern preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
                 <div class="preview-label">Modern</div>
               </div>
               <div class="preview" data-template="minimal">
-                <img src="{{ url_for('static', filename='images/template_minimal.svg') }}" alt="Minimal preview">
+                <img src="{{ url_for('static', filename='images/template_minimal.svg') }}" alt="Minimal preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
                 <div class="preview-label">Minimal</div>
               </div>
               <div class="preview" data-template="academic">
-                <img src="{{ url_for('static', filename='images/template_academic.svg') }}" alt="Academic preview">
+                <img src="{{ url_for('static', filename='images/template_academic.svg') }}" alt="Academic preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
                 <div class="preview-label">Academic</div>
               </div>
               <div class="preview" data-template="creative">
-                <img src="{{ url_for('static', filename='images/template_creative.svg') }}" alt="Creative preview">
+                <img src="{{ url_for('static', filename='images/template_creative.svg') }}" alt="Creative preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
                 <div class="preview-label">Creative</div>
               </div>
             </div>
@@ -56,13 +56,6 @@
                 });
               });
             </script>
-            <style>
-              .template-previews { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-              .template-previews .preview { width: 110px; cursor: pointer; text-align: center; border-radius: 6px; overflow: hidden; border: 1px solid #e6e6e6; background: #fff; }
-              .template-previews .preview img { width: 100%; height: auto; display: block; }
-              .template-previews .preview .preview-label { padding: 6px 4px; font-size: 12px; color: #374151; }
-              .template-previews .preview.selected { box-shadow: 0 6px 18px rgba(0,0,0,0.12); transform: translateY(-4px); }
-            </style>
           </div>
         </div>
       </section>

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="resume-form-wrap">
+    <h1 class="page-title">Resume Builder</h1>
+    <p class="page-subtitle">Enter your details and choose a template to generate your PDF resume.</p>
+
+    <form action="{{ url_for('generate') }}" method="POST" enctype="multipart/form-data" class="resume-form">
+        <div class="form-section">
+            <h3>1. Select Template</h3>
+            <div class="template-previews">
+                <label class="preview">
+                    <input type="radio" name="template" value="classic" checked>
+                    <div class="preview-label">Classic ATS</div>
+                </label>
+                <label class="preview">
+                    <input type="radio" name="template" value="modern">
+                    <div class="preview-label">Modern Sidebar</div>
+                </label>
+                <label class="preview">
+                    <input type="radio" name="template" value="minimal">
+                    <div class="preview-label">Minimalist</div>
+                </label>
+                <label class="preview">
+                    <input type="radio" name="template" value="academic">
+                    <div class="preview-label">Academic</div>
+                </label>
+                <label class="preview">
+                    <input type="radio" name="template" value="creative">
+                    <div class="preview-label">Creative</div>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>2. Personal Details</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" value="{{ session.get('name', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Profile Photo (Optional)</label>
+                    <input type="file" name="profile_photo" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city">
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" name="country" value="India">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>3. Education</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>University/College</label>
+                    <input type="text" name="school_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Degree (e.g., B.Tech)</label>
+                    <input type="text" name="degree_type">
+                </div>
+                <div class="form-group">
+                    <label>Field of Study</label>
+                    <input type="text" name="field_of_study" placeholder="e.g. Machine Learning">
+                </div>
+                <div class="form-group">
+                    <label>Graduation Year</label>
+                    <input type="text" name="grad_year">
+                </div>
+                <div class="form-group">
+                    <label>Percentage/CGPA</label>
+                    <input type="text" name="school_percentage">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="school_location">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>4. Experience & Skills</h3>
+            <div class="form-group full-width">
+                <label>Professional Objective</label>
+                <textarea name="objective" rows="3"></textarea>
+            </div>
+            <div class="form-group full-width">
+                <label>Technical Skills (comma separated)</label>
+                <input type="text" name="technical_skills" placeholder="Python, SQL, PyTorch...">
+            </div>
+            <div class="form-group full-width">
+                <label>Projects (one per line)</label>
+                <textarea name="projects" rows="4" placeholder="Enter project names..."></textarea>
+            </div>
+            <div class="form-group full-width">
+                <label>Languages & Certifications</label>
+                <input type="text" name="languages" placeholder="English, Hindi, AWS Certified...">
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary full-width">Generate Resume PDF</button>
+    </form>
+</div>
+{% endblock %}

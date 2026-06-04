@@ -27,9 +27,12 @@
                     <td>{{ s['name'] }}</td>
                     <td>{{ s['cgpa'] }}</td>
                     <td>{{ s['attendance'] }}%</td>
-                    <td>
+                    <td style="display: flex; gap: 6px; justify-content: center;">
                         <a href="{{ url_for('student_details', student_uid=s['uid']) }}" class="btn-view">
-                            View Details
+                            View
+                        </a>
+                        <a href="{{ url_for('faculty_edit_student', uid=s['uid']) }}" class="btn-edit">
+                            Edit
                         </a>
                     </td>
                 </tr>

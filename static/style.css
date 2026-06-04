@@ -114,6 +114,12 @@ section:nth-of-type(even){
     height: 100%;
     padding: 0 30px;
 }
+.main-logo {
+    height: 80px;
+    width: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+}
 .nav-left {
     display: flex;
     align-items: center;
@@ -773,50 +779,138 @@ section:nth-of-type(even){
   }
 }
 
-/* ---------------- Faculty Cards ---------------- */
-
-.faculty_det{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 25px;
-}
-.faculty-card{
-    height: 260px;
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
+/* Faculty Section Styling */
+#faculty {
+    padding: 80px 0;
+    background-color: #fdfdfe;
     text-align: center;
+}
+
+#faculty h2 {
+    font-size: 32px;
+    color: #0a1f44;
+    margin-bottom: 50px;
+    position: relative;
+    display: inline-block;
+}
+
+.faculty_det {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.faculty-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #f0f4f8;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    transition: all 0.25s ease;
+    height: 280px;
+    text-align: center;
 }
-.faculty-card img{
-    width: 80px;
-    height: 80px;
+
+.faculty-card img {
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    margin: 0 auto 12px auto;
-    border: 3px solid #ddd;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 4px solid #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
-.faculty-card:hover{
-    background: linear-gradient(135deg, #0072ff, #00c6ff);
-    transform: translateY(-6px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+
+.faculty-card h3 {
+    font-size: 18px;
+    color: #0a1f44;
+    margin-bottom: 8px;
+    font-weight: 700;
 }
-.faculty-card:hover h3,
-.faculty-card:hover .role{
-    color: #fff;
+
+.faculty-card .role {
+    font-size: 14px;
+    color: #5e6d82;
+    line-height: 1.4;
 }
-.faculty-card:hover img{
-    border-color: #fff;
+
+.faculty-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(10, 31, 68, 0.15);
+    border-color: #3b82f6;
+    background: #fff;
 }
-.extra-faculty{
+
+.faculty-card:hover img {
+    border-color: #3b82f6;
+    transform: scale(1.05);
+}
+
+.extra-faculty {
     display: none;
 }
-.faculty_det.show-all .extra-faculty{
+
+.faculty_det.show-all .extra-faculty {
     display: flex;
 }
+
+/* Resume Template Previews */
+.template-previews {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.template-previews .preview {
+    width: 140px;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    background: #fff;
+    transition: all 0.3s ease;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.template-previews .preview img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    display: block;
+    background: #fdfdfd;
+    transition: transform 0.3s ease;
+}
+
+.template-previews .preview .preview-label {
+    margin-top: auto;
+    padding: 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.template-previews .preview.selected {
+    border-color: #1e88e5;
+    background-color: #f0f7ff;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2), 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+}
+
 .faculty-btn-wrap{
     text-align: center;
     margin-top: 20px;
@@ -1547,6 +1641,113 @@ opacity: 0.85;
     transition: scale(1.2);
 }
 
+/* ---------------- Previous Year Papers Grid ---------------- */
+.header-papers {
+  margin-bottom: 40px;
+}
 
+.header-papers h1 {
+  color: #0a1f44;
+  font-size: 28px;
+  margin-bottom: 6px;
+}
 
+.filter-box {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
 
+.filter-box select {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid #d6dbe6;
+  font-size: 14px;
+  background: #f9fbff;
+  cursor: pointer;
+}
+
+.paper-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: start; /* Prevents rows from stretching cards vertically */
+}
+
+.paper-card {
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+  aspect-ratio: 1/1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: 0.3s;
+  min-width: 0; /* Prevents overflow in grid */
+}
+
+.paper-card img.paper-preview {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.paper-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.paper-card h3 {
+  color: #0a1f44;
+  font-size: 16px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.meta-paper {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.paper-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.paper-buttons a {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 6px;
+  font-size: 12px;
+  text-decoration: none;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+.view-btn {
+  background: #eef3ff;
+  color: #1c3faa;
+}
+
+.download-btn {
+  background: #0a1f44;
+  color: white;
+}
+
+@media (max-width: 1100px) { .paper-container { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .paper-container { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .paper-container { grid-template-columns: 1fr; } }

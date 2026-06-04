@@ -29,7 +29,8 @@
                 <div class="resume-item-actions">
                     <a href="{{ url_for('view_resume', resume_id=r.id) }}" target="_blank" class="btn-action btn-view">View</a>
                     <a href="{{ url_for('download_resume', resume_id=r.id) }}" download class="btn-action btn-download">Download</a>
-                    <a href="/student/{{ r.uid }}" class="btn-action btn-secondary">Profile</a>
+                    <a href="{{ url_for('student_details', student_uid=r.uid) }}" class="btn-action btn-secondary">Profile</a>
+                    <a href="{{ url_for('faculty_edit_student', uid=r.uid) }}" class="btn-action btn-edit">Edit Student</a>
                 </div>
             </div>
             {% endfor %}
@@ -187,6 +188,11 @@
 
     .btn-secondary:hover {
         background: #475569;
+    }
+
+    .btn-edit {
+        background: #ed8936;
+        color: white;
     }
 
     .empty-state {

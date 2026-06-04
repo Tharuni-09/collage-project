@@ -57,54 +57,54 @@ VALUES
 
 -- NCSML student seed data
 INSERT INTO users
-(uid, username, password_hash, name, role, email, phone)
+(username, password_hash, name, role, email, phone)
 VALUES
-(111725049043, '111725049043', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'M.Manohar', 'student', 'm.manohar@example.com', '');
+('111725049043', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'M.Manohar', 'student', 'm.manohar@example.com', '');
 INSERT INTO students
 (uid, department, roll, name, cgpa, sgpa, attendance)
 VALUES
 (111725049043, 'NCSML', '111725049043', 'M.Manohar', 8.83, 8.83, 95);
 
 INSERT INTO users
-(uid, username, password_hash, name, role, email, phone)
+(username, password_hash, name, role, email, phone)
 VALUES
-(111725049035, '111725049035', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'J.Naga Bheema Prasadu', 'student', 'j.naga@example.com', '');
+('111725049035', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'J.Naga Bheema Prasadu', 'student', 'j.naga@example.com', '');
 INSERT INTO students
 (uid, department, roll, name, cgpa, sgpa, attendance)
 VALUES
 (111725049035, 'NCSML', '111725049035', 'J.Naga Bheema Prasadu', 8.96, 8.96, 80);
 
 INSERT INTO users
-(uid, username, password_hash, name, role, email, phone)
+(username, password_hash, name, role, email, phone)
 VALUES
-(111725049020, '111725049020', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'A.Asmitha', 'student', 'a.asmitha@example.com', '');
+('111725049020', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'A.Asmitha', 'student', 'a.asmitha@example.com', '');
 INSERT INTO students
 (uid, department, roll, name, cgpa, sgpa, attendance)
 VALUES
 (111725049020, 'NCSML', '111725049020', 'A.Asmitha', 9.22, 9.22, 78);
 
 INSERT INTO users
-(uid, username, password_hash, name, role, email, phone)
+(username, password_hash, name, role, email, phone)
 VALUES
-(111725049001, '111725049001', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'A.Sahasra', 'student', 'a.sahasra@example.com', '');
+('111725049001', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'A.Sahasra', 'student', 'a.sahasra@example.com', '');
 INSERT INTO students
 (uid, department, roll, name, cgpa, sgpa, attendance)
 VALUES
 (111725049001, 'NCSML', '111725049001', 'A.Sahasra', 9.0, 9.0, 88);
 
 INSERT INTO users
-(uid, username, password_hash, name, role, email, phone)
+(username, password_hash, name, role, email, phone)
 VALUES
-(111725049010, '111725049010', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'K.Priya', 'student', 'k.priya@example.com', '');
+('111725049010', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'K.Priya', 'student', 'k.priya@example.com', '');
 INSERT INTO students
 (uid, department, roll, name, cgpa, sgpa, attendance)
 VALUES
 (111725049010, 'NCSML', '111725049010', 'K.Priya', 9.6, 9.6, 92);
 
 INSERT INTO users
-(uid, username, password_hash, name, role, email, phone)
+(username, password_hash, name, role, email, phone)
 VALUES
-(111725049011, '111725049011', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'P Sri sravya', 'student', 'p.sri@example.com', '');
+('111725049011', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd9e1f3c2b1c8b6100b', 'P Sri sravya', 'student', 'p.sri@example.com', '');
 INSERT INTO students
 (uid, department, roll, name, cgpa, sgpa, attendance)
 VALUES

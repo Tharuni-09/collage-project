@@ -20,7 +20,7 @@
 <!-- ================= TOP NAVBAR ================= -->
 <nav class="topnav">
     <div class="nav-left">
-        <div class="nav-logo">ML Dept</div>
+        <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Department Logo" class="main-logo">
         <span>Department of Machine Learning <br>
             <p>Loyola Academy, Degree and PG College, Old Alwal, Secunderabad</p>
         </span>
@@ -142,53 +142,38 @@
 
 <!-- ================= FACULTY SNAPSHOT ================= -->
 <section id="faculty">
-    <h2>Faculty</h2>
-    <div class="faculty_det" id="facultyGrid">
-        <!-- Visible -->
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/venugopal sir.jpeg') }}" alt="Venugopal">
-            <h3>Mr. A. Venugopal</h3>
-            <p class="role">Asst. Prof. in Comp. Sci & HoD</p>
-        </div>
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/shanthi mam.jpeg') }}" alt="Shanthi">
-            <h3>Dr. C. Shanthi</h3>
-            <p class="role">Asst. Prof. Electronics</p>
-        </div>
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/rajini mam.jpeg') }}" alt="Rajini">
-            <h3>Dr. B. Rajini</h3>
-            <p class="role">Asst. Prof. in Comp. Sci</p>
-        </div>
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/naveen sir.jpeg') }}" alt="Naveen">
-            <h3>Mr. N. Naveen</h3>
-            <p class="role">Asst. Prof. in Comp. Sci</p>
-        </div>
-        <div class="faculty-card">
-            <img src="{{ url_for('static', filename='images/kavya mam.jpeg') }}" alt="Kavya">
-            <h3>Mrs. B. Kavya</h3>
-            <p class="role">Asst. Prof. in Comp. Sci</p>
-        </div>
+  
+  <h2>Faculty</h2>
 
-        <div class="faculty-card extra-faculty">
-            <img src="{{ url_for('static', filename='images/bindhu_mam.jpeg') }}" alt="Bindhu">
-            <h3>Dr. B. Bindhu</h3>
-            <p class="role">Asst. Prof. in Comp. Sci</p>
-        </div>
-        <div class="faculty-card extra-faculty">
-            <img src="{{ url_for('static', filename='images/kiran_sir.jpeg') }}" alt="Kiran">
-            <h3>Mr. K. Kiran</h3>
-            <p class="role">Asst. Prof. in Comp. Sci</p>
-        </div>
+  <div class="faculty_det" id="facultyGrid">
 
-        <!-- Hidden (you can extend this in JS as before) -->
-        <!-- Add more faculty with same pattern when needed -->
-    </div>
-    <div class="faculty-btn-wrap">
-        <button id="viewBtn" class="btn">View All Faculty</button>
-    </div>
+    <!-- Visible -->
+    <div class="faculty-card"><img src="venugopal sir.jpeg"><h3>Mr. A. Venugopal</h3><p class="role">Asst. Prof. in Comp. Sci & HoD</p></div>
+    <div class="faculty-card"><img src="shanthi mam.jpeg"><h3>Dr. C. Shanthi</h3><p class="role">Asst. Prof. Electronics</p></div>
+    <div class="faculty-card"><img src="rajini mam.jpeg"><h3>Dr. B. Rajini</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+    <div class="faculty-card"><img src="naveen sir.jpeg"><h3>Mr. N. Naveen</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+    <div class="faculty-card"><img src="kavya mam.jpeg"><h3>Mrs. B. Kavya</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+
+    <!-- Hidden -->
+    <div class="faculty-card extra-faculty"><img src="os_sir.jpeg"><h3>Mr. P. Venkata Jaya Krishna Ramana Teja</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+    <div class="faculty-card extra-faculty"><img src="bindhu_mam.jpeg"><h3>Mrs. Bindu Babu</h3><p class="role">Asst. Prof. in Mathematics</p></div>
+    <div class="faculty-card extra-faculty"><img src="kiran_sir.jpeg"><h3>Mr. K. Kiran Kumar</h3><p class="role">Asst. Prof. in Mathematics</p></div>
+    <div class="faculty-card extra-faculty"><img src="sravani_mam.jpeg"><h3>Mrs. D. Sravani</h3><p class="role">Asst. Prof. in Statistics</p></div>
+    <div class="faculty-card extra-faculty"><img src="sirisha_mam.jpeg"><h3>Ms. Sirisha</h3><p class="role">Asst. Prof. in Mathematics</p></div>
+    <div class="faculty-card extra-faculty"><img src="pritivika_mam.jpeg"><h3>Dr. S. Pritivika</h3><p class="role">Asst. Prof. in English</p></div>
+    <div class="faculty-card extra-faculty"><img src="hep_mam.jpeg"><h3>Ms. B. Hepzibah Spoorthi</h3><p class="role">Asst. Prof. in English</p></div>
+    <div class="faculty-card extra-faculty"><img src="musalaya_sir.jpg"><h3>Dr. K. Musalaiah</h3><p class="role">Asst. Prof. in IHC</p></div>
+    <div class="faculty-card extra-faculty"><img src="evs.jpeg"><h3>Ms. O. Nikhila</h3><p class="role">Asst. Prof. in Environmental Science</p></div>
+      
+
+  </div>
+
+  <div class="faculty-btn-wrap">
+    <button id="viewBtn" class="btn">View All Faculty</button>
+  </div>
+
 </section>
+
 
 <!-- ================= FOOTER ================= -->
  
