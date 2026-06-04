@@ -59,8 +59,8 @@
         {% endif %}
 
         <form method="POST" action="{{ url_for('login') }}" class="form-stacked">
-            <label>UID:
-                <input type="number" name="uid" required />
+            <label>Roll / UID:
+                <input type="text" name="uid" placeholder="Enter roll number or UID" required />
             </label>
             <label>Password:
                 <input type="password" name="password" required />

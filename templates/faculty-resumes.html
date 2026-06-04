@@ -1,50 +1,230 @@
 {% extends "base.html" %}
 
-{% block title %}All Resumes{% endblock %}
+{% block title %}All Resumes — Faculty{% endblock %}
 
 {% block content %}
-<div class="page-container">
-    <h2 class="section-title">All Resumes</h2>
-    <p class="muted">Review all submitted resumes and open them when needed.</p>
-
+<div class="container">
+    <h2 style="margin-bottom: 20px;">📄 All Student Resumes</h2>
+    
     {% if resumes %}
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Roll</th>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Title</th>
-                <th>Created</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="resumes-container">
+        <div class="resumes-header">
+            <span class="resumes-count">Total: {{ resumes|length }} resumes</span>
+        </div>
+        
+        <div class="resume-list">
             {% for r in resumes %}
-            <tr>
-                <td>{{ r['roll'] }}</td>
-                <td>{{ r['name'] }}</td>
-                <td>{{ r['department'] }}</td>
-                <td>{{ r['title'] }}</td>
-                <td>{{ r['created_at'] }}</td>
-                <td>
-                    <a href="{{ url_for('download_resume', resume_id=r['id']) }}" download class="btn-download">
-                        Download
-                    </a>
-                    <a href="{{ url_for('view_resume', resume_id=r['id']) }}" target="_blank" class="btn-view">
-                        View
-                    </a>
-                </td>
-            </tr>
+            <div class="resume-item-row">
+                <div class="resume-item-left">
+                    <div class="resume-item-top">
+                        <span class="roll-cell">{{ r.roll }}</span>
+                        <span class="name-cell">{{ r.name }}</span>
+                        <span class="dept-badge">{{ r.department }}</span>
+                    </div>
+                    <div class="resume-item-bottom">
+                        <span class="resume-title">{{ r.title or 'Resume' }}</span>
+                        <span class="resume-meta">{{ r.created_at.split()[0] }}</span>
+                    </div>
+                </div>
+                <div class="resume-item-actions">
+                    <a href="{{ url_for('view_resume', resume_id=r.id) }}" target="_blank" class="btn-action btn-view">View</a>
+                    <a href="{{ url_for('download_resume', resume_id=r.id) }}" download class="btn-action btn-download">Download</a>
+                    <a href="/student/{{ r.uid }}" class="btn-action btn-secondary">Profile</a>
+                </div>
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p class="muted">No resumes have been submitted yet.</p>
-    {% endif %}
-
-    <div class="back-link">
-        <a href="{{ url_for('faculty_dashboard') }}" class="btn-secondary">← Back to Faculty Dashboard</a>
+        </div>
     </div>
+    {% else %}
+    <div class="empty-state">
+        <p>📄 No resumes found yet.</p>
+        <p style="color: #666; margin-top: 10px;">Students will create resumes using the resume builder.</p>
+    </div>
+    {% endif %}
 </div>
+
+<style>
+    .resumes-container {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .resumes-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+        color: white;
+        padding: 18px 24px;
+        font-weight: 700;
+    }
+
+    .resumes-count {
+        font-size: 14px;
+    }
+
+    .resume-list {
+        padding: 18px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .resume-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 18px;
+    }
+
+    .resume-item-left {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .resume-item-top {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    .roll-cell {
+        font-family: 'Courier New', monospace;
+        color: #1d4ed8;
+        font-weight: 700;
+    }
+
+    .name-cell {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .dept-badge {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .resume-item-bottom {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    .resume-title {
+        font-weight: 600;
+        color: #0f172a;
+        max-width: 420px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .resume-meta {
+        color: #64748b;
+    }
+
+    .resume-item-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+        min-width: 90px;
+    }
+
+    .btn-view {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-download {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-download:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-secondary {
+        background: #64748b;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #475569;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #475569;
+    }
+
+    @media (max-width: 900px) {
+        .resume-item-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .resume-item-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
 {% endblock %}
+
+<script>
+// Improve details toggle UX: allow clicking the summary area to toggle and prevent full-row selection issues
+document.addEventListener('DOMContentLoaded', function () {
+    // Accordion behavior: toggle item, close others
+    document.querySelectorAll('.accordion-header').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const item = btn.parentElement;
+            const open = item.classList.contains('open');
+            // close all
+            document.querySelectorAll('.accordion-item.open').forEach(i=>i.classList.remove('open'));
+            // toggle this
+            if (!open) {
+                item.classList.add('open');
+                // scroll into view
+                setTimeout(()=> item.scrollIntoView({ behavior: 'smooth', block: 'center' }), 120);
+            }
+        });
+    });
+});
+</script>

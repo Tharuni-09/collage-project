@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+<h1>Edit Student</h1>
+
+<form method="post" action="{{ url_for('faculty_edit_student', uid=student.uid) }}">
+
+    <div>
+        <label>UID</label>
+        <input type="text" value="{{ student.uid }}" disabled>
+    </div>
+
+    <div>
+        <label>Roll</label>
+        <input type="text" name="roll" value="{{ student.roll }}" required>
+    </div>
+
+    <div>
+        <label>Name</label>
+        <input type="text" name="name" value="{{ student.name }}" required>
+    </div>
+
+    <div>
+        <label>Department</label>
+        <select name="department" required>
+            <option value="ACSML" {% if student.department == "ACSML" %}selected{% endif %}>ACSML</option>
+            <option value="NCSML" {% if student.department == "NCSML" %}selected{% endif %}>NCSML</option>
+            <option value="DCSML" {% if student.department == "DCSML" %}selected{% endif %}>DCSML</option>
+        </select>
+    </div>
+
+    <div>
+        <label>CGPA</label>
+        <input type="number" step="0.01" name="cgpa" value="{{ student.cgpa or 0.0 }}" required>
+    </div>
+
+    <div>
+        <label>SGPA</label>
+        <input type="number" step="0.01" name="sgpa" value="{{ student.sgpa or 0.0 }}" required>
+    </div>
+
+    <div>
+        <label>Attendance</label>
+        <input type="number" name="attendance" value="{{ student.attendance or 0 }}" required>
+    </div>
+
+    <button type="submit">Update Student</button>
+    <a href="{{ url_for('faculty_dashboard') }}">Cancel</a>
+
+</form>
+{% endblock %}

@@ -22,7 +22,7 @@
             </thead>
             <tbody>
                 {% for s in students %}
-                <tr>
+                <tr class="{% if s['attendance'] < 65 and s['sgpa'] < 6 %}row-critical{% elif s['attendance'] < 75 %}row-warning{% endif %}">
                     <td>{{ s['roll'] }}</td>
                     <td>{{ s['name'] }}</td>
                     <td>{{ s['cgpa'] }}</td>
@@ -61,12 +61,12 @@
                     <td>{{ r['name'] }}</td>
                     <td>{{ r['title'] }}</td>
                     <td>{{ r['created_at'] }}</td>
-                    <td>
-                        <a href="{{ url_for('download_resume', resume_id=r['id']) }}" download class="btn-download">
-                            Download
-                        </a>
+                    <td style="display: flex; gap: 6px; justify-content: center;">
                         <a href="{{ url_for('view_resume', resume_id=r['id']) }}" target="_blank" class="btn-view">
-                            View
+                            👁️ View
+                        </a>
+                        <a href="{{ url_for('download_resume', resume_id=r['id']) }}" download class="btn-download">
+                            ⬇️ Download
                         </a>
                     </td>
                 </tr>

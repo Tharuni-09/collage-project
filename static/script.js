@@ -172,10 +172,33 @@ function sendChat() {
 
 function addMessage(text, type) {
   const messages = document.getElementById("chat-messages");
-  const messageElement = document.createElement("p");
-  messageElement.className = type;
+
+  // Container for message + actions
+  const wrapper = document.createElement('div');
+  wrapper.className = 'chat-message-wrapper ' + type;
+
+  const messageElement = document.createElement("div");
+  messageElement.className = 'chat-message-text';
   messageElement.textContent = text;
-  messages.appendChild(messageElement);
+
+  // Copy button
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'chat-copy-btn';
+  copyBtn.title = 'Copy message';
+  copyBtn.innerText = 'Copy';
+  copyBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text).then(function () {
+      copyBtn.innerText = 'Copied';
+      setTimeout(() => copyBtn.innerText = 'Copy', 1500);
+    }).catch(() => {
+      alert('Copy failed.');
+    });
+  });
+
+  wrapper.appendChild(messageElement);
+  wrapper.appendChild(copyBtn);
+  messages.appendChild(wrapper);
 
   // Scroll to bottom
   messages.scrollTop = messages.scrollHeight;

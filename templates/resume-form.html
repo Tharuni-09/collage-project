@@ -1,238 +1,200 @@
 {% extends "base.html" %}
-
-{% block title %}Build Professional Resume{% endblock %}
+{% block title %}Build Resume{% endblock %}
 
 {% block content %}
-<div class="resume-form">
-    <h2>Resume Preparation Form</h2>
-    <p class="muted">
-        Fill this form carefully. Your answers will be used to generate a professional PDF resume.
-    </p>
+<div class="page-container">
+  <div class="resume-form-wrap">
+    <h2 class="page-title">Build Your Resume</h2>
+    <p class="page-subtitle">Choose a template and fill in your details to generate a professional PDF.</p>
 
-    <form method="POST">
-        <div class = "resume-form">
-        <fieldset class="form-section">
-            <legend class="section-title">1. Personal Information</legend>
+    <form method="POST" enctype="multipart/form-data" class="resume-form">
+      <section class="form-section">
+        <h3>Template Selection</h3>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="template">Choose Your Resume Format (5 Professional Styles)</label>
+            <select id="template" name="template" required>
+              <option value="classic">Classic ATS - Traditional format (corporate)</option>
+              <option value="modern">Modern Student - Clean, contemporary (startups)</option>
+              <option value="minimal">Minimal Tech - Sleek, minimalist (tech)</option>
+              <option value="academic">Academic Focus - Research & GPA (research)</option>
+              <option value="creative">Creative Professional - Visual & modern (design)</option>
+            </select>
+            <div class="form-help-note"><strong>Template Guide:</strong> Click a preview to select a template. Use Classic for corporate roles, Modern for startups, Minimal for tech, Academic for research, Creative for design-focused roles.</div>
+            
+            <div class="template-previews">
+              <div class="preview" data-template="classic">
+                <img src="{{ url_for('static', filename='images/template_classic.svg') }}" alt="Classic preview">
+                <div class="preview-label">Classic</div>
+              </div>
+              <div class="preview" data-template="modern">
+                <img src="{{ url_for('static', filename='images/template_modern.svg') }}" alt="Modern preview">
+                <div class="preview-label">Modern</div>
+              </div>
+              <div class="preview" data-template="minimal">
+                <img src="{{ url_for('static', filename='images/template_minimal.svg') }}" alt="Minimal preview">
+                <div class="preview-label">Minimal</div>
+              </div>
+              <div class="preview" data-template="academic">
+                <img src="{{ url_for('static', filename='images/template_academic.svg') }}" alt="Academic preview">
+                <div class="preview-label">Academic</div>
+              </div>
+              <div class="preview" data-template="creative">
+                <img src="{{ url_for('static', filename='images/template_creative.svg') }}" alt="Creative preview">
+                <div class="preview-label">Creative</div>
+              </div>
+            </div>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.template-previews .preview').forEach(function (el) {
+                  el.addEventListener('click', function () {
+                    var t = el.getAttribute('data-template');
+                    document.getElementById('template').value = t;
+                    document.querySelectorAll('.template-previews .preview').forEach(p=>p.classList.remove('selected'));
+                    el.classList.add('selected');
+                  });
+                });
+              });
+            </script>
+            <style>
+              .template-previews { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+              .template-previews .preview { width: 110px; cursor: pointer; text-align: center; border-radius: 6px; overflow: hidden; border: 1px solid #e6e6e6; background: #fff; }
+              .template-previews .preview img { width: 100%; height: auto; display: block; }
+              .template-previews .preview .preview-label { padding: 6px 4px; font-size: 12px; color: #374151; }
+              .template-previews .preview.selected { box-shadow: 0 6px 18px rgba(0,0,0,0.12); transform: translateY(-4px); }
+            </style>
+          </div>
+        </div>
+      </section>
 
-            <label class="form-label"><strong>Full Name *</strong></label>
-            <input type="text" name="name" value="{{ name }}" required class="form-input">
+      <section class="form-section">
+        <h3>Personal Details</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
 
-            <label class="form-label"><strong>Phone Number *</strong></label>
-            <input type="text" name="phone" value="{{ phone }}" required class="form-input">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required>
+          </div>
 
-            <label class="form-label"><strong>Professional Email Address *</strong></label>
-            <input type="email" name="email" value="{{ email }}" required class="form-input">
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required>
+          </div>
 
-            <label class="form-label"><strong>LinkedIn Profile</strong></label>
-            <input type="url" name="linkedin" value="{{ linkedin }}" placeholder="https://linkedin.com/in/..." class="form-input">
+          <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" required>
+          </div>
 
-            <label class="form-label"><strong>Portfolio / GitHub / Website</strong></label>
-            <input type="url" name="portfolio" value="{{ portfolio }}" placeholder="https://github.com/username" class="form-input">
+          <div class="form-group">
+            <label for="country">Country</label>
+            <input type="text" id="country" name="country" required>
+          </div>
 
-            <label class="form-label"><strong>City & State / Location</strong></label>
-            <input type="text" name="location" value="{{ location }}" class="form-input">
-        </fieldset>
+          <div class="form-group">
+            <label for="photo">Photo</label>
+            <input type="file" id="photo" name="photo" accept="image/*">
+          </div>
 
+          <div class="form-group full-width">
+            <label for="portfolio">Portfolio URL</label>
+            <input type="url" id="portfolio" name="portfolio" placeholder="https://yourportfolio.com">
+          </div>
 
-        <fieldset class="form-section">
-            <legend class="section-title">2. Career Objective / Summary</legend>
+          <div class="form-group full-width">
+            <label for="website">LinkedIn / Personal Website</label>
+            <input type="url" id="website" name="website" placeholder="https://linkedin.com/in/yourname">
+          </div>
 
-            <label class="form-label"><strong>Career objective (2–3 lines)</strong></label>
-            <textarea name="objective" rows="4" class="form-textarea" placeholder="
-Recent B.Tech CSE graduate with strong problem-solving skills and proficiency in Python and Machine Learning.
-Seeking a Software Developer / Data Analyst role to apply my academic projects and technical skills.
-            ">{{ objective }}</textarea>
-        </fieldset>
+          <div class="form-group full-width">
+            <label for="languages">Languages</label>
+            <textarea id="languages" name="languages" rows="2" placeholder="English, Telugu, Hindi"></textarea>
+          </div>
+        </div>
+      </section>
 
+      <section class="form-section">
+        <h3>Professional Summary</h3>
+        <div class="form-group full-width">
+          <label for="objective">Career Objective</label>
+          <textarea id="objective" name="objective" rows="4" placeholder="Write 2-4 lines about your goals, skills, and interests."></textarea>
+          <div class="form-help-note">Need help? Open the chat and ask for a "career objective" example.</div>
+        </div>
+      </section>
 
-        <fieldset class="form-section">
-            <legend class="section-title">3. Education Details</legend>
+      <section class="form-section">
+        <h3>Education</h3>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="school_name">College / School Name</label>
+            <input type="text" id="school_name" name="school_name" required>
+          </div>
 
-            <label class="form-label"><strong>Education (degree, college, CGPA, etc.)</strong></label>
-            <textarea name="education" rows="6" class="form-textarea" placeholder="
-B.Tech in Computer Science and Engineering
-Mahatma Gandhi Institute of Technology, Hyderabad
-CGPA: 8.7 | Year of Graduation: 2026
+          <div class="form-group full-width">
+            <label for="school_location">Location</label>
+            <input type="text" id="school_location" name="school_location" required>
+          </div>
 
-Intermediate / 12th in MPC
-ABC Junior College, Hyderabad
-Board: Telangana State Board | 2021 | 9.3 CGPA
-            ">{{ education }}</textarea>
-        </fieldset>
+          <div class="form-group">
+            <label for="degree_type">Degree</label>
+            <select id="degree_type" name="degree_type" required>
+              <option value="">Select Degree</option>
+              <option value="High School Diploma">High School Diploma</option>
+              <option value="Diploma">Diploma</option>
+              <option value="Bachelor of Science">Bachelor of Science</option>
+              <option value="Bachelor of Technology">Bachelor of Technology</option>
+              <option value="Master of Science">Master of Science</option>
+              <option value="Certification">Certification</option>
+            </select>
+          </div>
 
+          <div class="form-group">
+            <label for="field_of_study">Field of Study</label>
+            <input type="text" id="field_of_study" name="field_of_study" placeholder="Computer Science, AI, Data Science" required>
+          </div>
 
-        <fieldset class="form-section">
-            <legend class="section-title">4. Skills</legend>
+          <div class="form-group">
+            <label for="graduation_year">Graduation Year</label>
+            <input type="number" id="graduation_year" name="graduation_year" required>
+          </div>
 
-            <label class="form-label"><strong>Technical Skills</strong> (one skill per line)</label>
-            <textarea name="technical_skills" rows="4" class="form-textarea" placeholder="
-Python
-Machine Learning
-Flask / FastAPI
-SQL (SQLite, MySQL)
-HTML, CSS, JavaScript
-Git, GitHub
-ReportLab
-            ">{{ technical_skills }}</textarea>
+          <div class="form-group">
+            <label for="school_percentage">Percentage / CGPA</label>
+            <input type="text" id="school_percentage" name="school_percentage" placeholder="8.4 CGPA / 85%">
+          </div>
+        </div>
+      </section>
 
-            <label class="form-label"><strong>Soft Skills</strong> (one per line)</label>
-            <textarea name="soft_skills" rows="3" class="form-textarea" placeholder="
-Communication
-Teamwork
-Problem Solving
-Time Management
-Leadership
-            ">{{ soft_skills }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">5. Work Experience</legend>
-
-            <label class="form-label"><strong>Work Experience (if any)</strong> (one role per block)</label>
-            <textarea name="work_experience" rows="6" class="form-textarea" placeholder="
-Junior Software Engineer – ABC Tech Pvt. Ltd.
-June 2024 – Dec 2024
-- Developed and maintained REST APIs in Python Flask.
-- Implemented user authentication and data validation.
-            ">{{ work_experience }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">6. Internship Experience</legend>
-
-            <label class="form-label"><strong>Internship Experience</strong> (one per block)</label>
-            <textarea name="internships" rows="6" class="form-textarea" placeholder="
-Summer Intern – XYZ Solutions
-May 2024 – July 2024
-- Worked on a web‑based student management system.
-- Assisted in backend API design and testing.
-            ">{{ internships }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">7. Projects</legend>
-
-            <label class="form-label"><strong>Projects</strong> (title, description, tech, role, results)</label>
-            <textarea name="projects" rows="8" class="form-textarea" placeholder="
-Online Resume Builder (Python, Flask, ReportLab)
-Built a web application for students to generate professional PDF resumes.
-Backend: Flask, SQLite; PDF: ReportLab; Frontend: HTML/CSS/JS.
-
-Stock Price Prediction (Python, ML)
-Used LSTM neural network to predict stock prices; achieved 78% accuracy.
-            ">{{ projects }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">8. Certifications</legend>
-
-            <label class="form-label"><strong>Certifications</strong> (one per line)</label>
-            <textarea name="certifications" rows="5" class="form-textarea" placeholder="
-Python for Data Science and Machine Learning – Udemy
-Completed: Feb 2024
-
-Google Cloud Fundamentals – Coursera
-Completed: Dec 2023
-            ">{{ certifications }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">9. Achievements / Awards</legend>
-
-            <label class="form-label"><strong>Achievements / Awards</strong> (one per line)</label>
-            <textarea name="achievements" rows="5" class="form-textarea" placeholder="
-Won 1st Prize in Coding Hackathon – 2023
-Received Merit Scholarship for CGPA 8.5+
-Participated in Regional Robotics Competition – 2024
-            ">{{ achievements }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">10. Extracurricular Activities</legend>
-
-            <label class="form-label"><strong>Extracurricular Activities</strong> (clubs, events, volunteering, etc.)</label>
-            <textarea name="extracurriculars" rows="4" class="form-textarea" placeholder="
-Member, Computer Science Club (organized workshops)
-Member, Student Council (event management)
-Volunteer – NSS Group (social campaigns)
-            ">{{ extracurriculars }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">11. Languages Known</legend>
-
-            <label class="form-label"><strong>Languages Known</strong> (one per line)</label>
-            <textarea name="languages" rows="4" class="form-textarea" placeholder="
-English (Professional)
-Telugu (Native)
-Hindi (Conversational)
-            ">{{ languages }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">12. Hobbies / Interests</legend>
-
-            <label class="form-label"><strong>Hobbies / Interests</strong> (optional)</label>
-            <textarea name="hobbies" rows="3" class="form-textarea" placeholder="
-Reading technical blogs
-Competitive coding and problem solving
-Open‑source contribution on GitHub
-Fitness and running
-            ">{{ hobbies }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">13. References (Optional)</legend>
-
-            <label class="form-label"><strong>References</strong> (one per line)</label>
-            <textarea name="references" rows="4" class="form-textarea" placeholder="
-Dr. Suresh Reddy
-Professor, CSE Department
-MGIT, Hyderabad
-Email: suresh.reddy@mgit.ac.in | Phone: +91 98765 12345
-            ">{{ references }}</textarea>
-        </fieldset>
-
-
-        <fieldset class="form-section">
-            <legend class="section-title">14. Additional Details</legend>
-
-            <label class="form-label"><strong>Additional Details</strong> (availability, location, notice period, etc.)</label>
-            <textarea name="additional_details" rows="4" class="form-textarea" placeholder="
-Availability to Join: After July 2026
-Preferred Location: Hyderabad, Bangalore
-Notice Period: 15 days
-Willingness to Relocate: Yes
-Open to remote and on‑site roles.
-            ">{{ additional_details }}</textarea>
-        </fieldset>
+      <section class="form-section">
+        <h3>Skills, Projects & Experience</h3>
+        <div class="form-group full-width">
+          <label for="technical_skills">Technical Skills</label>
+          <textarea id="technical_skills" name="technical_skills" rows="4" placeholder="Python, Flask, SQL, HTML, CSS, JavaScript, Machine Learning"></textarea>
         </div>
 
-        <button type="submit" class="btn-primary">Generate Professional Resume PDF</button>
+        <div class="form-group full-width">
+          <label for="projects">Projects</label>
+          <textarea id="projects" name="projects" rows="5" placeholder="One project per line. Example: Movie Recommendation System - built using collaborative filtering"></textarea>
+          <div class="form-help-note">Add projects one per line. The resume will preserve order and add concise descriptions automatically.</div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="internships">Internships</label>
+          <textarea id="internships" name="internships" rows="5" placeholder="Company, role, duration, and key work"></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="certifications">Certifications</label>
+          <textarea id="certifications" name="certifications" rows="4" placeholder="Certification name - provider - year"></textarea>
+        </div>
+      </section>
+
+      <button type="submit" class="btn-primary full-width">Generate Resume</button>
     </form>
+  </div>
 </div>
-
-<div class="tips-box">
-    <h3>Resume Tips for Freshers</h3>
-    <ul>
-        <li>Use strong action verbs: <i>Developed, Designed, Implemented, Optimized.</i></li>
-        <li>Keep bullets short; avoid long paragraphs.</li>
-        <li>Place Education, Projects, Skills, and Certifications at the top.</li>
-    </ul>
-</div>
-
-<label class="form-label"><strong>Include References?</strong></label>
-<select name="include_references" class="form-input">
-    <option value="yes">Yes</option>
-    <option value="no">No</option>
-</select>
 {% endblock %}
