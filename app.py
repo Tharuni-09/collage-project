@@ -359,7 +359,7 @@ def gallery():
 
 @app.route("/previous-year-papers")
 def previous_year_papers():
-    return render_template("previous-year-papers.html", session=session)
+    return render_template("previous_year_papers.html", session=session)
 
 
 # =====================================================================
@@ -460,13 +460,13 @@ def login():
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "GET":
-        return render_template("forget-password.html", error=None, step="request")
+        return render_template("forget_password.html", error=None, step="request")
 
     action = request.form.get("action", "request")
     if action == "request":
         identifier = clean_text(request.form.get("identifier", ""))
         if not identifier:
-            return render_template("forget-password.html", error="Missing identifier", step="request")
+            return render_template("forget_password.html", error="Missing identifier", step="request")
 
         db = get_db()
         row = db.execute(
@@ -482,7 +482,7 @@ def forgot_password():
 
         if not row:
             return render_template(
-                "forget-password.html",
+                "forget_password.html",
                 error="No user found with that UID, email, phone, or roll number.",
                 step="request"
             )
@@ -490,13 +490,13 @@ def forgot_password():
         user_email = row["email"] if isinstance(row, sqlite3.Row) else row[1]
         if not user_email:
             return render_template(
-                "forget-password.html",
+                "forget_password.html",
                 error="No email address is available for this account.",
                 step="request"
             )
 
         return render_template(
-            "forget-password.html",
+            "forget_password.html",
             step="reset",
             uid=row["uid"],
             email=user_email,
@@ -511,7 +511,7 @@ def forgot_password():
 
         if not all([uid, email, password, password_confirm]):
             return render_template(
-                "forget-password.html",
+                "forget_password.html",
                 error="All fields are required.",
                 step="reset",
                 uid=uid,
@@ -520,7 +520,7 @@ def forgot_password():
 
         if password != password_confirm:
             return render_template(
-                "forget-password.html",
+                "forget_password.html",
                 error="Passwords do not match.",
                 step="reset",
                 uid=uid,
@@ -535,7 +535,7 @@ def forgot_password():
         if not row or (row["email"] if isinstance(row, sqlite3.Row) else row[0]) != email:
             db.close()
             return render_template(
-                "forget-password.html",
+                "forget_password.html",
                 error="Email verification failed.",
                 step="request"
             )
@@ -549,7 +549,7 @@ def forgot_password():
         db.close()
 
         return render_template(
-            "forget-password.html",
+            "forget_password.html",
             message="Password reset successfully. You can now login with your new password.",
             step="done"
         )
@@ -559,7 +559,7 @@ def forgot_password():
 # STUDENT DASHBOARD
 # =====================================================================
 
-@app.route("/student-dashboard")
+@app.route("/student_dashboard")
 def student_dashboard():
     uid = session.get("uid")
     if not uid:
@@ -584,7 +584,7 @@ def student_dashboard():
     if not row:
         db.close()
         return render_template(
-            "student-dashboard.html",
+            "student_dashboard.html",
             roll="N/A",
             name="Unknown Student",
             department="N/A",
@@ -613,14 +613,14 @@ def student_dashboard():
     db.close()
 
     return render_template(
-        "student-dashboard.html",
+        "student_dashboard.html",
         roll=roll, name=name, department=department,
         cgpa=cgpa, sgpa=sgpa, attendance=attendance,
         resumes=resumes,
         session=session  # ← ADD THIS
     )
 
-@app.route("/resume-form")
+@app.route("/resume_form")
 def resume_form():
     if "uid" not in session:
         return redirect(url_for("login"))
@@ -711,7 +711,7 @@ def faculty_department(dept):
         session=session
     )
 
-@app.route("/debug-dashboard")
+@app.route("/debug_dashboard")
 def debug_dashboard():
     uid = session.get("uid")
     if not uid or session.get("role") != "faculty":
@@ -731,7 +731,7 @@ def debug_dashboard():
 # =====================================================================
 # EDIT STUDENT DETAILS - FACULTY DASHBOARD
 # =====================================================================
-@app.route("/faculty/edit-student/<int:uid>", methods=["GET", "POST"])
+@app.route("/faculty/edit_student/<int:uid>", methods=["GET", "POST"])
 def faculty_edit_student(uid):
     if session.get("role") != "faculty":
         return redirect(url_for("login"))
@@ -804,19 +804,19 @@ def faculty_edit_student(uid):
 # =====================================================================
 # FACULTY ADD STUDENT PAGE
 # =====================================================================
-@app.route("/faculty/add-student", methods=["GET"])
+@app.route("/faculty/add_student", methods=["GET"])
 def faculty_add_student_form():
 
     if session.get("role") != "faculty":
         return redirect(url_for("login"))
 
-    return render_template("faculty-add-student.html")
+    return render_template("faculty_add_student.html")
 
 
 # =====================================================================
 # FACULTY ADD STUDENT SAVE
 # =====================================================================
-@app.route("/faculty/add-student", methods=["POST"])
+@app.route("/faculty/add_student", methods=["POST"])
 def faculty_add_student():
 
     if session.get("role") != "faculty":
@@ -883,7 +883,7 @@ def faculty_add_student():
 # FACULTY DELETE STUDENT SAVE
 # =====================================================================
 
-@app.route("/faculty/delete-student/<string:roll>", methods=["POST"])
+@app.route("/faculty/delete_student/<string:roll>", methods=["POST"])
 def faculty_delete_student(roll):
 
     if session.get("role") != "faculty":
@@ -919,7 +919,7 @@ def faculty_delete_student(roll):
     db.close()
     return redirect(url_for("faculty_dashboard"))
 
-@app.route("/faculty-dashboard")
+@app.route("/faculty_dashboard")
 def faculty_dashboard():
     try:
         uid = session.get("uid")
@@ -953,7 +953,7 @@ def faculty_dashboard():
             "dept": dept
         }
         db.close()
-        return render_template("faculty-dashboard.html", **context)
+        return render_template("faculty_dashboard.html", **context)
 
     except Exception as e:
         import traceback
@@ -1265,7 +1265,7 @@ def generate_resume_pdf(template_type, form_data):
 # DOWNLOAD 
 # =====================================================================
 
-@app.route("/download-resume/<int:resume_id>")
+@app.route("/download_resume/<int:resume_id>")
 def download_resume(resume_id):
     db = get_db()
     row = db.execute("SELECT pdf_content, title FROM resumes WHERE id = ?", [resume_id]).fetchone()
@@ -1282,7 +1282,7 @@ def download_resume(resume_id):
 # VIEW RESUME
 # =====================================================================
 
-@app.route("/view-resume/<int:resume_id>")
+@app.route("/view_resume/<int:resume_id>")
 def view_resume(resume_id):
     if session.get("role") == "faculty":
         db = get_db()
@@ -1330,14 +1330,14 @@ def faculty_resumes():
 
     db.close()
 
-    return render_template("faculty-resumes.html", resumes=resumes, session=session)
+    return render_template("faculty_resumes.html", resumes=resumes, session=session)
 
 
 # =====================================================================
 # DELETE RESUME
 # =====================================================================
 
-@app.route("/delete-resume", methods=["POST"])
+@app.route("/delete_resume", methods=["POST"])
 def delete_resume():
     if "uid" not in session:
         return redirect(url_for("login"))
@@ -1364,7 +1364,7 @@ def delete_resume():
 # STUDENT DETAILS
 # =====================================================================
 
-@app.route("/student-details/<int:student_uid>")
+@app.route("/student_details/<int:student_uid>")
 def student_details(student_uid):
     if session.get("role") != "faculty":
         return redirect(url_for("login"))
@@ -1396,7 +1396,7 @@ def student_details(student_uid):
     
     db.close()
     
-    return render_template("student-details.html", student=student, resumes=resumes)
+    return render_template("student_details.html", student=student, resumes=resumes)
 
 # =====================================================================
 # TEST CASE
@@ -1409,7 +1409,7 @@ def test():
 # =====================================================================
 #  CHECK AUTH STATUS
 # =====================================================================
-@app.route("/check-auth")
+@app.route("/check_auth")
 def check_auth():
     return jsonify({
         "logged_in": "uid" in session,
