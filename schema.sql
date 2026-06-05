@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS resumes;
+DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE users (
     uid INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
@@ -15,14 +19,18 @@ CREATE TABLE students (
     name TEXT NOT NULL,
     cgpa REAL DEFAULT 0.0,
     sgpa REAL DEFAULT 0.0,
-    attendance INTEGER DEFAULT 0
+    attendance INTEGER DEFAULT 0,
+    email TEXT,
+    phone TEXT,
+    address TEXT,
+    date_of_birth TEXT
 );
 
 CREATE TABLE resumes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id INTEGER NOT NULL,
     uid INTEGER NOT NULL,
-    pdf_path TEXT NOT NULL,
+    pdf_content BLOB,
     title TEXT DEFAULT 'Resume',
     created_at TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (student_id) REFERENCES students(uid),

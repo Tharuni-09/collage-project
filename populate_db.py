@@ -87,11 +87,10 @@ resume_titles = ['Software Developer Resume', 'Data Scientist Resume', 'ML Engin
 for student_uid in range(1, 21):  # Create resumes for first 20 students
     for i in range(random.randint(1, 3)):  # 1-3 resumes per student
         title = random.choice(resume_titles)
-        pdf_path = f"resumes/resume_{student_uid}_{i+1}.pdf"
         cursor.execute("""
-            INSERT INTO resumes (student_id, uid, pdf_path, title, created_at)
+            INSERT INTO resumes (student_id, uid, pdf_content, title, created_at)
             VALUES (?, ?, ?, ?, ?)
-        """, (student_uid, student_uid, pdf_path, title, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+        """, (student_uid, student_uid, b'', title, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
 conn.commit()
 conn.close()

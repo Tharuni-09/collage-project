@@ -2,192 +2,309 @@
 {% block title %}Build Resume{% endblock %}
 
 {% block content %}
-<div class="page-container">
-  <div class="resume-form-wrap">
-    <h2 class="page-title">Build Your Resume</h2>
-    <p class="page-subtitle">Choose a template and fill in your details to generate a professional PDF.</p>
-
-    <form method="POST" enctype="multipart/form-data" class="resume-form">
-      <section class="form-section">
-        <h3>Template Selection</h3>
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label for="template">Choose Your Resume Format (5 Professional Styles)</label>
-            <select id="template" name="template" required>
-              <option value="classic">Classic ATS - Traditional format (corporate)</option>
-              <option value="modern">Modern Student - Clean, contemporary (startups)</option>
-              <option value="minimal">Minimal Tech - Sleek, minimalist (tech)</option>
-              <option value="academic">Academic Focus - Research & GPA (research)</option>
-              <option value="creative">Creative Professional - Visual & modern (design)</option>
-            </select>
-            <div class="form-help-note"><strong>Template Guide:</strong> Click a preview to select a template. Use Classic for corporate roles, Modern for startups, Minimal for tech, Academic for research, Creative for design-focused roles.</div>
-            
-            <div class="template-previews">
-              <div class="preview" data-template="classic">
-                <img src="{{ url_for('static', filename='images/template_classic.svg') }}" alt="Classic preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
-                <div class="preview-label">Classic</div>
-              </div>
-              <div class="preview" data-template="modern">
-                <img src="{{ url_for('static', filename='images/template_modern.svg') }}" alt="Modern preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
-                <div class="preview-label">Modern</div>
-              </div>
-              <div class="preview" data-template="minimal">
-                <img src="{{ url_for('static', filename='images/template_minimal.svg') }}" alt="Minimal preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
-                <div class="preview-label">Minimal</div>
-              </div>
-              <div class="preview" data-template="academic">
-                <img src="{{ url_for('static', filename='images/template_academic.svg') }}" alt="Academic preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
-                <div class="preview-label">Academic</div>
-              </div>
-              <div class="preview" data-template="creative">
-                <img src="{{ url_for('static', filename='images/template_creative.svg') }}" alt="Creative preview" onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'; this.onerror=null;">
-                <div class="preview-label">Creative</div>
-              </div>
-            </div>
-            <script>
-              document.addEventListener('DOMContentLoaded', function () {
-                document.querySelectorAll('.template-previews .preview').forEach(function (el) {
-                  el.addEventListener('click', function () {
-                    var t = el.getAttribute('data-template');
-                    document.getElementById('template').value = t;
-                    document.querySelectorAll('.template-previews .preview').forEach(p=>p.classList.remove('selected'));
-                    el.classList.add('selected');
-                  });
-                });
-              });
-            </script>
-          </div>
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h3>Personal Details</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" required>
-          </div>
-
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" required>
-          </div>
-
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" required>
-          </div>
-
-          <div class="form-group">
-            <label for="city">City</label>
-            <input type="text" id="city" name="city" required>
-          </div>
-
-          <div class="form-group">
-            <label for="country">Country</label>
-            <input type="text" id="country" name="country" required>
-          </div>
-
-          <div class="form-group">
-            <label for="photo">Photo</label>
-            <input type="file" id="photo" name="photo" accept="image/*">
-          </div>
-
-          <div class="form-group full-width">
-            <label for="portfolio">Portfolio URL</label>
-            <input type="url" id="portfolio" name="portfolio" placeholder="https://yourportfolio.com">
-          </div>
-
-          <div class="form-group full-width">
-            <label for="website">LinkedIn / Personal Website</label>
-            <input type="url" id="website" name="website" placeholder="https://linkedin.com/in/yourname">
-          </div>
-
-          <div class="form-group full-width">
-            <label for="languages">Languages</label>
-            <textarea id="languages" name="languages" rows="2" placeholder="English, Telugu, Hindi"></textarea>
-          </div>
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h3>Professional Summary</h3>
-        <div class="form-group full-width">
-          <label for="objective">Career Objective</label>
-          <textarea id="objective" name="objective" rows="4" placeholder="Write 2-4 lines about your goals, skills, and interests."></textarea>
-          <div class="form-help-note">Need help? Open the chat and ask for a "career objective" example.</div>
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h3>Education</h3>
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label for="school_name">College / School Name</label>
-            <input type="text" id="school_name" name="school_name" required>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="school_location">Location</label>
-            <input type="text" id="school_location" name="school_location" required>
-          </div>
-
-          <div class="form-group">
-            <label for="degree_type">Degree</label>
-            <select id="degree_type" name="degree_type" required>
-              <option value="">Select Degree</option>
-              <option value="High School Diploma">High School Diploma</option>
-              <option value="Diploma">Diploma</option>
-              <option value="Bachelor of Science">Bachelor of Science</option>
-              <option value="Bachelor of Technology">Bachelor of Technology</option>
-              <option value="Master of Science">Master of Science</option>
-              <option value="Certification">Certification</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="field_of_study">Field of Study</label>
-            <input type="text" id="field_of_study" name="field_of_study" placeholder="Computer Science, AI, Data Science" required>
-          </div>
-
-          <div class="form-group">
-            <label for="graduation_year">Graduation Year</label>
-            <input type="number" id="graduation_year" name="graduation_year" required>
-          </div>
-
-          <div class="form-group">
-            <label for="school_percentage">Percentage / CGPA</label>
-            <input type="text" id="school_percentage" name="school_percentage" placeholder="8.4 CGPA / 85%">
-          </div>
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h3>Skills, Projects & Experience</h3>
-        <div class="form-group full-width">
-          <label for="technical_skills">Technical Skills</label>
-          <textarea id="technical_skills" name="technical_skills" rows="4" placeholder="Python, Flask, SQL, HTML, CSS, JavaScript, Machine Learning"></textarea>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="projects">Projects</label>
-          <textarea id="projects" name="projects" rows="5" placeholder="One project per line. Example: Movie Recommendation System - built using collaborative filtering"></textarea>
-          <div class="form-help-note">Add projects one per line. The resume will preserve order and add concise descriptions automatically.</div>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="internships">Internships</label>
-          <textarea id="internships" name="internships" rows="5" placeholder="Company, role, duration, and key work"></textarea>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="certifications">Certifications</label>
-          <textarea id="certifications" name="certifications" rows="4" placeholder="Certification name - provider - year"></textarea>
-        </div>
-      </section>
-
-      <button type="submit" class="btn-primary full-width">Generate Resume</button>
-    </form>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Resume Maker</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      margin: 0;
+      padding: 28px;
+      color: #111827;
+    }
+    .wrap{
+      max-width: 1180px;
+      margin: auto;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      padding: 28px;
+      border-radius: 22px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:16px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size: 32px;
+      letter-spacing: -0.04em;
+    }
+    .sub{
+      color:#64748b;
+      margin-top:6px;
+      font-size:14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+    input,textarea{
+      width:100%;
+      padding:13px 14px;
+      border:1px solid #d1d5db;
+      border-radius:14px;
+      box-sizing:border-box;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+      transition:0.2s;
+    }
+    input:focus,textarea:focus{
+      border-color:#6366f1;
+      box-shadow:0 0 0 4px rgba(99,102,241,0.12);
+    }
+    textarea{
+      min-height:96px;
+      resize:vertical;
+    }
+    .full{
+      grid-column:1/-1;
+    }
+    .section-title{
+      margin:24px 0 12px;
+      font-size:18px;
+    }
+    .templates{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:14px;
+      margin-bottom:20px;
+    }
+    .card{
+      border:1px solid #e5e7eb;
+      border-radius:18px;
+      padding:12px;
+      cursor:pointer;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      transition:0.22s;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.06);
+    }
+    .card:hover{
+      transform:translateY(-3px);
+      border-color:#6366f1;
+      box-shadow: 0 18px 30px rgba(99,102,241,0.10);
+    }
+    .card input{
+      width:auto;
+      margin-right:8px;
+    }
+    .label{
+      display:flex;
+      align-items:center;
+      font-weight:700;
+      margin-bottom:10px;
+      color:#0f172a;
+    }
+    .thumb{
+      height:160px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-size:12px;
+      font-weight:700;
+      padding:10px;
+      line-height:1.5;
+      border:1px solid rgba(255,255,255,0.7);
+      overflow:hidden;
+      position:relative;
+    }
+    .thumb::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.4), transparent 40%);
+      pointer-events:none;
+    }
+    .t1{background:linear-gradient(135deg,#ffffff,#eef2ff); color:#111827;}
+    .t2{background:linear-gradient(135deg,#0f172a,#1e293b); color:#fff;}
+    .t3{background:linear-gradient(135deg,#fafafa,#e5e7eb); color:#111827;}
+    .t4{background:linear-gradient(135deg,#e0e7ff,#c7d2fe); color:#1e1b4b;}
+    .t5{background:linear-gradient(135deg,#f5f3ff,#ddd6fe); color:#4c1d95;}
+    .thumb .mini{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      width:100%;
+      padding:8px;
+    }
+    .line{
+      height:8px;
+      border-radius:999px;
+      background: rgba(15,23,42,0.16);
+    }
+    .w70{width:70%}
+    .w55{width:55%}
+    .w40{width:40%}
+    .w90{width:90%}
+    .w60{width:60%}
+    .w30{width:30%}
+    .split{
+      display:grid;
+      grid-template-columns:30% 1fr;
+      gap:8px;
+      margin-top:6px;
+    }
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .main{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .bar{
+      height:6px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.7);
+    }
+    .dark .bar{background:rgba(255,255,255,0.25)}
+    button{
+      background: linear-gradient(135deg, #111827, #374151);
+      color:white;
+      padding:14px 22px;
+      border:none;
+      border-radius:14px;
+      font-size:15px;
+      cursor:pointer;
+      box-shadow:0 14px 28px rgba(17,24,39,0.18);
+    }
+    button:hover{
+      transform:translateY(-1px);
+    }
+    .note{
+      margin-top:10px;
+      color:#64748b;
+      font-size:13px;
+    }
+    @media(max-width:1100px){
+      .templates{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:700px){
+      .grid,.templates{grid-template-columns:1fr}
+      body{padding:14px}
+      .wrap{padding:18px}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Resume Maker</h1>
+      <div class="sub">Modern, stylish templates with clean alignment and PDF generation.</div>
+    </div>
   </div>
+
+  <form action="/generate" method="POST">
+    <div class="grid">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="phone" placeholder="Phone" required>
+      <input type="text" name="field_of_study" placeholder="Field of Study / Role" required>
+      <input type="text" name="degree_type" placeholder="Degree Type (B.Tech, M.Tech, etc.)">
+      <input type="text" name="school_name" placeholder="College / School Name">
+      <input type="text" name="school_location" placeholder="College Location">
+      <input type="text" name="grad_year" placeholder="Graduation Year">
+      <input type="text" name="school_percentage" placeholder="Score / Percentage">
+      <input type="text" name="city" placeholder="City">
+      <input type="text" name="country" placeholder="Country">
+      <textarea name="objective" class="full" placeholder="Objective / Summary"></textarea>
+      <textarea name="technical_skills" class="full" placeholder="Technical Skills: Python, Flask, SQL..."></textarea>
+      <textarea name="languages" class="full" placeholder="Languages: English, Telugu..."></textarea>
+      <textarea name="projects" class="full" placeholder="Projects: Resume Builder, Chatbot, Student Portal..."></textarea>
+      <textarea name="internships" class="full" placeholder="Internships / Experience"></textarea>
+      <textarea name="certifications" class="full" placeholder="Certifications"></textarea>
+    </div>
+
+    <h3 class="section-title">Choose a template</h3>
+    <div class="templates">
+      <label class="card">
+        <div class="label"><input type="radio" name="template" value="classic" checked>Elegant Classic</div>
+        <div class="thumb t1">
+          <div class="mini">
+            <div class="line w70"></div>
+            <div class="line w40"></div>
+            <div class="line w90"></div>
+            <div class="line w55"></div>
+            <div class="line w80"></div>
+            <div class="line w30"></div>
+          </div>
+        </div>
+      </label>
+
+      <label class="card">
+        <div class="label"><input type="radio" name="template" value="modern">Modern Sidebar</div>
+        <div class="thumb t2 dark">
+          <div class="split">
+            <div class="side">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <div class="main">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+          </div>
+        </div>
+      </label>
+
+      <label class="card">
+        <div class="label"><input type="radio" name="template" value="minimal">Minimal Premium</div>
+        <div class="thumb t3">
+          <div class="mini" style="align-items:center">
+            <div class="line w55"></div>
+            <div class="line w30"></div>
+            <div class="line w40"></div>
+            <div class="line w90"></div>
+            <div class="line w60"></div>
+          </div>
+        </div>
+      </label>
+
+      <label class="card">
+        <div class="label"><input type="radio" name="template" value="academic">Executive</div>
+        <div class="thumb t4">
+          <div class="mini">
+            <div class="line w90"></div>
+            <div class="line w60"></div>
+            <div class="line w40"></div>
+            <div class="line w80"></div>
+            <div class="line w55"></div>
+          </div>
+        </div>
+      </label>
+
+      <label class="card">
+        <div class="label"><input type="radio" name="template" value="creative">Creative Professional</div>
+        <div class="thumb t5">
+          <div class="split">
+            <div class="side">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <div class="main">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <button type="submit">Generate Resume</button>
+    <div class="note">Each template uses a different structure, spacing, and alignment for a more professional look.</div>
+  </form>
 </div>
+</body>
+</html>
 {% endblock %}
