@@ -8,6 +8,7 @@ from flask import url_for
 from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import (
+    SimpleDocTemplate,
     BaseDocTemplate,
     PageTemplate,
     Frame,
@@ -27,13 +28,6 @@ from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY, TA_RIGHT
 from reportlab.pdfbase import pdfform
 from reportlab.lib.units import mm
-
-
-
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "ml_dept.db")
-
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database", "ml_dept.db")
@@ -336,49 +330,14 @@ def get_db():
 # INIT DB SCHEMA
 # =====================================================================
 
-<<<<<<< HEAD
-=======
-@app.before_first_request
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
 def init_db():
-    db = get_db()
-    if db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").fetchone() is None:
-        with open(os.path.join(BASE_DIR, "schema.sql")) as f:
-            db.executescript(f.read())
+    if not os.path.exists(DB_PATH):
+        db = get_db()
+        with app.open_resource(os.path.join(BASE_DIR, "schema.sql")) as f:
+            db.executescript(f.read().decode("utf-8"))
         db.commit()
-<<<<<<< HEAD
-    else:
-        # Migration check: Handle legacy pdf_path and missing pdf_content
-        cursor = db.execute("PRAGMA table_info(resumes)")
-        cols = [row[1] for row in cursor.fetchall()]
-        
-        if "pdf_path" in cols:
-            print("Migrating database: Removing legacy 'pdf_path' constraint...")
-            # Reconstruct table to remove pdf_path and its NOT NULL constraint
-            db.executescript("""
-                CREATE TABLE resumes_new (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    student_id INTEGER NOT NULL,
-                    uid INTEGER NOT NULL,
-                    pdf_content BLOB,
-                    title TEXT DEFAULT 'Resume',
-                    created_at TEXT DEFAULT (datetime('now')),
-                    FOREIGN KEY (student_id) REFERENCES students(uid),
-                    FOREIGN KEY (uid) REFERENCES students(uid)
-                );
-                INSERT INTO resumes_new (id, student_id, uid, title, created_at)
-                SELECT id, student_id, uid, title, created_at FROM resumes;
-                DROP TABLE resumes;
-                ALTER TABLE resumes_new RENAME TO resumes;
-            """)
-            db.commit()
-        elif "pdf_content" not in cols:
-            db.execute("ALTER TABLE resumes ADD COLUMN pdf_content BLOB")
-            db.commit()
-=======
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
-    db.close()
-
+        db.close()
+        print("Database initialized.")
 
 # =====================================================================
 # INDEX AND STATIC PAGES
@@ -712,34 +671,9 @@ def generate():
     )
 
 # =====================================================================
-<<<<<<< HEAD
-# Debug 
-# =====================================================================
-=======
 # FACULTY DEPARTMENT / RESUMES PAGES
-
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
-@app.route("/debug-dashboard")
-def debug_dashboard():
-    uid = session.get("uid")
-    if not uid or session.get("role") != "faculty":
-        return "Login as faculty first"
-    
-    try:
-        db = get_db()
-        students_ncsml = db.execute("SELECT * FROM students WHERE department = 'NCSML'").fetchall()
-        print("First NCSML student keys:", students_ncsml[0].keys() if students_ncsml else "NO DATA")
-        print("First student type:", type(students_ncsml[0]) if students_ncsml else "EMPTY")
-        db.close()
-        return f"NCSML students: {len(students_ncsml)}<br>Type: {type(students_ncsml[0]) if students_ncsml else 'empty'}"
-    except Exception as e:
-        import traceback
-        return f"ERROR: {str(e)}<br>{traceback.format_exc()}"
-
-<<<<<<< HEAD
 # =====================================================================
-# FACULTY DASHBOARD
-# =====================================================================
+
 @app.route("/faculty/<dept>")
 def faculty_department(dept):
     if session.get("role") != "faculty":
@@ -776,122 +710,23 @@ def faculty_department(dept):
         resumes=resumes,
         session=session
     )
-=======
 
-@app.route("/faculty-dashboard")
-def faculty_dashboard():
+@app.route("/debug-dashboard")
+def debug_dashboard():
+    uid = session.get("uid")
+    if not uid or session.get("role") != "faculty":
+        return "Login as faculty first"
+    
     try:
-        uid = session.get("uid")
-        if not uid or session.get("role") != "faculty":
-            return redirect("/login")
-
         db = get_db()
-        
-        students_acsml = db.execute("SELECT * FROM students WHERE department = 'ACSML'").fetchall()
         students_ncsml = db.execute("SELECT * FROM students WHERE department = 'NCSML'").fetchall()
-        students_dcsml = db.execute("SELECT * FROM students WHERE department = 'DCSML'").fetchall()
-        
-        resumes_acsml = db.execute("""
-            SELECT r.id, r.uid, r.title, r.pdf_path, r.created_at, s.roll, s.name 
-            FROM resumes r JOIN students s ON r.uid = s.uid 
-            WHERE s.department = 'ACSML'
-        """).fetchall()
-        
-        resumes_ncsml = db.execute("""
-            SELECT r.id, r.uid, r.title, r.pdf_path, r.created_at, s.roll, s.name 
-            FROM resumes r JOIN students s ON r.uid = s.uid 
-            WHERE s.department = 'NCSML'
-        """).fetchall()
-        
-        resumes_dcsml = db.execute("""
-            SELECT r.id, r.uid, r.title, r.pdf_path, r.created_at, s.roll, s.name 
-            FROM resumes r JOIN students s ON r.uid = s.uid 
-            WHERE s.department = 'DCSML'
-        """).fetchall()
-        
+        print("First NCSML student keys:", students_ncsml[0].keys() if students_ncsml else "NO DATA")
+        print("First student type:", type(students_ncsml[0]) if students_ncsml else "EMPTY")
         db.close()
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
-
-        return render_template("faculty-dashboard.html", 
-                             students_acsml=students_acsml,
-                             students_ncsml=students_ncsml,
-                             students_dcsml=students_dcsml,
-                             resumes_acsml=resumes_acsml,
-                             resumes_ncsml=resumes_ncsml,
-                             resumes_dcsml=resumes_dcsml,
-                             session=session)
-                             
+        return f"NCSML students: {len(students_ncsml)}<br>Type: {type(students_ncsml[0]) if students_ncsml else 'empty'}"
     except Exception as e:
         import traceback
-        error_msg = f"ERROR: {str(e)}\n\n{traceback.format_exc()}"
-        print(error_msg)  # Terminal
-        return f"<pre>{error_msg}</pre>"  # Browser shows exact error
-
-@app.route("/faculty-dashboard")
-def faculty_dashboard():
-    try:
-        uid = session.get("uid")
-        if not uid or session.get("role") != "faculty":
-            return redirect(url_for("login"))
-
-        dept = request.args.get("dept", None)  # from URL: ?dept=ACSML
-
-        db = get_db()
-
-        def get_students_for(department):
-            if dept is None or dept == department:
-                return db.execute(
-                    """
-                    SELECT s.*, u.email, u.phone
-                    FROM students s
-                    JOIN users u ON s.uid = u.uid
-                    WHERE s.department = ?
-                    ORDER BY s.roll
-                    """,
-                    [department]
-                ).fetchall()
-            return []
-
-        def get_resumes_for(department):
-            if dept is None or dept == department:
-                return db.execute(
-                    """
-                    SELECT r.id, r.uid, r.title, r.created_at,
-                           s.roll, s.name
-                    FROM resumes r
-                    JOIN students s ON r.uid = s.uid
-                    WHERE s.department = ?
-                    ORDER BY s.roll
-                    """,
-                    [department]
-                ).fetchall()
-            return []
-
-        students_acsml = get_students_for("ACSML")
-        students_ncsml = get_students_for("NCSML")
-        students_dcsml = get_students_for("DCSML")
-
-        resumes_acsml = get_resumes_for("ACSML")
-        resumes_ncsml = get_resumes_for("NCSML")
-        resumes_dcsml = get_resumes_for("DCSML")
-
-        db.close()
-
-        return render_template("faculty-dashboard.html",
-                             students_acsml=students_acsml,
-                             students_ncsml=students_ncsml,
-                             students_dcsml=students_dcsml,
-                             resumes_acsml=resumes_acsml,
-                             resumes_ncsml=resumes_ncsml,
-                             resumes_dcsml=resumes_dcsml,
-                             session=session,
-                             dept=dept)
-
-    except Exception as e:
-        import traceback
-        error_msg = f"ERROR: {str(e)}\\n\\n{traceback.format_exc()}"
-        print(error_msg)
-        return f"<pre>{error_msg}</pre>"
+        return f"ERROR: {str(e)}<br>{traceback.format_exc()}"
 
 # =====================================================================
 # EDIT STUDENT DETAILS - FACULTY DASHBOARD
@@ -1004,7 +839,6 @@ def faculty_add_student():
         return "Missing required fields", 400
 
     db = get_db()
-<<<<<<< HEAD
 
     try:
         h = hashlib.sha256(password.encode()).hexdigest()
@@ -1040,10 +874,9 @@ def faculty_add_student():
 
     except Exception as e:
         db.rollback()
+        db.close()
         return str(e)
 
-    finally:
-        db.close()
 
     return redirect(url_for("faculty_dashboard"))
 # =====================================================================
@@ -1083,23 +916,59 @@ def faculty_delete_student(roll):
 
         db.commit()
 
-=======
-    student = db.execute("SELECT roll, name, department FROM students WHERE uid = ?", [uid]).fetchone()
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
     db.close()
-
     return redirect(url_for("faculty_dashboard"))
+
+@app.route("/faculty-dashboard")
+def faculty_dashboard():
+    try:
+        uid = session.get("uid")
+        if not uid or session.get("role") != "faculty":
+            return redirect(url_for("login"))
+
+        dept = request.args.get("dept", None) 
+
+        db = get_db()
+        
+        def get_students_for(department):
+            return db.execute(
+                "SELECT s.*, u.email, u.phone FROM students s JOIN users u ON s.uid = u.uid WHERE s.department = ? ORDER BY s.roll",
+                [department]
+            ).fetchall()
+
+        def get_resumes_for(department):
+            return db.execute(
+                "SELECT r.id, r.uid, r.title, r.created_at, s.roll, s.name FROM resumes r JOIN students s ON r.uid = s.uid WHERE s.department = ? ORDER BY r.created_at DESC",
+                [department]
+            ).fetchall()
+
+        context = {
+            "students_acsml": get_students_for("ACSML"),
+            "students_ncsml": get_students_for("NCSML"),
+            "students_dcsml": get_students_for("DCSML"),
+            "resumes_acsml": get_resumes_for("ACSML"),
+            "resumes_ncsml": get_resumes_for("NCSML"),
+            "resumes_dcsml": get_resumes_for("DCSML"),
+            "session": session,
+            "dept": dept
+        }
+        db.close()
+        return render_template("faculty-dashboard.html", **context)
+
+    except Exception as e:
+        import traceback
+        return f"<pre>{traceback.format_exc()}</pre>"
 
 # =====================================================================
 # RESUME TEMPLATE GENERATORS (5 Styles)
 # =====================================================================
+
 
 def make_styles(template_type):
     styles = getSampleStyleSheet()
     body_font = "Times-Roman" if template_type == "academic" else "Helvetica"
     bold_font = "Times-Bold" if template_type == "academic" else "Helvetica-Bold"
 
-<<<<<<< HEAD
     palette = {
         "classic": ("#1e3a5f", "#51606f", "#d7dee6"),
         "modern": ("#0f766e", "#5b6472", "#dbe4ea"),
@@ -1280,79 +1149,6 @@ def generate_resume_pdf(template_type, form_data):
                 desc = describe_certification(c)
                 story.append(Paragraph(f"• <b>{clean_text(c)}</b>: {clean_text(desc)}", styles["body"]))
                 story.append(Spacer(1, 2))
-=======
-        doc = SimpleDocTemplate(
-            full_path,
-            pagesize=A4,
-            rightMargin=40,
-            leftMargin=40,
-            topMargin=40,
-            bottomMargin=40
-        )
-        styles = getSampleStyleSheet()
-        
-        # Custom styles
-        name_style = ParagraphStyle(
-            "Name", parent=styles["Title"], 
-            fontSize=24, leading=28, 
-            spaceAfter=20, alignment=1  # Center aligned
-        )
-        contact_style = ParagraphStyle(
-            "Contact", parent=styles["Normal"], 
-            fontSize=11, leading=14,
-            spaceAfter=20, alignment=1  # Center aligned
-        )
-        section_style = ParagraphStyle(
-            "Section", parent=styles["Heading2"],
-            fontSize=14, leading=18,
-            spaceBefore=20, spaceAfter=8,
-            textColor=colors.darkblue,
-            fontName="Helvetica-Bold"
-        )
-        content_style = ParagraphStyle(
-            "Content", parent=styles["Normal"],
-            fontSize=10, leading=14,
-            leftIndent=10
-        )
-
-        story = []
-        
-        # 1. NAME (Centered, Large)
-        story.append(Paragraph(request.form.get("name", ""), name_style))
-        
-        # 2. CONTACT INFO (Centered)
-        contact = f"{request.form.get('email', '')} | {request.form.get('phone', '')} | {request.form.get('location', '')}"
-        story.append(Paragraph(contact, contact_style))
-        
-        # 3. Horizontal Line
-        story.append(Spacer(1, 15))
-        story.append(HRFlowable(color=colors.black, thickness=1, width="80%", spaceBefore=5, spaceAfter=5))
-        story.append(Spacer(1, 20))
-
-        # 4. SECTIONS IN ORDER (Single Column)
-        sections_data = [
-            ("OBJECTIVE", request.form.get("objective", "")),
-            ("EDUCATION", request.form.get("education", "")),
-            ("SKILLS", request.form.get("technical_skills", "")),
-            ("PROJECTS", request.form.get("projects", "")),
-            ("WORK EXPERIENCE", request.form.get("work_experience", "")),
-            ("CERTIFICATIONS", request.form.get("certifications", "")),
-            ("INTERNSHIPS", request.form.get("internships", ""))
-        ]
-
-        for section_title, content in sections_data:
-            if should_print_section(content, content):
-                # Section Header
-                story.append(Paragraph(section_title, section_style))
-                
-                # Processed Content
-                processed_content = elaborate(content, section_title.lower().replace(" ", "_"))
-                if not processed_content:
-                    processed_content = expand_section(content, section_title.lower().replace(" ", "_"))
-                
-                story.append(Paragraph(processed_content, content_style))
-                story.append(Spacer(1, 12))
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
 
         doc.build(story)
         pdf_out = buffer.getvalue()
@@ -1465,24 +1261,6 @@ def generate_resume_pdf(template_type, form_data):
     buffer.close()
     return pdf_out
 
-<<<<<<< HEAD
-=======
-        # Save to database
-        student_id, student_name, student_dept = student
-        conn = get_db()
-        conn.execute(
-            "INSERT INTO resumes (student_id, uid, pdf_path, title, created_at) VALUES (?, ?, ?, ?, ?)",
-            [student_id, uid, pdf_path_disk, f"{student_name}'s Resume", datetime.now()]
-        )
-        conn.commit()
-        conn.close()
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
-
-
-<<<<<<< HEAD
-=======
-    return render_template("resume-form.html", student=student)
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
 # =====================================================================
 # DOWNLOAD 
 # =====================================================================
@@ -1586,161 +1364,6 @@ def delete_resume():
 # STUDENT DETAILS
 # =====================================================================
 
-<<<<<<< HEAD
-=======
-@app.route("/faculty-dashboard")
-def faculty_dashboard():
-    uid = session.get("uid")
-    if not uid or session.get("role") != "faculty":
-        return redirect("/login")
-
-    db = get_db()
-    db.row_factory = sqlite3.Row
-    
-    # Get students by department
-    students_acsml = db.execute("SELECT * FROM students WHERE department = 'ACSML'").fetchall()
-    students_ncsml = db.execute("SELECT * FROM students WHERE department = 'NCSML'").fetchall()
-    students_dcsml = db.execute("SELECT * FROM students WHERE department = 'DCSML'").fetchall()
-    
-    # Get resumes by department
-    resumes_acsml = db.execute(
-        """
-        SELECT
-            r.id, r.uid, r.title, r.pdf_path, r.created_at,
-            s.roll, s.name, s.department
-        FROM
-            resumes r
-        JOIN
-            students s ON r.uid = s.uid
-        WHERE s.department = 'ACSML'
-        ORDER BY
-            r.created_at DESC
-        """
-    ).fetchall()
-    
-    resumes_ncsml = db.execute(
-        """
-        SELECT
-            r.id, r.uid, r.title, r.pdf_path, r.created_at,
-            s.roll, s.name, s.department
-        FROM
-            resumes r
-        JOIN
-            students s ON r.uid = s.uid
-        WHERE s.department = 'NCSML'
-        ORDER BY
-            r.created_at DESC
-        """
-    ).fetchall()
-    
-    resumes_dcsml = db.execute(
-        """
-        SELECT
-            r.id, r.uid, r.title, r.pdf_path, r.created_at,
-            s.roll, s.name, s.department
-        FROM
-            resumes r
-        JOIN
-            students s ON r.uid = s.uid
-        WHERE s.department = 'DCSML'
-        ORDER BY
-            r.created_at DESC
-        """
-    ).fetchall()
-    
-    db.close()
-
-    return render_template("faculty-dashboard.html",
-                       students_acsml=students_acsml,
-                       students_ncsml=students_ncsml,
-                       students_dcsml=students_dcsml,
-                       resumes_acsml=resumes_acsml,
-                       resumes_ncsml=resumes_ncsml,
-                       resumes_dcsml=resumes_dcsml,
-                       session=session)
-
-
-# =====================================================================
-# FACULTY ADD STUDENT
-# =====================================================================
-@app.route("/faculty/add-student", methods=["POST"])
-def faculty_add_student():
-    if session.get("role") != "faculty":
-        return redirect("/login")
-
-    username = request.form.get("username")
-    password = request.form.get("password")
-    department = request.form.get("department")
-    roll = request.form.get("roll")
-    name = request.form.get("name")
-    cgpa = float(request.form.get("cgpa", 0.0) or 0.0)
-    sgpa = float(request.form.get("sgpa", 0.0) or 0.0)
-    attendance = int(request.form.get("attendance", 0) or 0)
-
-    if not all([username, password, department, roll, name]):
-        return "Missing required fields", 400
-
-    db = get_db()
-
-    try:
-        h = hashlib.sha256(password.encode()).hexdigest()
-
-        # 1. Insert into users
-        db.execute(
-            "INSERT INTO users (username, password_hash, name, role) VALUES (?, ?, ?, 'student')",
-            [username, h, name]
-        )
-        db.commit()
-
-        # 2. Now get the new user's uid
-        user_row = db.execute(
-            "SELECT uid FROM users WHERE username = ?", [username]
-        ).fetchone()
-        if not user_row:
-            db.rollback()
-            return "User creation failed", 500
-
-        uid = user_row[0]
-
-        # 3. Insert into students
-        db.execute(
-            """
-            INSERT INTO students (uid, department, roll, name, cgpa, sgpa, attendance)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            [uid, department, roll, name, cgpa, sgpa, attendance]
-        )
-        db.commit()
-
-    except sqlite3.IntegrityError as e:
-        db.rollback()
-        return f"Error: {str(e)}", 400
-    except Exception as e:
-        db.rollback()
-        return f"Unexpected error: {str(e)}", 500
-    finally:
-        db.close()
-
-    return redirect("/faculty-dashboard")
-
-@app.route("/faculty/delete-student/<string:roll>", methods=["POST"])
-def faculty_delete_student(roll):
-    if session.get("role") != "faculty":
-        return redirect("/login")
-
-    db = get_db()
-    row = db.execute("SELECT uid FROM students WHERE roll = ?", [roll]).fetchone()
-    if row:
-        uid = row[0]
-        db.execute("DELETE FROM resumes WHERE uid = ?", [uid])
-        db.execute("DELETE FROM students WHERE roll = ?", [roll])
-        db.execute("DELETE FROM users WHERE uid = ?", [uid])
-        db.commit()
-    db.close()
-
-    return redirect("/faculty-dashboard")
-
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
 @app.route("/student-details/<int:student_uid>")
 def student_details(student_uid):
     if session.get("role") != "faculty":
@@ -1863,16 +1486,9 @@ def chat():
     # Generic helpful response
     return jsonify({"reply": "I'm here to help with information about the Machine Learning Department. You can ask me about our programs, faculty, student resources, or any other department-related questions. What would you like to know?"})
 
-
-
-
-
-
-
 if __name__ == "__main__":
-<<<<<<< HEAD
     init_db()
-    app.run(debug=True, host="0.0.0.0", port=5000)
-=======
-    app.run(debug=True, host="0.0.0.0", port=5000)
->>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
+    # Use Render's PORT environment variable
+    port = int(os.environ.get("PORT", 5000))
+    # Debug should be False in production
+    app.run(debug=False, host="0.0.0.0", port=port)
