@@ -31,7 +31,7 @@ from reportlab.lib.units import mm
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database", "ml_dept.db")
-
+DATABASE_URL = os.getenv('DATABASE_URL')
 # =====================================================================
 # HELPER FUNCTIONS
 # =====================================================================
