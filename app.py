@@ -31,7 +31,7 @@ from reportlab.lib.units import mm
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database", "ml_dept.db")
-DATABASE_URL = os.getenv('DATABASE_URL')
+
 # =====================================================================
 # HELPER FUNCTIONS
 # =====================================================================
@@ -1487,7 +1487,6 @@ def chat():
     return jsonify({"reply": "I'm here to help with information about the Machine Learning Department. You can ask me about our programs, faculty, student resources, or any other department-related questions. What would you like to know?"})
 
 if __name__ == "__main__":
-    init_db()
     # Use Render's PORT environment variable
     port = int(os.environ.get("PORT", 5000))
     # Debug should be False in production

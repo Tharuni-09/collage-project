@@ -1,21 +1,1257 @@
 {% extends "base.html" %}
-{% block title %}Previous Year Papers{% endblock %}
+{% block title %}Previous Year Papers - ML Department{% endblock %}
 {% block content %}
+<style>
+.header{
+  margin-bottom:40px;
+}
+
+.header h1{
+  color:#0a1f44;
+  font-size:28px;
+  margin-bottom:6px;
+}
+
+.header p{
+  color:#666;
+  font-size:14px;
+}
+
+/* FILTER SECTION */
+.filter-box{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.05);
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  margin-bottom:40px;
+}
+
+select{
+  padding:5px 10px;
+  border-radius:8px;
+  border:1px solid #d6dbe6;
+  font-size:14px;
+  background:#f9fbff;
+  cursor:pointer;
+}
+
+/* PAPER GRID */
+.paper-container{
+  display:grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap:20px;
+}
+
+
+/* CARD */
+.paper-card{
+  background:white;
+  border-radius:10px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.05);
+  aspect-ratio:1/1;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:0.3s;
+}
+
+.paper-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 30px rgba(0,0,0,0.08);
+}
+
+.paper-card h3{
+  color:#0a1f44;
+  font-size:17px;
+  margin-bottom:8px;
+}
+
+.meta{
+  font-size:13px;
+  color:#777;
+  margin-bottom:15px;
+}
+
+.buttons{
+  display:flex;
+  gap:10px;
+  margin-top:auto;
+}
+
+.buttons a{
+  flex:1;
+  text-align:center;
+  padding:8px 0;
+  border-radius:6px;
+  font-size:13px;
+  text-decoration:none;
+  transition:0.3s;
+}
+
+.view-btn{
+  background:#eef3ff;
+  color:#1c3faa;
+}
+
+.view-btn:hover{
+  background:#dce6ff;
+}
+
+.download-btn{
+  background:#0a1f44;
+  color:white;
+}
+
+.download-btn:hover{
+  background:#1c3faa;
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const yearFilter = document.getElementById("yearFilter");
+  const semFilter = document.getElementById("semFilter");
+  const cards = document.querySelectorAll(".paper-card");
+  function filterPapers() {
+    const yearValue = yearFilter.value;
+    const semValue = semFilter.value;
+    cards.forEach(card => {
+      const cardYear = card.dataset.year;
+      const cardSem = card.dataset.sem;
+      const yearMatch = (yearValue === "all" || yearValue === cardYear);
+      const semMatch = (semValue === "all" || semValue === cardSem);
+      card.style.display = (yearMatch && semMatch) ? "flex" : "none";
+    });
+  }
+  yearFilter.addEventListener("change", filterPapers);
+  semFilter.addEventListener("change", filterPapers);
+});
+</script>
 <div class="page-container">
-    <h2>📚 Previous Year Question Papers</h2>
-    <div class="card-grid">
-        <div class="card">
-            <h3>ACSML Sem-I (2025)</h3>
-            <a href="{{ url_for('static', filename='papers/acsml-sem1.pdf') }}" class="btn-primary" download>⬇️ Download</a>
-        </div>
-        <div class="card">
-            <h3>NCSML Sem-II (2025)</h3>
-            <a href="{{ url_for('static', filename='papers/ncsml-sem2.pdf') }}" class="btn-primary" download>⬇️ Download</a>
-        </div>
-        <div class="card">
-            <h3>DCSML Sem-III (2025)</h3>
-            <a href="{{ url_for('static', filename='papers/dcsml-sem3.pdf') }}" class="btn-primary" download>⬇️ Download</a>
-        </div>
-    </div>
+<div class="header">
+<h1>Previous Year Question Papers</h1>
+<p>Machine Learning Department | 2023 – 2025</p>
+</div>
+
+<div class="filter-box">
+<select id="yearFilter">
+<option value="all">All Years</option>
+<option value="2023">2023</option>
+<option value="2024">2024</option>
+<option value="2025">2025</option>
+</select>
+
+<select id="semFilter">
+<option value="all">All Semesters</option>
+<option value="1">Semester 1</option>
+<option value="2">Semester 2</option>
+<option value="3">Semester 3</option>
+<option value="4">Semester 4</option>
+<option value="5">Semester 5</option>
+<option value="6">Semester 6</option>
+</select>
+</div>
+
+<div class="paper-container">
+
+<!-- ===== 2023 ===== -->
+<div class="paper-card" data-year="2023" data-sem="1">
+<img src="{{ url_for('static', filename='images/english_1_2023_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>General English - I</h3>
+<div class="meta">2023 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/english_1_2023_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/english_1_2023_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="1">
+<img src="{{ url_for('static', filename='images/ve_24_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Value Education and Personality Development</h3>
+<div class="meta">2023 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/value_edu_2023_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/value_edu_2023_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2023" data-sem="1">
+<img src="{{ url_for('static', filename='images/fdsc_24_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Fundamentals of IT and Data Visualization</h3>
+<div class="meta">2023 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/fit_dv_2023_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/fit_dv_2023_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="1">
+<img src="{{ url_for('static', filename='images/math_de_2023_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Differential Equations and Matrices</h3>
+<div class="meta">2023 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/math_de_2023_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/math_de_2023_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2023" data-sem="1">
+<img src="{{ url_for('static', filename='images/c_prog_2023_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Problem Solving and Programming in C</h3>
+<div class="meta">2023 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/c_prog_2023_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/c_prog_2023_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="1">
+<img src="{{ url_for('static', filename='images/electronics_2023_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Basic Electronic and Circuits</h3>
+<div class="meta">2023 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/electronics_2023_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/electronics_2023_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+<!-- Sem2 -->
+
+<div class="paper-card" data-year="2023" data-sem="2">
+<img src="{{ url_for('static', filename='images/english_2_2023_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>General English - II</h3>
+<div class="meta">2023 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/english_2_2023_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/english_2_2023_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="2">
+<img src="{{ url_for('static', filename='images/ihc_24_2.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Indian Heritage & Culture</h3>
+<div class="meta">2023 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/heritage_2023_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/heritage_2023_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+  
+<div class="paper-card" data-year="2023" data-sem="2">
+<img src="{{ url_for('static', filename='images/prob_stats_2023_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Probability and Statistics for ML</h3>
+<div class="meta">2023 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/prob_stats_2023_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/prob_stats_2023_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="2">
+<img src="{{ url_for('static', filename='images/math_vc_2023_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Vector Calculus & Number Theory</h3>
+<div class="meta">2023 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/math_vc_2023_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/math_vc_2023_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2023" data-sem="2">
+<img src="{{ url_for('static', filename='images/data_structures_2023_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Fundamentals of Data Structures Using C</h3>
+<div class="meta">2023 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_structures_2023_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_structures_2023_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="2">
+<img src="{{ url_for('static', filename='images/python_2023_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Python Programming</h3>
+<div class="meta">2023 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/python_2023_2_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/python_2023_2_2.jpeg') }}" class="view-btn">P2</a>
+</div>
+</div>
+
+
+<!-- sem3 -->
+
+<div class="paper-card" data-year="2023" data-sem="3">
+<img src="{{ url_for('static', filename='images/env_sci_2023_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Environmental Science and Generalisation</h3>
+<div class="meta">2023 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/env_sci_2023_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/env_sci_2023_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="3">
+<img src="{{ url_for('static', filename='images/discrete_math_2023_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Discrete Mathematics</h3>
+<div class="meta">2023 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/discrete_math_2023_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/discrete_math_2023_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2023" data-sem="3">
+<img src="{{ url_for('static', filename='images/dbms_24_3.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>DataBase Management System</h3>
+<div class="meta">2023 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/dbms_2023_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/dbms_2023_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="3">
+<img src="{{ url_for('static', filename='images/digital_logic_2023_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Digital Logic and Design</h3>
+<div class="meta">2023 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/digital_logic_2023_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/digital_logic_2023_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2023" data-sem="3">
+<img src="{{ url_for('static', filename='images/ai_intro_2023_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Introduction to AI</h3>
+<div class="meta">2023 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/ai_intro_2023_3.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/ai_intro_2023_3.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+
+
+<!-- Sem4 -->
+
+<div class="paper-card" data-year="2023" data-sem="4">
+<img src="{{ url_for('static', filename='images/ml_23_4.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Introduction to Machine Learning</h3>
+<div class="meta">2023 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/machine_learning_2023_4_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/machine_learning_2023_4_2.jpeg') }}" class="view-btn">P2</a>
+<a href="{{ url_for('static', filename='images/machine_learning_2023_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="4">
+<img src="{{ url_for('static', filename='images/dm_23_4.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Data Mining</h3>
+<div class="meta">2023 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_mining_2023_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_mining_2023_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="4">
+<img src="{{ url_for('static', filename='images/daa_23_4.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Design and Analysis of Algorithms</h3>
+<div class="meta">2023 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/daa_2023_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/daa_2023_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="4">
+<img src="{{ url_for('static', filename='images/os_23_4.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Operating System</h3>
+<div class="meta">2023 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/os_2023_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/os_2023_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="4">
+<img src="{{ url_for('static', filename='images/se_23_4.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Software Engineering</h3>
+<div class="meta">2023 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/se_2023_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/se_2023_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="4">
+<img src="{{ url_for('static', filename='images/web_tech_2023_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Web Technologies</h3>
+<div class="meta">2023 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/wt_23_4.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/wt_23_4.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+
+<!-- Sem5 -->
+
+<div class="paper-card" data-year="2023" data-sem="5">
+<img src="{{ url_for('static', filename='images/bda_23_5.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Big Data Analysis</h3>
+<div class="meta">2023 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/big_data_2023_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/big_data_2023_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="5">
+<img src="{{ url_for('static', filename='images/social_media_2023_5_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Social Media Analysis</h3>
+<div class="meta">2023 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/social_media_2023_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/social_media_2023_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="5">
+<img src="{{ url_for('static', filename='images/data_security_2023_5_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Data Security</h3>
+<div class="meta">2023 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_security_2023_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_security_2023_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="5">
+<img src="{{ url_for('static', filename='images/cs_23_5.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Cyber Security</h3>
+<div class="meta">2023 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cyber_security_2023_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cyber_security_2023_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="5">
+<img src="{{ url_for('static', filename='images/ot_23_5.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Optimization Theory</h3>
+<div class="meta">2023 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/optimization_2023_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/optimization_2023_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="5">
+<img src="{{ url_for('static', filename='images/dl_23_5.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Deep Learning</h3>
+<div class="meta">2023 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/deep_learning_2023_5_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/deep_learning_2023_5_2.jpeg') }}" class="view-btn">P2</a>
+<a href="{{ url_for('static', filename='images/deep_learning_2023_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="5">
+<img src="{{ url_for('static', filename='images/cognitive_2023_5_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Cognitive Computing</h3>
+<div class="meta">2023 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cc_23_5.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cc_23_5.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+
+
+
+<!-- Sem6 -->
+
+<div class="paper-card" data-year="2023" data-sem="6">
+<img src="{{ url_for('static', filename='images/cloud_2023_6_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Cloud Computing</h3>
+<div class="meta">2023 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cloud_2023_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cloud_2023_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="6">
+<img src="{{ url_for('static', filename='images/hci_2023_6_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Human Computer Interaction</h3>
+<div class="meta">2023 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/hci_2023_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/hci_2023_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="6">
+<img src="{{ url_for('static', filename='images/iot_2023_6_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Internet of Things</h3>
+<div class="meta">2023 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/iot_2023_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/iot_2023_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="6">
+<img src="{{ url_for('static', filename='images/blockchain_2023_6_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Block Chain</h3>
+<div class="meta">2023 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/blockchain_2023_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/blockchain_2023_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="6">
+<img src="{{ url_for('static', filename='images/vision_2023_6_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Computer Vision</h3>
+<div class="meta">2023 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/vision_2023_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/vision_2023_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2023" data-sem="6">
+<img src="{{ url_for('static', filename='images/nlp_2023_6_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Natural Language Processing</h3>
+<div class="meta">2023 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/nlp_23_6.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/nlp_23_6.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<!-- ===== 2024 ===== -->
+<div class="paper-card" data-year="2024" data-sem="1">
+<img src="{{ url_for('static', filename='images/english_1_2024_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>General English - I</h3>
+<div class="meta">2024 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/english_1_2024_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/english_1_2024_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="1">
+<img src="{{ url_for('static', filename='images/value_edu_2024_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Value Education and Personality Development</h3>
+<div class="meta">2024 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/value_edu_2024_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/value_edu_2024_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2024" data-sem="1">
+<img src="{{ url_for('static', filename='images/fit_dv_2024_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Fundamentals of IT and Data Visualization</h3>
+<div class="meta">2024 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/fit_dv_2024_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/fit_dv_2024_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="1">
+<img src="{{ url_for('static', filename='images/math_de_2024_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Differential Equations and Matrices</h3>
+<div class="meta">2024 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/math_de_2024_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/math_de_2024_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2024" data-sem="1">
+<img src="{{ url_for('static', filename='images/c_prog_2024_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Problem Solving and Programming in C</h3>
+<div class="meta">2024 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/c_24_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/c_24_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="1">
+<img src="{{ url_for('static', filename='images/electronics_2024_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Basic Electronic and Circuits</h3>
+<div class="meta">2024 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/bec_24_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/bec_24_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+<!-- Sem2 -->
+
+<div class="paper-card" data-year="2024" data-sem="2">
+<img src="{{ url_for('static', filename='images/english_2_2024_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>General English - II</h3>
+<div class="meta">2024 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/eng_24_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/eng_24_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="2">
+<img src="{{ url_for('static', filename='images/heritage_2024_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Indian Heritage & Culture</h3>
+<div class="meta">2024 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/heritage_2024_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/heritage_2024_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2024" data-sem="2">
+<img src="{{ url_for('static', filename='images/prob_stats_2024_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Probability and Statistics for ML</h3>
+<div class="meta">2024 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/prob_stats_2024_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/prob_stats_2024_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="2">
+<img src="{{ url_for('static', filename='images/math_vc_2024_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Vector Calculus & Number Theory</h3>
+<div class="meta">2024 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/math_vc_2024_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/math_vc_2024_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2024" data-sem="2">
+<img src="{{ url_for('static', filename='images/data_structures_2024_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Fundamentals of Data Structures Using C</h3>
+<div class="meta">2024 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_structures_2024_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_structures_2024_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="2">
+<h3>Python Programming</h3>
+<div class="meta">2024 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/python_2024_2_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/python_2024_2_2.jpeg') }}" class="view-btn">P2</a>
+</div>
+</div>
+
+
+<!-- sem3 -->
+
+<div class="paper-card" data-year="2024" data-sem="3">
+<img src="{{ url_for('static', filename='images/env_sci_2024_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Environmental Science and Generalisation</h3>
+<div class="meta">2024 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/env_sci_2024_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/env_sci_2024_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="3">
+<img src="{{ url_for('static', filename='images/discrete_math_2024_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Discrete Mathematics</h3>
+<div class="meta">2024 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/discrete_math_2024_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/discrete_math_2024_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2024" data-sem="3">
+<img src="{{ url_for('static', filename='images/dbms_2024_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>DataBase Management System</h3>
+<div class="meta">2024 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/dbms_2024_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/dbms_2024_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="3">
+<img src="{{ url_for('static', filename='images/digital_logic_2024_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Digital Logic and Design</h3>
+<div class="meta">2024 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/digital_logic_2024_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/digital_logic_2024_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2024" data-sem="3">
+<img src="{{ url_for('static', filename='images/ai_intro_2024_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Introduction to AI</h3>
+<div class="meta">2024 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/ai_24_3.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/ai_24_3.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+
+
+<!-- Sem4 -->
+
+<div class="paper-card" data-year="2024" data-sem="4">
+<img src="{{ url_for('static', filename='images/machine_learning_2024_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Introduction to Machine Learning</h3>
+<div class="meta">2024 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/machine_learning_2024_4_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/machine_learning_2024_4_2.jpeg') }}" class="view-btn">P2</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="4">
+<img src="{{ url_for('static', filename='images/data_mining_2024_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Data Mining</h3>
+<div class="meta">2024 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_mining_2024_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_mining_2024_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="4">
+<img src="{{ url_for('static', filename='images/daa_2024_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Design and Analysis of Algorithms</h3>
+<div class="meta">2024 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/daa_2024_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/daa_2024_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="4">
+<img src="{{ url_for('static', filename='images/os_2024_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Operating System</h3>
+<div class="meta">2024 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/os_2024_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/os_2024_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="4">
+<img src="{{ url_for('static', filename='images/se_2024_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Software Engineering</h3>
+<div class="meta">2024 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/se_2024_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/se_2024_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="4">
+<img src="{{ url_for('static', filename='images/web_tech_2024_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Web Technologies</h3>
+<div class="meta">2024 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/wt_24_4.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/wt_24_4.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+
+<!-- Sem5 -->
+
+<div class="paper-card" data-year="2024" data-sem="5">
+<h3>Big Data Analysis</h3>
+<div class="meta">2024 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/big_data_2024_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/big_data_2024_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="5">
+<h3>Social Media Analysis</h3>
+<div class="meta">2024 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/social_media_2024_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/social_media_2024_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="5">
+<h3>Data Security</h3>
+<div class="meta">2024 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_security_2024_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_security_2024_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="5">
+<h3>Cyber Security</h3>
+<div class="meta">2024 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cyber_security_2024_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cyber_security_2024_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="5">
+<h3>Optimization Theory</h3>
+<div class="meta">2024 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/optimization_2024_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/optimization_2024_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="5">
+<h3>Deep Learning</h3>
+<div class="meta">2024 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/deep_learning_2024_5_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/deep_learning_2024_5_2.jpeg') }}" class="view-btn">P2</a>
+</div>
+</div>
+<div class="paper-card" data-year="2024" data-sem="5">
+<h3>Cognitive Computing</h3>
+<div class="meta">2024 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cognitive_2024_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cognitive_2024_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+<!-- Sem6 -->
+
+<div class="paper-card" data-year="2024" data-sem="6">
+<h3>Cloud Computing</h3>
+<div class="meta">2024 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cloud_2024_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cloud_2024_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="6">
+<h3>Human Computer Interaction</h3>
+<div class="meta">2024 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/hci_2024_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/hci_2024_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="6">
+<h3>Internet of Things</h3>
+<div class="meta">2024 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/iot_2024_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/iot_2024_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="6">
+<h3>Block Chain</h3>
+<div class="meta">2024 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/blockchain_2024_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/blockchain_2024_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="6">
+<h3>Computer Vision</h3>
+<div class="meta">2024 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/vision_2024_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/vision_2024_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2024" data-sem="6">
+<h3>Natural Language Processing</h3>
+<div class="meta">2024 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/nlp_2024_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/nlp_2024_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<!-- ===== 2025 ===== -->
+<div class="paper-card" data-year="2025" data-sem="1">
+<img src="{{ url_for('static', filename='images/english_1_2025_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>General English - I</h3>
+<div class="meta">2025 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/english_1_2025_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/english_1_2025_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="1">
+<img src="{{ url_for('static', filename='images/value_edu_2025_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Value Education and Personality Development</h3>
+<div class="meta">2025 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/value_edu_2025_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/value_edu_2025_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2025" data-sem="1">
+<img src="{{ url_for('static', filename='images/fit_dv_2025_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Fundamentals of IT and Data Visualization</h3>
+<div class="meta">2025 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/fit_dv_2025_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/fit_dv_2025_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="1">
+<img src="{{ url_for('static', filename='images/math_de_2025_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Differential Equations and Matrices</h3>
+<div class="meta">2025 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/math_de_2025_1_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/math_de_2025_1_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2025" data-sem="1">
+<img src="{{ url_for('static', filename='images/c_prog_2025_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Problem Solving and Programming in C</h3>
+<div class="meta">2025 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/c_25_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/c_25_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="1">
+<img src="{{ url_for('static', filename='images/electronics_2025_1_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Basic Electronic and Circuits</h3>
+<div class="meta">2025 • Semester 1</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/bec_25_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/bec_25_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+<!-- Sem2 -->
+
+<div class="paper-card" data-year="2025" data-sem="2">
+<img src="{{ url_for('static', filename='images/english_2_2025_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>General English - II</h3>
+<div class="meta">2025 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/eng_25_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/eng_25_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="2">
+<img src="{{ url_for('static', filename='images/heritage_2025_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Indian Heritage & Culture</h3>
+<div class="meta">2025 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/heritage_2025_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/heritage_2025_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2025" data-sem="2">
+<img src="{{ url_for('static', filename='images/prob_stats_2025_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Probability and Statistics for ML</h3>
+<div class="meta">2025 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/prob_stats_2025_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/prob_stats_2025_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="2">
+<img src="{{ url_for('static', filename='images/math_vc_2025_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Vector Calculus & Number Theory</h3>
+<div class="meta">2025 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/math_vc_25_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/math_vc_25_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2025" data-sem="2">
+<img src="{{ url_for('static', filename='images/data_structures_2025_2_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Fundamentals of Data Structures Using C</h3>
+<div class="meta">2025 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_structures_2025_2_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_structures_2025_2_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="2">
+<h3>Python Programming</h3>
+<div class="meta">2025 • Semester 2</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/python_2025_2_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/python_2025_2_2.jpeg') }}" class="view-btn">P2</a>
+</div>
+</div>
+
+
+<!-- sem3 -->
+
+<div class="paper-card" data-year="2025" data-sem="3">
+<img src="{{ url_for('static', filename='images/env_sci_2025_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Environmental Science and Generalisation</h3>
+<div class="meta">2025 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/env_sci_2025_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/env_sci_2025_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="3">
+<img src="{{ url_for('static', filename='images/discrete_math_2025_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Discrete Mathematics</h3>
+<div class="meta">2025 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/discrete_math_2025_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/discrete_math_2025_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2025" data-sem="3">
+<img src="{{ url_for('static', filename='images/dbms_2025_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>DataBase Management System</h3>
+<div class="meta">2025 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/dbms_2025_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/dbms_2025_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="3">
+<img src="{{ url_for('static', filename='images/digital_logic_2025_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Digital Logic and Design</h3>
+<div class="meta">2025 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/digital_logic_2025_3_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/digital_logic_2025_3_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+<div class="paper-card" data-year="2025" data-sem="3">
+<img src="{{ url_for('static', filename='images/ai_intro_2025_3_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Introduction to AI</h3>
+<div class="meta">2025 • Semester 3</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/ai_25_3.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/ai_25_3.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+
+
+<!-- Sem4 -->
+
+<div class="paper-card" data-year="2025" data-sem="4">
+<img src="{{ url_for('static', filename='images/machine_learning_2025_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Introduction to Machine Learning</h3>
+<div class="meta">2025 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/machine_learning_2025_4_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/machine_learning_2025_4_2.jpeg') }}" class="view-btn">P2</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="4">
+<img src="{{ url_for('static', filename='images/data_mining_2025_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Data Mining</h3>
+<div class="meta">2025 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_mining_2025_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_mining_2025_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="4">
+<img src="{{ url_for('static', filename='images/daa_2025_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Design and Analysis of Algorithms</h3>
+<div class="meta">2025 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/daa_2025_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/daa_2025_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="4">
+<img src="{{ url_for('static', filename='images/os_2025_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Operating System</h3>
+<div class="meta">2025 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/os_2025_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/os_2025_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="4">
+<img src="{{ url_for('static', filename='images/se_2025_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Software Engineering</h3>
+<div class="meta">2025 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/se_2025_4_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/se_2025_4_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="4">
+<img src="{{ url_for('static', filename='images/web_tech_2025_4_1.jpeg') }}" alt="Preview" class="paper-preview" onerror="this.style.display='none'">
+<h3>Web Technologies</h3>
+<div class="meta">2025 • Semester 4</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/wt_25_4.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/wt_25_4.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+
+<!-- Sem5 -->
+
+<div class="paper-card" data-year="2025" data-sem="5">
+<h3>Big Data Analysis</h3>
+<div class="meta">2025 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/big_data_2025_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/big_data_2025_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="5">
+<h3>Social Media Analysis</h3>
+<div class="meta">2025 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/social_media_2025_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/social_media_2025_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="5">
+<h3>Data Security</h3>
+<div class="meta">2025 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/data_security_2025_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/data_security_2025_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="5">
+<h3>Cyber Security</h3>
+<div class="meta">2025 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cyber_security_2025_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cyber_security_2025_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="5">
+<h3>Optimization Theory</h3>
+<div class="meta">2025 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/optimization_2025_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/optimization_2025_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="5">
+<h3>Deep Learning</h3>
+<div class="meta">2025 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/deep_learning_2025_5_1.jpeg') }}" class="view-btn">P1</a>
+<a href="{{ url_for('static', filename='images/deep_learning_2025_5_2.jpeg') }}" class="view-btn">P2</a>
+</div>
+</div>
+<div class="paper-card" data-year="2025" data-sem="5">
+<h3>Cognitive Computing</h3>
+<div class="meta">2025 • Semester 5</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cognitive_2025_5_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cognitive_2025_5_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+
+<!-- Sem6 -->
+
+<div class="paper-card" data-year="2025" data-sem="6">
+<h3>Cloud Computing</h3>
+<div class="meta">2025 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/cloud_2025_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/cloud_2025_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="6">
+<h3>Human Computer Interaction</h3>
+<div class="meta">2025 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/hci_2025_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/hci_2025_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="6">
+<h3>Internet of Things</h3>
+<div class="meta">2025 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/iot_2025_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/iot_2025_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="6">
+<h3>Block Chain</h3>
+<div class="meta">2025 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/blockchain_2025_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/blockchain_2025_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="6">
+<h3>Computer Vision</h3>
+<div class="meta">2025 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/vision_2025_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/vision_2025_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+
+<div class="paper-card" data-year="2025" data-sem="6">
+<h3>Natural Language Processing</h3>
+<div class="meta">2025 • Semester 6</div>
+<div class="buttons">
+<a href="{{ url_for('static', filename='images/nlp_2025_6_1.jpeg') }}" class="view-btn">View</a>
+<a href="{{ url_for('static', filename='images/nlp_2025_6_1.jpeg') }}" class="download-btn" download>Download</a>
+</div>
+</div>
+</div> <!-- END PAPER CONTAINER -->
 </div>
 {% endblock %}
+ 

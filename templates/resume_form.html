@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Build Resume{% endblock %}
+<<<<<<< HEAD
 
 {% block content %}
 <!DOCTYPE html>
@@ -243,6 +244,134 @@
             <div class="line w80"></div>
             <div class="line w30"></div>
           </div>
+=======
+{% block content %}
+<div class="page-container">
+    <h2>Resume Builder</h2>
+    <form method="POST" enctype="multipart/form-data" class="resume-form">
+        <section class="form-section">
+            <h3>Personal Info</h3>
+            <input type="text" name="name" placeholder="Full Name *" required>
+            <input type="email" name="email" placeholder="Email *" required>
+            <input type="tel" name="phone" placeholder="Phone *" required>
+            
+            <!-- Country + Pincode -->
+            <div class="form-row">
+                <div class="radio-group">
+                    <label><input type="radio" name="country" value="India" checked> India</label>
+                    <label><input type="radio" name="country" value="USA"> USA</label>
+                    <label><input type="radio" name="country" value="UK"> UK</label>
+                    <label><input type="radio" name="country" value="Other"> Other</label>
+                </div>
+                <input type="text" name="pincode" placeholder="Pincode">
+                <input type="text" name="city" placeholder="City">
+            </div>
+            
+            <!-- Photo Upload -->
+            <input type="file" name="photo" accept="image/*" class="file-input">
+        </section>
+        <h3>Education Details</h3>
+
+<input type="text" name="school_name" placeholder="School Name" required>
+<input type="text" name="school_location" placeholder="School Location" required>
+
+<div class="radio-group">
+  <label><input type="radio" name="degree_type" value="High School Diploma"> High School Diploma</label>
+  <label><input type="radio" name="degree_type" value="Science"> Science</label>
+  <label><input type="radio" name="degree_type" value="Bachelor of Science"> Bachelor of Science</label>
+  <label><input type="radio" name="degree_type" value="Bachelor of Technology"> Bachelor of Technology</label>
+  <label><input type="radio" name="degree_type" value="Master of Science"> Master of Science</label>
+</div>
+
+<input type="text" name="field_of_study" placeholder="Field of Study, e.g. Machine Learning" required>
+
+<div class="radio-group">
+  <label><input type="radio" name="grad_month" value="January"> January</label>
+  <label><input type="radio" name="grad_month" value="February"> February</label>
+  <label><input type="radio" name="grad_month" value="March"> March</label>
+  <label><input type="radio" name="grad_month" value="April"> April</label>
+  <label><input type="radio" name="grad_month" value="May"> May</label>
+  <label><input type="radio" name="grad_month" value="June"> June</label>
+  <label><input type="radio" name="grad_month" value="July"> July</label>
+  <label><input type="radio" name="grad_month" value="August"> August</label>
+  <label><input type="radio" name="grad_month" value="September"> September</label>
+  <label><input type="radio" name="grad_month" value="October"> October</label>
+  <label><input type="radio" name="grad_month" value="November"> November</label>
+  <label><input type="radio" name="grad_month" value="December"> December</label>
+</div>
+
+<div class="radio-group">
+  <label><input type="radio" name="grad_year" value="2024"> 2024</label>
+  <label><input type="radio" name="grad_year" value="2025"> 2025</label>
+  <label><input type="radio" name="grad_year" value="2026"> 2026</label>
+  <label><input type="radio" name="grad_year" value="2027"> 2027</label>
+</div>
+
+        <section class="form-section">
+            <h3>Professional Summary</h3>
+            <textarea name="objective" rows="4" placeholder="Career objective..."></textarea>
+        </section>
+
+        <section class="form-section">
+            <h3>Work Experience</h3>
+            <select name="work_experience" class="full-width">
+                <option value="">Select Experience Level</option>
+                <option value="No Experience">No Experience</option>
+                <option value="Less than 1 year">Less than 1 year</option>
+                <option value="1-3 years">1-3 years</option>
+                <option value="3-5 years">3-5 years</option>
+                <option value="5-10 years">5-10 years</option>
+                <option value="10+ years">10+ years</option>
+            </select>
+            <textarea name="work_details" rows="4" placeholder="Work history details..."></textarea>
+        </section>
+
+        <section class="form-section">
+            <h3>Skills</h3>
+            <textarea name="technical_skills" rows="4" placeholder="Python, Flask, SQL, ML..."></textarea>
+        </section>
+        <h3>Education Details</h3>
+
+<input type="text" name="school_name" placeholder="School Name" required>
+<input type="text" name="school_location" placeholder="School Location" required>
+
+<div class="radio-group">
+    <label><input type="radio" name="degree_type" value="High School Diploma"> High School Diploma</label>
+    <label><input type="radio" name="degree_type" value="Science"> Science</label>
+    <label><input type="radio" name="degree_type" value="Bachelor of Science"> Bachelor of Science</label>
+    <label><input type="radio" name="degree_type" value="Bachelor of Technology"> Bachelor of Technology</label>
+    <label><input type="radio" name="degree_type" value="Master of Science"> Master of Science</label>
+</div>
+
+        <div class="radio-group">
+    <label><input type="radio" name="grad_month" value="January"> January</label>
+    <label><input type="radio" name="grad_month" value="February"> February</label>
+    <label><input type="radio" name="grad_month" value="March"> March</label>
+    <label><input type="radio" name="grad_month" value="April"> April</label>
+    <label><input type="radio" name="grad_month" value="May"> May</label>
+    <label><input type="radio" name="grad_month" value="June"> June</label>
+    <label><input type="radio" name="grad_month" value="July"> July</label>
+    <label><input type="radio" name="grad_month" value="August"> August</label>
+    <label><input type="radio" name="grad_month" value="September"> September</label>
+    <label><input type="radio" name="grad_month" value="October"> October</label>
+    <label><input type="radio" name="grad_month" value="November"> November</label>
+    <label><input type="radio" name="grad_month" value="December"> December</label>
+</div>
+
+<div class="radio-group">
+    <label><input type="radio" name="grad_year" value="2024"> 2024</label>
+    <label><input type="radio" name="grad_year" value="2025"> 2025</label>
+    <label><input type="radio" name="grad_year" value="2026"> 2026</label>
+    <label><input type="radio" name="grad_year" value="2027"> 2027</label>
+</div>
+
+<input type="text" name="field_of_study" placeholder="Field of Study, e.g. Machine Learning" required>
+
+        <section class="form-section">
+            <h3>Projects & Education</h3>
+            <textarea name="projects" rows="4" placeholder="Key projects, education..."></textarea>
+        </section>
+>>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
         </div>
       </label>
 
@@ -309,3 +438,22 @@
 </body>
 </html>
 {% endblock %}
+=======
+<input type="file" name="photo" accept="image/*">
+
+<div class="tips-box">
+    <h3>Resume Tips for Freshers</h3>
+    <ul>
+        <li>Use strong action verbs: <i>Developed, Designed, Implemented, Optimized.</i></li>
+        <li>Keep bullets short; avoid long paragraphs.</li>
+        <li>Place Education, Projects, Skills, and Certifications at the top.</li>
+    </ul>
+</div>
+
+<label class="form-label"><strong>Include References?</strong></label>
+<select name="include_references" class="form-input">
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+</select>
+{% endblock %}
+>>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
