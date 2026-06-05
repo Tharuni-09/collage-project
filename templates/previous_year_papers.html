@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Previous Year Papers{% endblock %}
+{% block content %}
+<div class="page-container">
+    <h2>📚 Previous Year Question Papers</h2>
+    <div class="card-grid">
+        <div class="card">
+            <h3>ACSML Sem-I (2025)</h3>
+            <a href="{{ url_for('static', filename='papers/acsml-sem1.pdf') }}" class="btn-primary" download>⬇️ Download</a>
+        </div>
+        <div class="card">
+            <h3>NCSML Sem-II (2025)</h3>
+            <a href="{{ url_for('static', filename='papers/ncsml-sem2.pdf') }}" class="btn-primary" download>⬇️ Download</a>
+        </div>
+        <div class="card">
+            <h3>DCSML Sem-III (2025)</h3>
+            <a href="{{ url_for('static', filename='papers/dcsml-sem3.pdf') }}" class="btn-primary" download>⬇️ Download</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

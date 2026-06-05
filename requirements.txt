@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 aiohappyeyeballs==2.6.1
 annotated-doc==0.0.4
 annotated-types==0.7.0
@@ -72,3 +73,9 @@ Werkzeug==3.1.8
 xxhash==3.7.0
 yarl==1.23.0
 zstandard==0.25.0
+=======
+Flask
+gunicorn
+mysql-conector-python
+reportlab
+>>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48

@@ -24,6 +24,7 @@
             <div class="sidebar-header">
                 <h3>Navigation</h3>
             </div>
+<<<<<<< HEAD
             <ul class="sidebar-nav-links">
                 {% if session.role == 'student' %}
                 <li><a href="{{ url_for('student_dashboard') }}">Student Dashboard</a></li>
@@ -40,6 +41,23 @@
                 <li><a href="{{ url_for('previous_year_papers') }}">Previous Year Papers</a></li>
             <li><a href="{{ url_for('index') }}">Home</a></li>
             </ul>
+=======
+<ul class="sidebar-nav-links">
+    {% if session.role == 'student' %}
+    <li><a href="{{ url_for('student_dashboard') }}">Student Dashboard</a></li>
+    <li><a href="{{ url_for('resume_form') }}">Build Resume</a></li>
+    {% endif %}
+    {% if session.role == 'faculty' %}
+    <li><a href="{{ url_for('faculty_dashboard') }}">Faculty Dashboard</a></li>
+    <li><a href="{{ url_for('faculty_department', dept='ACSML') }}">ACSML</a></li>
+    <li><a href="{{ url_for('faculty_department', dept='NCSML') }}">NCSML</a></li>
+    <li><a href="{{ url_for('faculty_department', dept='DCSML') }}">DCSML</a></li>
+    <li><a href="{{ url_for('faculty_resumes') }}">All Resumes</a></li>
+    {% endif %}
+    <li><a href="{{ url_for('previous_year_papers') }}">Previous Year Papers</a></li> 
+    <li><a href="{{ url_for('index') }}"> Home</a></li>
+</ul>
+>>>>>>> 8cae6f965907b79ec4473874e39a2ad25594fa48
 
             {% if session.role == 'student' and resumes %}
             <div class="sidebar-resumes">
