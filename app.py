@@ -559,7 +559,7 @@ def forgot_password():
 # STUDENT DASHBOARD
 # =====================================================================
 
-@app.route("/student_dashboard")
+@app.route("/student-dashboard")
 def student_dashboard():
     uid = session.get("uid")
     if not uid:
