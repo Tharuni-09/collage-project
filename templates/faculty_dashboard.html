@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Dashboard{% endblock %}
+
+{% block content %}
+
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Dashboard</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Fraunces:wght@600;700&amp;display=swap" rel="stylesheet">
+  <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .tab-active { border-bottom: 3px solid #1e40af; color: #1e40af; }
+    </style>
+ </head>
+ <body data-template-id="__page-root" class="min-h-screen w-full">
+  <header class="w-full border-b border-gray-200">
+   <div class="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4"><img src="https://ui-avatars.com/api/?name={{ session.name or 'Faculty' }}&background=random" class="w-16 h-16 rounded-full object-cover" loading="lazy">
+    <div>
+     <h1 class="text-xl font-bold">{{ session.name }}</h1>
+     <p class="text-sm opacity-75">Faculty Dashboard</p>
+    </div>
+   </div>
+  </header>
+  <main class="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-3 gap-6"><!-- Left column: Profile info -->
+   <aside class="space-y-4">
+    <section class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+     <h2 class="font-semibold mb-3 text-blue-900">Managed Departments</h2>
+     <ul class="space-y-2 text-sm">
+      <li><a href="{{ url_for('faculty_department', dept='ACSML') }}" class="text-blue-600 hover:underline">ACSML (Applied ML)</a></li>
+      <li><a href="{{ url_for('faculty_department', dept='NCSML') }}" class="text-blue-600 hover:underline">NCSML (Neural Computing)</a></li>
+      <li><a href="{{ url_for('faculty_department', dept='DCSML') }}" class="text-blue-600 hover:underline">DCSML (Data Science)</a></li>
+     </ul>
+    </section>
+    <section class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+     <h2 class="font-semibold mb-3 text-blue-900">Quick Actions</h2>
+     <div class="space-y-3 text-sm">
+      <a href="{{ url_for('faculty_add_student_form') }}" class="flex items-center gap-2 text-blue-600 hover:underline">
+       <i data-lucide="user-plus" class="w-4 h-4"></i> Add New Student
+      </a>
+      <a href="{{ url_for('faculty_resumes') }}" class="flex items-center gap-2 text-blue-600 hover:underline">
+       <i data-lucide="file-text" class="w-4 h-4"></i> View All Resumes
+      </a>
+     </div>
+    </section>
+   </aside><!-- Right column: Notes & Tasks -->
+   <div class="lg:col-span-2 space-y-4"><!-- Tabs -->
+    <nav class="flex gap-6 border-b border-gray-200 pb-0" role="tablist"><button id="tab-notes" class="tab-active pb-2 font-medium text-sm" role="tab" aria-selected="true" onclick="switchTab('notes')"> <i data-lucide="pen-line" class="inline w-4 h-4 mr-1"></i>Class Notes </button> <button id="tab-tasks" class="pb-2 font-medium text-sm text-gray-500" role="tab" aria-selected="false" onclick="switchTab('tasks')"> <i data-lucide="check-square" class="inline w-4 h-4 mr-1"></i>Task Planner </button>
+    </nav><!-- Notes Panel -->
+    <div id="panel-notes">
+     <form id="note-form" class="rounded-xl p-4 border border-gray-200 space-y-3 mb-4 bg-white">
+      <div class="grid sm:grid-cols-2 gap-3">
+       <div><label class="text-xs font-medium block mb-1" for="note-class">Target Class</label> <input id="note-class" type="text" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="e.g. CSE-A 3rd Year">
+       </div>
+       <div><label class="text-xs font-medium block mb-1" for="note-subject">Subject</label> <input id="note-subject" type="text" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="e.g. Data Structures">
+       </div>
+      </div>
+      <div><label class="text-xs font-medium block mb-1" for="note-title">Title</label> <input id="note-title" type="text" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Note title">
+      </div>
+      <div><label class="text-xs font-medium block mb-1" for="note-content">Note Content</label> <textarea id="note-content" rows="3" class="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Write your note..."></textarea>
+      </div><button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">Save Note</button>
+     </form>
+     <div id="notes-list" class="space-y-3"></div>
+     <p id="notes-empty" class="text-center py-8 opacity-60">No notes saved yet.</p>
+    </div><!-- Tasks Panel -->
+    <div id="panel-tasks" class="hidden">
+     <form id="task-form" class="flex gap-2 mb-4"><input id="task-title" type="text" class="flex-1 border rounded-lg px-3 py-2 text-sm" placeholder="New task..."> <input id="task-due" type="date" class="border rounded-lg px-3 py-2 text-sm"> <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">Add Task</button>
+     </form>
+     <div id="tasks-list" class="space-y-2"></div>
+     <p id="tasks-empty" class="text-center py-8 opacity-60">No pending tasks.</p>
+    </div>
+   </div>
+  </main>
+  <template id="note-template">
+   <div data-template-id="note-item" class="canva-card rounded-lg p-4 border border-gray-100 relative">
+    <div class="flex justify-between items-start">
+     <div>
+      <h3 data-template-id="note-item-title" class="canva-text font-semibold text-sm"></h3>
+      <p class="text-xs text-gray-500 mt-0.5 note-meta"></p>
+     </div><button class="note-delete text-gray-400 hover:text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>
+    <p data-template-id="note-item-content" class="canva-text text-sm mt-2 whitespace-pre-wrap"></p>
+   </div>
+  </template>
+  <template id="task-template">
+   <div data-template-id="task-item" class="canva-card flex items-center gap-3 rounded-lg p-3 border border-gray-100"><button class="task-toggle w-5 h-5 rounded border-2 border-gray-300 flex items-center justify-center shrink-0"></button>
+    <div class="flex-1 min-w-0"><span data-template-id="task-item-title" class="canva-text text-sm"></span> <span class="task-due text-xs text-gray-400 ml-2"></span>
+    </div><button class="task-delete text-gray-400 hover:text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+   </div>
+  </template>
+  <div id="loading-toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm hidden">
+   Saving...
+  </div>
+  <div id="limit-warning" class="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg text-sm hidden">
+   Record limit reached (999). Please delete some items.
+  </div>
+  <script>
+        let allData = [];
+        let currentTab = 'notes';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('panel-notes').classList.toggle('hidden', tab !== 'notes');
+            document.getElementById('panel-tasks').classList.toggle('hidden', tab !== 'tasks');
+            document.getElementById('tab-notes').classList.toggle('tab-active', tab === 'notes');
+            document.getElementById('tab-tasks').classList.toggle('tab-active', tab === 'tasks');
+            document.getElementById('tab-notes').setAttribute('aria-selected', tab === 'notes');
+            document.getElementById('tab-tasks').setAttribute('aria-selected', tab === 'tasks');
+            if (tab !== 'notes') document.getElementById('tab-notes').classList.add('text-gray-500');
+            else document.getElementById('tab-notes').classList.remove('text-gray-500');
+            if (tab !== 'tasks') document.getElementById('tab-tasks').classList.add('text-gray-500');
+            else document.getElementById('tab-tasks').classList.remove('text-gray-500');
+        }
+
+        function saveData() {
+            localStorage.setItem('faculty_data', JSON.stringify(allData));
+            renderNotes();
+            renderTasks();
+            checkLimit();
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading-toast').classList.toggle('hidden', !show);
+        }
+
+        function renderNotes() {
+            const notes = allData.filter(d => d.entry_type === 'note').sort((a,b) => b.created_at.localeCompare(a.created_at));
+            const container = document.getElementById('notes-list');
+            const existing = new Map([...container.children].map(el => [el.dataset.id, el]));
+            const seen = new Set();
+
+            notes.forEach(n => {
+                seen.add(n.__backendId);
+                if (existing.has(n.__backendId)) {
+                    const el = existing.get(n.__backendId);
+                    el.querySelector('[data-template-id="note-item-title"]').textContent = n.note_title;
+                    el.querySelector('[data-template-id="note-item-content"]').textContent = n.note_content;
+                    el.querySelector('.note-meta').textContent = `${n.note_class} · ${n.note_subject}`;
+                } else {
+                    const tpl = document.getElementById('note-template').content.cloneNode(true);
+                    const div = tpl.firstElementChild;
+                    div.dataset.id = n.__backendId;
+                    div.querySelector('[data-template-id="note-item-title"]').textContent = n.note_title;
+                    div.querySelector('[data-template-id="note-item-content"]').textContent = n.note_content;
+                    div.querySelector('.note-meta').textContent = `${n.note_class} · ${n.note_subject}`;
+                    div.querySelector('.note-delete').onclick = () => deleteRecord(n);
+                    container.appendChild(tpl);
+                    lucide.createIcons();
+                }
+            });
+            existing.forEach((el, id) => { if (!seen.has(id)) el.remove(); });
+            document.getElementById('notes-empty').classList.toggle('hidden', notes.length > 0);
+        }
+
+        function renderTasks() {
+            const tasks = allData.filter(d => d.entry_type === 'task').sort((a,b) => {
+                if (a.task_completed !== b.task_completed) return a.task_completed ? 1 : -1;
+                return b.created_at.localeCompare(a.created_at);
+            });
+            const container = document.getElementById('tasks-list');
+            const existing = new Map([...container.children].map(el => [el.dataset.id, el]));
+            const seen = new Set();
+
+            tasks.forEach(t => {
+                seen.add(t.__backendId);
+                if (existing.has(t.__backendId)) {
+                    const el = existing.get(t.__backendId);
+                    const titleEl = el.querySelector('[data-template-id="task-item-title"]');
+                    titleEl.textContent = t.task_title;
+                    titleEl.style.textDecoration = t.task_completed ? 'line-through' : 'none';
+                    titleEl.style.opacity = t.task_completed ? '0.5' : '1';
+                    el.querySelector('.task-due').textContent = t.task_due || '';
+                    el.querySelector('.task-toggle').innerHTML = t.task_completed ? '<i data-lucide="check" class="w-3 h-3 text-green-600"></i>' : '';
+                    lucide.createIcons();
+                } else {
+                    const tpl = document.getElementById('task-template').content.cloneNode(true);
+                    const div = tpl.firstElementChild;
+                    div.dataset.id = t.__backendId;
+                    const titleEl = div.querySelector('[data-template-id="task-item-title"]');
+                    titleEl.textContent = t.task_title;
+                    titleEl.style.textDecoration = t.task_completed ? 'line-through' : 'none';
+                    titleEl.style.opacity = t.task_completed ? '0.5' : '1';
+                    div.querySelector('.task-due').textContent = t.task_due || '';
+                    div.querySelector('.task-toggle').innerHTML = t.task_completed ? '<i data-lucide="check" class="w-3 h-3 text-green-600"></i>' : '';
+                    div.querySelector('.task-toggle').onclick = () => toggleTask(t);
+                    div.querySelector('.task-delete').onclick = () => deleteRecord(t);
+                    container.appendChild(tpl);
+                    lucide.createIcons();
+                }
+            });
+            existing.forEach((el, id) => { if (!seen.has(id)) el.remove(); });
+            document.getElementById('tasks-empty').classList.toggle('hidden', tasks.length > 0);
+        }
+
+        async function deleteRecord(record) {
+            showLoading(true);
+            allData = allData.filter(d => d.__backendId !== record.__backendId);
+            saveData();
+            showLoading(false);
+        }
+
+        async function toggleTask(task) {
+            showLoading(true);
+            const item = allData.find(d => d.__backendId === task.__backendId);
+            if (item) item.task_completed = !item.task_completed;
+            saveData();
+            showLoading(false);
+        }
+
+        function showError() {
+            const toast = document.getElementById('loading-toast');
+            toast.textContent = 'Error. Try again.';
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.classList.add('hidden'); toast.textContent = 'Saving...'; }, 2000);
+        }
+
+        function checkLimit() {
+            if (allData.length >= 999) {
+                document.getElementById('limit-warning').classList.remove('hidden');
+                return false;
+            }
+            document.getElementById('limit-warning').classList.add('hidden');
+            return true;
+        }
+
+        // Forms
+        document.getElementById('note-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!checkLimit()) return;
+            const cls = document.getElementById('note-class').value.trim();
+            const subj = document.getElementById('note-subject').value.trim();
+            const title = document.getElementById('note-title').value.trim();
+            const content = document.getElementById('note-content').value.trim();
+            if (!title || !content) return;
+            showLoading(true);
+            const newNote = { __backendId: Date.now().toString(), entry_type: 'note', note_title: title, note_content: content, note_class: cls, note_subject: subj, task_title: '', task_due: '', task_completed: false, created_at: new Date().toISOString() };
+            allData.push(newNote);
+            saveData();
+            showLoading(false);
+            e.target.reset();
+        });
+
+        document.getElementById('task-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!checkLimit()) return;
+            const title = document.getElementById('task-title').value.trim();
+            const due = document.getElementById('task-due').value;
+            if (!title) return;
+            showLoading(true);
+            const r = await window.dataSdk.create({ entry_type: 'task', task_title: title, task_due: due, task_completed: false, note_title: '', note_content: '', note_class: '', note_subject: '', created_at: new Date().toISOString() });
+            showLoading(false);
+            if (r.isOk) { document.getElementById('task-title').value = ''; document.getElementById('task-due').value = ''; }
+            else showError();
+        });
+
+        // Local Data initialization instead of SDK
+        allData = JSON.parse(localStorage.getItem('faculty_data') || '[]');
+        renderNotes();
+        renderTasks();
+
+        lucide.createIcons();
+    </script>
+ </body>
+
+{% endblock %}

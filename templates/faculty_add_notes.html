@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Upload Notes{% endblock %}
+{% block content %}
+<div class="page-container" style="max-width: 600px;">
+    <h2 class="section-title">Upload Study Material</h2>
+    <div class="card" style="padding: 25px;">
+        <form action="{{ url_for('faculty_add_notes') }}" method="POST" enctype="multipart/form-data" class="form-stacked">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Subject Title</label>
+                <input type="text" name="subject" placeholder="e.g. Neural Networks" required>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Semester</label>
+                    <select name="semester" required>
+                        {% for i in range(1, 7) %}
+                        <option value="{{ i }}">Semester {{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Year</label>
+                    <input type="number" name="year" value="2025" required>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Target Department</label>
+                <select name="department" required>
+                    <option value="ACSML">ACSML</option>
+                    <option value="NCSML">NCSML</option>
+                    <option value="DCSML">DCSML</option>
+                    <option value="ALL">All Departments</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Files (PDF, PPT, PPTX)</label>
+                <input type="file" name="note_files" multiple required accept=".pdf,.ppt,.pptx">
+                <p style="font-size: 11px; color: #666; margin-top: 5px;">You can select multiple files at once.</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn-primary" style="flex: 1;">Upload Material</button>
+                <a href="{{ url_for('notes') }}" class="btn-secondary" style="flex: 1; text-align: center; line-height: 20px;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

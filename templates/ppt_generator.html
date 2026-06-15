@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&amp;family=Caveat:wght@700&amp;display=swap" rel="stylesheet">
+<style>
+    .ppt-gen-body { font-family: 'Outfit', sans-serif; color: #2c2c2c; }
+    .font-display { font-family: 'Caveat', cursive; }
+    
+    .upload-zone { 
+        transition: all 0.3s ease; 
+        border: 2px dashed #5e84d0; 
+        background: #6385ca;
+    }
+    .upload-zone:hover { border-color: #8dbbe1; background: #80abdf; }
+    .upload-zone.dragover { border-color: #87a5c9; background: #94b5da; }
+    
+    .feature-card { animation: slideUp 0.5s ease-out forwards; opacity: 0; }
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(20px); } }
+    
+    .btn-gen { 
+        background: linear-gradient(135deg, #66a4ef, #6dc8e2); 
+        color: rgb(122, 113, 153);
+        transition: all 0.3s ease; 
+        box-shadow: 0 4px 12px rgba(106, 141, 184, 0.2);
+    }
+    .btn-gen:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(104, 163, 234, 0.4); opacity: 0.9; }
+    
+    .recent-item { animation: fadeIn 0.3s ease-out; background: #7d7aa9; border: 1px solid #7492ca; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(120, 142, 179, 0.1); border-top: 3px solid #4c6b90; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div id="ppt-generator-container" class="ppt-gen-body w-full">
+  <div id="app" class="h-full w-full">
+   <header class="bg-[#0a3d62] text-white px-6 py-6 rounded-xl mb-8 shadow-lg">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+     <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold"><i data-lucide="sparkles" class="w-7 h-7"></i>
+      </div>
+      <div>
+       <h1 class="text-2xl font-bold" id="app-title">Smart PPT &amp; Notes Generator</h1>
+       <p class="text-xs text-blue-100/80">AI-Powered Course Material Creator</p>
+      </div>
+     </div>
+     <div class="hidden sm:block text-right text-sm text-white/70">
+      <p>Create engaging course materials in seconds</p>
+     </div>
+    </div>
+   </header>
+   <main class="max-w-6xl mx-auto space-y-8"><!-- Upload Section -->
+    <section class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+     <div class="space-y-6">
+      <div>
+       <h2 class="text-2xl font-bold mb-2 text-[#0a1f44]">Step 1: Upload Your Content</h2>
+       <p class="text-gray-500">Upload your textbook chapters, syllabus, or course outline</p>
+      </div><!-- File Upload Zone -->
+      <div id="upload-zone" class="upload-zone p-8 rounded-xl text-center cursor-pointer"><input type="file" id="file-input" accept=".pdf,.txt,.docx,.doc" class="hidden">
+       <div class="space-y-3">
+        <div class="flex justify-center">
+         <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center"><i data-lucide="upload-cloud" class="w-8 h-8 text-blue-500"></i>
+         </div>
+        </div>
+        <div>
+         <p class="text-lg font-semibold text-gray-700">Drag &amp; drop your file here</p>
+         <p class="text-sm text-gray-400">or click to browse (PDF, DOCX, TXT)</p>
+        </div>
+        <p class="text-xs text-gray-400 pt-2">Max file size: 50 MB</p>
+       </div>
+      </div><!-- File Info -->
+      <div id="file-info" class="hidden bg-blue-50 rounded-lg p-4 flex items-center justify-between border border-blue-100">
+       <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+        <div>
+         <p class="font-medium text-blue-900" id="file-name">File selected</p>
+         <p class="text-xs text-blue-600" id="file-size">100 MB</p>
+        </div>
+       </div><button onclick="clearFile()" class="text-gray-400 hover:text-red-500 transition"> <i data-lucide="x" class="w-5 h-5"></i> </button>
+      </div>
+     </div>
+    </section><!-- Generation Options -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6"><!-- PPT Card -->
+     <div class="feature-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:border-blue-200 transition">
+      <div class="flex items-start justify-between mb-4">
+       <div>
+        <h3 class="text-xl font-bold">Generate PPT</h3>
+        <p class="text-sm text-white/70">Beautiful, ready-to-present slides</p>
+       </div>
+       <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center"><i data-lucide="presentation" class="w-5 h-5 text-blue-300"></i>
+       </div>
+      </div>
+      <div class="space-y-3 mb-6 text-sm text-gray-500">
+       <div class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"></i> <span>High-quality slides with images</span>
+       </div>
+       <div class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"></i> <span>All important topics covered</span>
+       </div>
+       <div class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"></i> <span>Professional styling</span>
+       </div>
+      </div><input type="number" id="ppt-slides" placeholder="Number of slides (default: 20)" min="5" max="100" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-400 mb-3 focus:outline-none focus:border-blue-400 text-sm"> <button id="ppt-btn" onclick="generatePPT()" class="btn-gen w-full font-bold py-3 rounded-lg flex items-center justify-center gap-2"> <i data-lucide="sparkles" class="w-4 h-4"></i> <span id="ppt-btn-text">Generate PPT</span> </button>
+     </div><!-- Notes Card -->
+     <div class="feature-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:border-green-200 transition">
+      <div class="flex items-start justify-between mb-4">
+       <div>
+        <h3 class="text-xl font-bold">Generate Notes</h3>
+        <p class="text-sm text-white/70">Comprehensive study notes</p>
+       </div>
+       <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center"><i data-lucide="file-text" class="w-5 h-5 text-green-300"></i>
+       </div>
+      </div>
+      <div class="space-y-3 mb-6 text-sm text-gray-500">
+       <div class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"></i> <span>Key concepts highlighted</span>
+       </div>
+       <div class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"></i> <span>Perfect for student review</span>
+       </div>
+       <div class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"></i> <span>Well-organized sections</span>
+       </div>
+      </div><input type="number" id="notes-sections" placeholder="Number of sections (default: 10)" min="3" max="50" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-400 mb-3 focus:outline-none focus:border-green-400 text-sm"> <button id="notes-btn" onclick="generateNotes()" class="btn-gen w-full font-bold py-3 rounded-lg flex items-center justify-center gap-2"> <i data-lucide="pen-tool" class="w-4 h-4"></i> <span id="notes-btn-text">Generate Notes</span> </button>
+     </div>
+    </section><!-- Recent Requests -->
+    <section id="recent-section" class="hidden">
+     <div class="flex items-center justify-between mb-4">
+      <h2 class="text-2xl font-bold text-[#0a1f44]">Recent Requests</h2><button onclick="clearRecent()" class="text-gray-400 hover:text-red-500 transition text-sm flex items-center gap-2"> <i data-lucide="trash-2" class="w-4 h-4"></i> Clear </button>
+     </div>
+     <div id="recent-list" class="space-y-3"></div>
+    </section><!-- Info Section -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+     <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[#0a1f44]"><i data-lucide="lightbulb" class="w-5 h-5 text-amber-500"></i> How It Works</h2>
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+       <p class="font-semibold text-blue-600 mb-2">1. Upload</p>
+       <p class="text-sm text-gray-500">Share your textbook or syllabus</p>
+      </div>
+      <div>
+       <p class="font-semibold text-blue-600 mb-2">2. Customize</p>
+       <p class="text-sm text-gray-500">Choose slides, notes, or both</p>
+      </div>
+      <div>
+       <p class="font-semibold text-blue-600 mb-2">3. Download</p>
+       <p class="text-sm text-gray-500">Get professional materials instantly</p>
+      </div>
+     </div>
+    </section><!-- Status Messages -->
+    <div id="toast" class="fixed bottom-4 right-4 hidden bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-3 rounded-lg flex items-center gap-2 text-sm"></div>
+   </main>
+  </div>
+  <script>
+    const defaultConfig = {
+      app_title: 'Smart PPT & Notes Generator',
+      upload_label: 'Upload Textbook/Syllabus',
+      ppt_button: 'Generate PPT',
+      notes_button: 'Generate Notes',
+      background_color: '#667eea',
+      accent_color: '#f59e0b',
+      header_color: '#000000',
+      text_color: '#ffffff',
+      font_family: 'Outfit',
+      font_size: 16
+    };
+
+    let selectedFile = null;
+    let recentRequests = JSON.parse(localStorage.getItem('recentRequests')) || [];
+
+    // File upload handling
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFileSelect(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      selectedFile = file;
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-size').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+      document.getElementById('file-info').classList.remove('hidden');
+      uploadZone.style.opacity = '0.5';
+      showToast('✓ File uploaded successfully!');
+    }
+
+    function clearFile() {
+      selectedFile = null;
+      fileInput.value = '';
+      document.getElementById('file-info').classList.add('hidden');
+      uploadZone.style.opacity = '1';
+    }
+
+    function generatePPT() {
+      if (!selectedFile) {
+        showToast('⚠️ Please upload a file first');
+        return;
+      }
+      const slides = document.getElementById('ppt-slides').value || 20;
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("slides", slides);
+
+      const btn = document.getElementById('ppt-btn');
+      const btnText = document.getElementById('ppt-btn-text');
+      
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner"></span> Generating...';
+
+      fetch("/generate-ppt", {method: "POST", body: formData})
+        .then(res => res.json())
+        .then(data => {
+          btn.disabled = false;
+          btnText.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Generate PPT';
+          lucide.createIcons(); // Re-render lucide icons after changing innerHTML
+
+          if(data.success) {
+            const request = {
+              id: Date.now(),
+              type: 'PPT',
+              file: selectedFile.name,
+              count: slides,
+              timestamp: new Date().toLocaleTimeString(),
+              date: new Date().toLocaleDateString()
+            };
+            recentRequests.unshift(request);
+            localStorage.setItem('recentRequests', JSON.stringify(recentRequests.slice(0, 10)));
+            updateRecentList();
+            showToast(`✓ PPT generated! Ready for download.`);
+            window.location.href = data.download_url;
+          } else {
+            showToast(`Error: ${data.error}`);
+          }
+        })
+        .catch(error => {
+          console.error("Error generating PPT:", error);
+          btn.disabled = false;
+          btn.innerHTML ='<i data-lucide="pen-tool" class="w-4 h-4"></i> Generate Notes';
+          lucide.createIcons();
+          showToast("Server Error - Check Flask Console");
+        });
+    }
+
+    function generateNotes() {
+      if (!selectedFile) {
+        showToast('⚠️ Please upload a file first');
+        return;
+      }
+      const sections = document.getElementById('notes-sections').value || 10;
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("sections", sections);
+
+      const btn = document.getElementById('notes-btn');
+      const btnText = document.getElementById('notes-btn-text');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+      fetch("/generate-notes", {method: "POST", body: formData})
+        .then(res => res.json())
+        .then(data => {
+          btn.disabled = false;
+          btnText.innerHTML = '<i data-lucide="pen-tool" class="w-4 h-4"></i> Generate Notes';
+          lucide.createIcons();
+
+          if(data.success) {
+            const request = {
+              id: Date.now(),
+              type: 'Notes',
+              file: selectedFile.name,
+              count: sections,
+              timestamp: new Date().toLocaleTimeString(),
+              date: new Date().toLocaleDateString()
+            };
+            recentRequests.unshift(request);
+            localStorage.setItem('recentRequests', JSON.stringify(recentRequests.slice(0, 10)));
+            updateRecentList();
+            showToast(`✓ Notes generated! Ready for download.`);
+            window.location.href = data.download_url;
+          } else {
+            showToast(`Error: ${data.error}`);
+          }
+        })
+        .catch(error => {
+          console.error("Error generating Notes:", error);
+          btn.disabled = false;
+          btnText.innerHTML = '<i data-lucide="pen-tool" class="w-4 h-4"></i> Generate Notes';
+          lucide.createIcons();
+          showToast("Server Error - Check Flask Console");
+        });
+    }
+
+    function simulateGeneration(type, count) {
+      // This function is no longer needed as actual generation is handled by backend calls.
+      // It will be removed.
+    }
+
+    // The simulateGeneration function was removed as it's no longer needed.
+
+    function updateRecentList() {
+      const recentSection = document.getElementById('recent-section');
+      const recentList = document.getElementById('recent-list');
+      
+      if (recentRequests.length > 0) {
+        recentSection.classList.remove('hidden');
+        recentList.innerHTML = recentRequests.map(req => `
+          <div class="recent-item rounded-lg p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg ${req.type === 'PPT' ? 'bg-blue-500/30' : 'bg-green-500/30'} flex items-center justify-center">
+                <i data-lucide="${req.type === 'PPT' ? 'presentation' : 'file-text'}" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="font-medium text-gray-800">${req.type} - ${req.count} ${req.type === 'PPT' ? 'slides' : 'sections'}</p>
+                <p class="text-xs text-gray-400">${req.file} · ${req.timestamp}</p>
+              </div>
+            </div>
+            <button onclick="deleteRecent(${req.id})" class="text-gray-300 hover:text-red-500 transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      } else {
+        recentSection.classList.add('hidden');
+      }
+    }
+
+    function deleteRecent(id) {
+      recentRequests = recentRequests.filter(r => r.id !== id);
+      localStorage.setItem('recentRequests', JSON.stringify(recentRequests));
+      updateRecentList();
+    }
+
+    function clearRecent() {
+      recentRequests = [];
+      localStorage.removeItem('recentRequests');
+      updateRecentList();
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // Element SDK
+    function updateUI(config) {
+      document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+      const pptBtnEl = document.getElementById('ppt-btn');
+      const notesBtnEl = document.getElementById('notes-btn');
+      
+      if (pptBtnEl) pptBtnEl.textContent = config.ppt_button || defaultConfig.ppt_button;
+      if (notesBtnEl) notesBtnEl.textContent = config.notes_button || defaultConfig.notes_button;
+
+      const font = config.font_family || defaultConfig.font_family;
+      const size = config.font_size || defaultConfig.font_size;
+      document.body.style.fontSize = `${size}px`;
+    }
+
+    updateRecentList();
+    lucide.createIcons();
+  </script>
+</div>

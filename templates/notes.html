@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Study Notes{% endblock %}
+{% block content %}
+<div class="page-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 class="section-title" style="margin: 0;">📚 Study Notes</h2>
+        {% if session.role == 'faculty' %}
+        <a href="{{ url_for('faculty_add_notes') }}" class="btn-primary">Upload New Notes</a>
+        {% endif %}
+    </div>
+
+    {% if notes %}
+    <div class="data-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Sem</th>
+                    <th>Year</th>
+                    <th>Uploaded By</th>
+                    <th>Files</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for note in notes %}
+                <tr>
+                    <td><strong>{{ note.subject }}</strong></td>
+                    <td>{{ note.semester }}</td>
+                    <td>{{ note.year }}</td>
+                    <td>{{ note.uploader_name }}</td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                        {% for file in note.files %}
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 12px; color: #666;">
+                                    {% if file.file_type == 'pdf' %}📄{% elif 'ppt' in file.file_type %}📊{% else %}📁{% endif %}
+                                </span>
+                                <a href="{{ url_for('static', filename='uploads/notes/' + file.file_path) }}" target="_blank" style="text-decoration: none; color: #2563eb; font-weight: 500;">
+                                    {{ file.filename.split('_', 1)[1] if '_' in file.filename else file.filename }}
+                                </a>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card">
+        <p class="muted">No notes have been uploaded yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
