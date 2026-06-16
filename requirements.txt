@@ -4,5 +4,5 @@ MarkupSafe
 Werkzeug
 reportlab
 gunicorn
-google-generativeai
+requests
 python-dotenv
