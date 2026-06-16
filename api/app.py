@@ -1,6 +1,6 @@
 from flask import Flask, send_file, render_template, request, redirect, session, current_app, jsonify
 from werkzeug.utils import secure_filename
-from google import genai
+import google.generativeai as genai
 import os
 import logging
 import time
@@ -41,8 +41,8 @@ import google.generativeai as genai_v1
 
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
-genai_v1.configure(api_key=api_key)
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 model = genai_v1.GenerativeModel(
     "gemini-1.5-flash"
@@ -127,7 +127,7 @@ def create_ppt(source_filepath, output_filename, slides_count):
             f"Text: {text[:8000]}"
         )
         try:
-            response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
+            response = response = model.generate_content(prompt)
             raw_text = response.text
             slides_raw = raw_text.split("Slide:")
             for s in slides_raw:
@@ -2341,11 +2341,5 @@ def chat():
 
 # This ensures the database is checked/created as soon as the app starts,
 # regardless of whether it's run via 'python app.py' or a WSGI server like Gunicorn.
-with app.app_context():
-    init_db()
 
-if __name__ == "__main__":
-    # Use Render's PORT environment variable
-    port = int(os.environ.get("PORT", 5000))
-    # Debug should be False in production
-    app.run(debug=True, host="0.0.0.0", port=port)
+app = Flask(__name__)
