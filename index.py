@@ -1,6 +1,6 @@
 from flask import Flask, send_file, render_template, request, redirect, session, current_app, jsonify
 from werkzeug.utils import secure_filename
-import google.generativeai as genai
+# import google.generativeai as genai
 import os
 import logging
 import time
@@ -37,16 +37,16 @@ from reportlab.lib.units import mm
 from pptx import Presentation
 from reportlab.platypus import *
 import traceback
-import google.generativeai as genai_v1
+# import google.generativeai as genai_v1
 
 load_dotenv()
 
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+# genai.configure(api_key=GEMINI_API_KEY)
+# model = genai.GenerativeModel("gemini-1.5-flash")
 
-model = genai_v1.GenerativeModel(
-    "gemini-1.5-flash"
-)
+# model = genai_v1.GenerativeModel(
+#     "gemini-1.5-flash"
+# )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database", "ml_dept.db")
