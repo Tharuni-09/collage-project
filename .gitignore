@@ -1,4 +1,0 @@
-.env
-*.db
-output/
-__pycache__/
