@@ -1732,349 +1732,177 @@ def signup():
     return render_template("signup.html")
  
  
-# =====================================================================
-# RESUME PDF GENERATION
-# =====================================================================
+# ==================def make_styles(template_type):
+    styles = getSampleStyleSheet()
+    
+    # Universal ATS-Friendly Harvard Style
+    primary = colors.black
+    muted   = colors.HexColor("#333333")
+    
+    styles.add(ParagraphStyle(name='title', fontName='Helvetica-Bold', fontSize=18, spaceAfter=2, alignment=TA_CENTER, textColor=primary))
+    styles.add(ParagraphStyle(name='subtitle', fontName='Helvetica', fontSize=10, spaceAfter=8, alignment=TA_CENTER, textColor=muted))
+    styles.add(ParagraphStyle(name='section', fontName='Helvetica-Bold', fontSize=11, spaceBefore=12, spaceAfter=2, textColor=primary, textTransform='uppercase'))
+    styles.add(ParagraphStyle(name='body', fontName='Helvetica', fontSize=10, spaceAfter=3, leading=14, textColor=primary))
+    styles.add(ParagraphStyle(name='bullet', fontName='Helvetica', fontSize=10, spaceAfter=2, leading=14, leftIndent=15, firstLineIndent=-10, textColor=primary))
+    styles.add(ParagraphStyle(name='small', fontName='Helvetica', fontSize=10, spaceAfter=2, textColor=muted))
+    styles.add(ParagraphStyle(name='bold_inline', fontName='Helvetica-Bold', fontSize=10, spaceAfter=2, textColor=primary))
+    styles.add(ParagraphStyle(name='right_align', fontName='Helvetica', fontSize=10, alignment=TA_RIGHT, textColor=primary))
+    
+    # Map all old template names to this professional standard
+    styles.add(ParagraphStyle(name='center_title', parent=styles['title']))
+    styles.add(ParagraphStyle(name='center_sub', parent=styles['subtitle']))
+    styles.add(ParagraphStyle(name='right_title', parent=styles['title']))
+    styles.add(ParagraphStyle(name='justify', parent=styles['body']))
+    styles["line"] = primary
+    return styles
  
-def make_styles(template_type):
-    styles    = getSampleStyleSheet()
-    body_font = "Times-Roman"
-    bold_font = "Times-Bold"
-    palette   = {
-        "classic":  ("#1e3a5f", "#51606f", "#d7dee6"),
-        "modern":   ("#0f766e", "#5b6472", "#dbe4ea"),
-        "minimal":  ("#111827", "#6b7280", "#e5e7eb"),
-        "academic": ("#334155", "#64748b", "#cbd5e1"),
-        "creative": ("#8b5e3c", "#647b68", "#e8dfd4"),
-    }
-    primary, muted, line = palette.get(template_type, palette["classic"])
-    primary = colors.HexColor(primary)
-    muted   = colors.HexColor(muted)
-    line    = colors.HexColor(line)
-    return {
-        "title":        ParagraphStyle("title", parent=styles["Normal"], fontName=bold_font, fontSize=22, leading=22*1.15, textColor=primary, alignment=TA_LEFT, spaceAfter=3),
-        "subtitle":     ParagraphStyle("subtitle", parent=styles["Normal"], fontName=body_font, fontSize=10, leading=10*1.15, textColor=muted, spaceAfter=7),
-        "section":      ParagraphStyle("section", parent=styles["Heading2"], fontName=bold_font, fontSize=11.1, leading=11.1*1.15, textColor=primary, spaceBefore=6, spaceAfter=5),
-        "body":         ParagraphStyle("body", parent=styles["BodyText"], fontName=body_font, fontSize=10, leading=10*1.15, textColor=colors.black),
-        "small":        ParagraphStyle("small", parent=styles["BodyText"], fontName=body_font, fontSize=9, leading=9*1.15, textColor=muted),
-        "center_title": ParagraphStyle("center_title", parent=styles["Normal"], fontName=bold_font, fontSize=22, leading=26, textColor=primary, alignment=TA_CENTER, spaceAfter=2),
-        "center_sub":   ParagraphStyle("center_sub", parent=styles["Normal"], fontName=body_font, fontSize=10, leading=12, textColor=muted, alignment=TA_CENTER),
-        "right_title":  ParagraphStyle("right_title", parent=styles["Normal"], fontName=bold_font, fontSize=18, leading=22, textColor=primary, alignment=TA_RIGHT, spaceAfter=2),
-        "justify":      ParagraphStyle("justify", parent=styles["BodyText"], fontName=body_font, fontSize=9.2, leading=12.5, textColor=colors.black, alignment=TA_JUSTIFY),
-        "line": line, "primary": primary, "muted": muted,
-    }
- 
- 
+
 def page_header(canvas, doc, form_data, template_type):
-    canvas.saveState()
-    w, h = A4
-    if template_type == "modern":
-        canvas.setFillColor(colors.HexColor("#ecfdf5"))
-        canvas.rect(0, h - 48, w, 48, stroke=0, fill=1)
-        canvas.setStrokeColor(colors.HexColor("#0f766e"))
-        canvas.setLineWidth(1.2)
-        canvas.line(doc.leftMargin, h - 24, w - doc.rightMargin, h - 24)
-        canvas.setFont("Helvetica", 9)
-        canvas.setFillColor(colors.HexColor("#0f766e"))
-        canvas.drawRightString(w - doc.rightMargin, h - 16, clean_text(form_data.get("field_of_study")))
-    elif template_type == "academic":
-        canvas.setStrokeColor(colors.HexColor("#94a3b8"))
-        canvas.setLineWidth(1)
-        canvas.line(doc.leftMargin, h - 22, w - doc.rightMargin, h - 22)
-        canvas.setFont("Helvetica", 8.5)
-        canvas.setFillColor(colors.HexColor("#64748b"))
-        canvas.drawString(doc.leftMargin, h - 16, clean_text(form_data.get("field_of_study")))
-    elif template_type == "creative":
-        canvas.setFillColor(colors.HexColor("#f7f3ee"))
-        canvas.rect(0, h - 52, w, 52, stroke=0, fill=1)
-        canvas.setStrokeColor(colors.HexColor("#8b5e3c"))
-        canvas.line(doc.leftMargin, h - 26, w - doc.rightMargin, h - 26)
-    elif template_type == "minimal":
-        canvas.setStrokeColor(colors.HexColor("#111827"))
-        canvas.line(25*mm, h - 24, w - 25*mm, h - 24)
-    else:
-        canvas.setStrokeColor(colors.HexColor("#d7dee6"))
-        canvas.line(doc.leftMargin, h - 26, w - doc.rightMargin, h - 26)
-        canvas.setFont("Helvetica", 9)
-        canvas.setFillColor(colors.HexColor("#51606f"))
-        canvas.drawString(doc.leftMargin, h - 18, clean_text(form_data.get("field_of_study")))
-    canvas.restoreState()
+    # No decorative headers for ATS resumes
+    pass
  
- 
-def box(title, text, styles, fill=None):
-    tbl = Table([[Paragraph(f"<b>{title}</b>", styles["body"])],
-                 [Paragraph(text, styles["small"])]], colWidths=[None])
-    ts  = [
-        ("BOX",           (0, 0), (-1, -1), 0.8, styles["line"]),
-        ("VALIGN",        (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING",   (0, 0), (-1, -1), 6),
-        ("RIGHTPADDING",  (0, 0), (-1, -1), 6),
-        ("TOPPADDING",    (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-    ]
-    if fill:
-        ts.append(("BACKGROUND", (0, 0), (-1, -1), fill))
-    tbl.setStyle(TableStyle(ts))
-    return tbl
- 
- 
-def common_sections(form_data, styles):
-    story = []
-    story.append(Paragraph("CAREER OBJECTIVE", styles["section"]))
-    story.append(Paragraph(enhance_objective(form_data.get("objective"), form_data.get("field_of_study")), styles["body"]))
-    story.append(Spacer(1, 5))
-    story.append(Paragraph("ACADEMIC QUALIFICATION", styles["section"]))
-    if form_data.get("ssc_school"):
-        story.append(Paragraph(f"<b>SSC (10th Standard)</b>: {clean_text(form_data.get('ssc_school'))}<br/>Score: {clean_text(form_data.get('ssc_percentage'))}", styles["body"]))
-        story.append(Spacer(1, 3))
-    if form_data.get("inter_college"):
-        story.append(Paragraph(f"<b>Intermediate (12th Standard)</b>: {clean_text(form_data.get('inter_college'))}<br/>Score: {clean_text(form_data.get('inter_percentage'))}", styles["body"]))
-        story.append(Spacer(1, 3))
-    if form_data.get("ug_college"):
-        story.append(Paragraph(f"<b>UG</b>: {clean_text(form_data.get('ug_degree'))} in {clean_text(form_data.get('ug_branch'))}<br/>{clean_text(form_data.get('ug_college'))}<br/>Score: {clean_text(form_data.get('ug_score'))}", styles["body"]))
-        story.append(Spacer(1, 3))
-    if form_data.get("pg_college"):
-        story.append(Paragraph(f"<b>PG</b>: {clean_text(form_data.get('pg_degree'))} in {clean_text(form_data.get('pg_branch'))}<br/>{clean_text(form_data.get('pg_college'))}<br/>Score: {clean_text(form_data.get('pg_score'))}", styles["body"]))
-        story.append(Spacer(1, 3))
-    skill_names  = form_data.get("skill_name", [])
-    skill_levels = form_data.get("skill_level", [])
-    if isinstance(skill_names, str):
-        skill_names  = [skill_names]
-        skill_levels = [skill_levels]
-    processed_skills = []
-    for i in range(len(skill_names)):
-        name  = clean_text(skill_names[i])
-        level = clean_text(skill_levels[i]) if i < len(skill_levels) else ""
-        if name:
-            processed_skills.append(f"{name} - {level}")
-    form_data['processed_technical_skills'] = " • ".join(processed_skills)
-    return story
 
- 
 def parse_projects_with_bullets(form_data):
-
     titles = form_data.get("project_title", [])
     descriptions = form_data.get("project_description", [])
     technologies = form_data.get("project_technology", [])
 
     if not isinstance(titles, list):
         titles = [titles]
-
     if not isinstance(descriptions, list):
         descriptions = [descriptions]
-
     if not isinstance(technologies, list):
         technologies = [technologies]
 
     projects = []
-
-    for title, tech, desc in zip(
-        titles,
-        technologies,
-        descriptions
-    ):
-
-        bullets = [
-            line.strip()
-            for line in str(desc).split("\n")
-            if line.strip()
-        ]
-
+    for title, tech, desc in zip(titles, technologies, descriptions):
+        bullets = [line.strip() for line in str(desc).split("\n") if line.strip()]
         projects.append({
             "title": str(title),
             "technology": str(tech),
             "bullets": bullets
         })
-
     return projects
  
- 
+
 def generate_resume_pdf(template_type, form_data):
-    buffer        = io.BytesIO()
-    template_type = (template_type or "classic").lower()
-    if template_type not in ["classic", "modern", "minimal", "academic", "creative"]:
-        template_type = "classic"
+    buffer = io.BytesIO()
+    # Enforce standard A4 ATS margins
+    doc = BaseDocTemplate(buffer, pagesize=A4, leftMargin=15*mm, rightMargin=15*mm, topMargin=15*mm, bottomMargin=15*mm)
     styles = make_styles(template_type)
- 
-    def on_page(canvas, doc):
-        page_header(canvas, doc, form_data, template_type)
-        canvas.saveState()
-        canvas.setFont("Helvetica", 8)
-        canvas.setFillColor(colors.HexColor("#6b7280"))
-        canvas.drawRightString(A4[0] - doc.rightMargin, 8*mm, f"Page {doc.page}")
-        canvas.restoreState()
- 
-    if template_type == "modern":
-        doc      = BaseDocTemplate(buffer, pagesize=A4, leftMargin=12*mm, rightMargin=12*mm, topMargin=54*mm, bottomMargin=15*mm)
-        sidebar_w = 60*mm
-        gap       = 6*mm
-        main_w    = A4[0] - doc.leftMargin - doc.rightMargin - sidebar_w - gap
-        frame_h   = A4[1] - doc.topMargin - doc.bottomMargin
-        left_frame  = Frame(doc.leftMargin, doc.bottomMargin, sidebar_w, frame_h, id="sidebar", showBoundary=0)
-        right_frame = Frame(doc.leftMargin + sidebar_w + gap, doc.bottomMargin, main_w, frame_h, id="main", showBoundary=0)
-        doc.addPageTemplates([PageTemplate(id="modern", frames=[left_frame, right_frame], onPage=on_page)])
-        story = []
-        story.append(Paragraph("PROFILE", styles["section"]))
-        story.append(Paragraph(enhance_objective(form_data.get("objective"), form_data.get("field_of_study")), styles["small"]))
-        story.append(Spacer(1, 4))
-        story.append(Paragraph("CONTACT", styles["section"]))
-        contact_lines = [f"Email: {clean_text(form_data.get('email'))}", f"Phone: {clean_text(form_data.get('phone'))}"]
-        if form_data.get('linkedin'): contact_lines.append(f"LinkedIn: {clean_text(form_data.get('linkedin'))}")
-        if form_data.get('github'):   contact_lines.append(f"GitHub: {clean_text(form_data.get('github'))}")
-        if form_data.get('website'):  contact_lines.append(f"Website: {clean_text(form_data.get('website'))}")
-        location_str = ", ".join(filter(None, [clean_text(form_data.get('city')), clean_text(form_data.get('state')), clean_text(form_data.get('country'))]))
-        if location_str: contact_lines.append(f"Location: {location_str}")
-        story.append(Paragraph("<br/>".join(contact_lines), styles["small"]))
-        story.append(Spacer(1, 4))
-        story.append(Paragraph("SKILLS", styles["section"]))
-        skill_names  = form_data.get("skill_name", [])
-        skill_levels = form_data.get("skill_level", [])
-        if isinstance(skill_names, str): skill_names = [skill_names]
-        if isinstance(skill_levels, str): skill_levels = [skill_levels]
-        processed_skills = []
-        for i in range(len(skill_names)):
-            name  = clean_text(skill_names[i])
-            level = skill_levels[i] if i < len(skill_levels) else ""
-            if name: processed_skills.append(f"{name} - {level}")
-        story.append(Paragraph(" • ".join(processed_skills) or "N/A", styles["small"]))
-        story.append(Spacer(1, 4))
-        story.append(Paragraph("LANGUAGES", styles["section"]))
-        langs = "<br/>".join(f"• {clean_text(x)}" for x in split_items(form_data.get("languages")))
-        story.append(Paragraph(langs or "N/A", styles["small"]))
-        story.append(FrameBreak())
-        story.append(Paragraph(clean_text(form_data.get("name")), styles["title"]))
-        story.append(Paragraph(clean_text(form_data.get("field_of_study")), styles["subtitle"]))
-        story.extend(common_sections(form_data, styles))
-        projects = parse_projects_with_bullets(form_data)
-        if projects:
-            story.append(Paragraph("PROJECTS", styles["section"]))
-            for i, p in enumerate(projects, 1):
-                title   = clean_text(p["title"]) or f"Project {i}"
-                bullets = p["bullets"] or ["Project details not provided."]
-                txt     = f"<b>{title}</b><br/>" + "<br/>".join(f"• {clean_text(b)}" for b in bullets)
-                story.append(box(f"Project {i}", txt, styles, fill=colors.HexColor("#f0fdfa")))
-                story.append(Spacer(1, 4))
-        experiences = split_items(form_data.get("work_experience")) or split_items(form_data.get("internships"))
-        if experiences:
-            story.append(Paragraph("INTERNSHIPS", styles["section"]))
-            for exp in experiences:
-                bullets_exp = describe_experience(exp)
-                txt         = f"<b>{clean_text(exp)}</b><br/>" + "<br/>".join(f"• {clean_text(b)}" for b in bullets_exp)
-                story.append(Paragraph(txt, styles["body"]))
-                story.append(Spacer(1, 4))
-        certs = split_items(form_data.get("certifications"))
-        if certs:
-            story.append(Paragraph("CERTIFICATIONS", styles["section"]))
-            for c in certs:
-                story.append(Paragraph(f"• <b>{clean_text(c)}</b>: {clean_text(describe_certification(c))}", styles["body"]))
-                story.append(Spacer(1, 2))
-        doc.build(story)
-        pdf_out = buffer.getvalue()
-        buffer.close()
-        return pdf_out
- 
-    # All other templates
-    doc   = BaseDocTemplate(buffer, pagesize=A4, leftMargin=15*mm, rightMargin=15*mm, topMargin=18*mm, bottomMargin=15*mm)
     story = []
-    if template_type == "classic":
-        story.append(Paragraph(clean_text(form_data.get("name")), styles["title"]))
-        contact_parts = [clean_text(form_data.get('field_of_study')), clean_text(form_data.get('email')), clean_text(form_data.get('phone'))]
-        if form_data.get('linkedin'): contact_parts.append(f"LinkedIn: {clean_text(form_data.get('linkedin'))}")
-        if form_data.get('github'):   contact_parts.append(f"GitHub: {clean_text(form_data.get('github'))}")
-        if form_data.get('website'):  contact_parts.append(f"Website: {clean_text(form_data.get('website'))}")
-        story.append(Paragraph(" | ".join(filter(None, contact_parts)), styles["subtitle"]))
-        story.append(HRFlowable(width="100%", thickness=0.8, color=styles["line"]))
-        story.append(Spacer(1, 5))
-    elif template_type == "minimal":
-        story.append(Paragraph(clean_text(form_data.get("name")), styles["center_title"]))
-        story.append(Paragraph(clean_text(form_data.get("field_of_study")), styles["center_sub"]))
-        contact_parts = [clean_text(form_data.get('email')), clean_text(form_data.get('phone'))]
-        if form_data.get('linkedin'): contact_parts.append(clean_text(form_data.get('linkedin')))
-        if form_data.get('github'):   contact_parts.append(clean_text(form_data.get('github')))
-        story.append(Paragraph(" • ".join(filter(None, contact_parts)), styles["center_sub"]))
-        story.append(Spacer(1, 5))
-        story.append(HRFlowable(width="42%", thickness=1, color=styles["line"]))
-        story.append(Spacer(1, 7))
-    elif template_type == "academic":
-        story.append(Paragraph(clean_text(form_data.get("name")), styles["title"]))
-        story.append(Paragraph(clean_text(form_data.get("field_of_study")), styles["right_title"]))
-        contact_info = f"{clean_text(form_data.get('email'))} | {clean_text(form_data.get('phone'))}"
-        if form_data.get('linkedin'): contact_info += f" | LinkedIn: {clean_text(form_data.get('linkedin'))}"
-        story.append(Paragraph(contact_info, styles["small"]))
-        story.append(Spacer(1, 4))
-        story.append(HRFlowable(width="100%", thickness=1, color=styles["line"]))
-        story.append(Spacer(1, 6))
-    elif template_type == "creative":
-        story.append(Paragraph(clean_text(form_data.get("name")), styles["title"]))
-        story.append(Paragraph(clean_text(form_data.get("field_of_study")), styles["subtitle"]))
-        if form_data.get('website'): story.append(Paragraph(f"Portfolio: {clean_text(form_data.get('website'))}", styles["small"]))
+
+    # 1. HEADER (Name & Contact)
+    story.append(Paragraph(clean_text(form_data.get("name")), styles["title"]))
+    
+    contact_parts = []
+    location_str = ", ".join(filter(None, [clean_text(form_data.get('city')), clean_text(form_data.get('state')), clean_text(form_data.get('country'))]))
+    if location_str: contact_parts.append(location_str)
+    if form_data.get('phone'): contact_parts.append(clean_text(form_data.get('phone')))
+    if form_data.get('email'): contact_parts.append(clean_text(form_data.get('email')))
+    if form_data.get('linkedin'): contact_parts.append(clean_text(form_data.get('linkedin')))
+    if form_data.get('github'): contact_parts.append(clean_text(form_data.get('github')))
+    if form_data.get('website'): contact_parts.append(clean_text(form_data.get('website')))
+    
+    story.append(Paragraph(" | ".join(contact_parts), styles["subtitle"]))
+    
+    # 2. OBJECTIVE
+    if form_data.get("objective"):
+        story.append(Paragraph("CAREER OBJECTIVE", styles["section"]))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black, spaceAfter=6, spaceBefore=0))
+        story.append(Paragraph(enhance_objective(form_data.get("objective"), form_data.get("field_of_study")), styles["body"]))
+
+    # 3. EDUCATION
+    story.append(Paragraph("EDUCATION", styles["section"]))
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.black, spaceAfter=6, spaceBefore=0))
+    
+    if form_data.get("pg_college"):
+        story.append(Paragraph(f"<b>{clean_text(form_data.get('pg_college'))}</b>", styles["body"]))
+        story.append(Paragraph(f"{clean_text(form_data.get('pg_degree'))} in {clean_text(form_data.get('pg_branch'))} | Score: {clean_text(form_data.get('pg_score'))}", styles["body"]))
         story.append(Spacer(1, 3))
-        story.append(HRFlowable(width="100%", thickness=1.1, color=styles["line"]))
-        story.append(Spacer(1, 7))
- 
-    story.extend(common_sections(form_data, styles))
- 
+    if form_data.get("ug_college"):
+        story.append(Paragraph(f"<b>{clean_text(form_data.get('ug_college'))}</b>", styles["body"]))
+        story.append(Paragraph(f"{clean_text(form_data.get('ug_degree'))} in {clean_text(form_data.get('ug_branch'))} | Score: {clean_text(form_data.get('ug_score'))}", styles["body"]))
+        story.append(Spacer(1, 3))
+    if form_data.get("inter_college"):
+        story.append(Paragraph(f"<b>{clean_text(form_data.get('inter_college'))}</b>", styles["body"]))
+        story.append(Paragraph(f"Intermediate (12th Standard) | Score: {clean_text(form_data.get('inter_percentage'))}", styles["body"]))
+        story.append(Spacer(1, 3))
+    if form_data.get("ssc_school"):
+        story.append(Paragraph(f"<b>{clean_text(form_data.get('ssc_school'))}</b>", styles["body"]))
+        story.append(Paragraph(f"SSC (10th Standard) | Score: {clean_text(form_data.get('ssc_percentage'))}", styles["body"]))
+        story.append(Spacer(1, 3))
+
+    # 4. SKILLS
     skill_names  = form_data.get("skill_name", [])
     skill_levels = form_data.get("skill_level", [])
     if isinstance(skill_names, str): skill_names = [skill_names]
     if isinstance(skill_levels, str): skill_levels = [skill_levels]
     processed_skills = []
     for i in range(len(skill_names)):
-        name  = clean_text(skill_names[i])
-        level = skill_levels[i] if i < len(skill_levels) else ""
-        if name: processed_skills.append(f"{name} - {level}")
+        name = clean_text(skill_names[i])
+        if name: processed_skills.append(name)
+        
     if processed_skills:
         story.append(Paragraph("TECHNICAL SKILLS", styles["section"]))
-        story.append(Paragraph(" • ".join(processed_skills), styles["body"]))
-        story.append(Spacer(1, 5))
- 
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black, spaceAfter=6, spaceBefore=0))
+        story.append(Paragraph("<b>Skills:</b> " + ", ".join(processed_skills), styles["body"]))
+        
     if form_data.get("languages"):
-        story.append(Paragraph("LANGUAGES", styles["section"]))
-        if template_type == "minimal":
-            data = [[Paragraph("Languages", styles["body"]), Paragraph(" • ".join(clean_text(x) for x in split_items(form_data.get("languages"))), styles["small"])]]
-            t    = Table(data, colWidths=[35*mm, None])
-            t.setStyle(TableStyle([("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f8fafc")), ("BOX", (0, 0), (-1, -1), 0.8, styles["line"]), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 6), ("RIGHTPADDING", (0, 0), (-1, -1), 6), ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5)]))
-            story.append(t)
-        elif template_type == "academic":
-            story.append(Paragraph(" • ".join(clean_text(x) for x in split_items(form_data.get("languages"))), styles["justify"]))
-        else:
-            story.append(Paragraph(" • ".join(clean_text(x) for x in split_items(form_data.get("languages"))), styles["body"]))
-        story.append(Spacer(1, 5))
- 
+        langs = ", ".join(clean_text(x) for x in split_items(form_data.get("languages")))
+        story.append(Paragraph(f"<b>Languages:</b> {langs}", styles["body"]))
+
+    # 5. PROJECTS
     projects = parse_projects_with_bullets(form_data)
     if projects:
         story.append(Paragraph("PROJECTS", styles["section"]))
-        for i, p in enumerate(projects, 1):
-            title   = clean_text(p["title"]) or f"Project {i}"
-            bullets = p["bullets"] or ["Project details not provided."]
-            txt     = f"<b>{title}</b><br/>" + "<br/>".join(f"• {clean_text(b)}" for b in bullets)
-            if template_type == "creative":
-                story.append(box(f"Project {i}", txt, styles, fill=colors.HexColor("#fbf7f2")))
-            elif template_type == "academic":
-                story.append(Paragraph(txt, styles["justify"]))
-            else:
-                story.append(Paragraph(txt, styles["body"]))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black, spaceAfter=6, spaceBefore=0))
+        for p in projects:
+            title = clean_text(p["title"])
+            tech = clean_text(p.get("technology", ""))
+            bullets = p["bullets"]
+            
+            # Project Title line
+            title_line = f"<b>{title}</b>"
+            if tech:
+                title_line += f" | <i>{tech}</i>"
+            story.append(Paragraph(title_line, styles["body"]))
+            
+            # Project Bullets
+            for b in bullets:
+                story.append(Paragraph(f"• {clean_text(b)}", styles["bullet"]))
             story.append(Spacer(1, 4))
- 
+
+    # 6. EXPERIENCE / INTERNSHIPS
     experiences = split_items(form_data.get("work_experience")) or split_items(form_data.get("internships"))
     if experiences:
         story.append(Paragraph("EXPERIENCE & INTERNSHIPS", styles["section"]))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black, spaceAfter=6, spaceBefore=0))
         for exp in experiences:
+            story.append(Paragraph(f"<b>{clean_text(exp)}</b>", styles["body"]))
             bullets_exp = describe_experience(exp)
-            txt         = f"<b>{clean_text(exp)}</b><br/>" + "<br/>".join(f"• {clean_text(b)}" for b in bullets_exp)
-            story.append(Paragraph(txt, styles["body"]))
-            story.append(Spacer(1, 5))
-        story.append(Spacer(1, 5))
- 
+            for b in bullets_exp:
+                story.append(Paragraph(f"• {clean_text(b)}", styles["bullet"]))
+            story.append(Spacer(1, 4))
+
+    # 7. CERTIFICATIONS
     certs = split_items(form_data.get("certifications"))
     if certs:
         story.append(Paragraph("CERTIFICATIONS", styles["section"]))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black, spaceAfter=6, spaceBefore=0))
         for c in certs:
-            story.append(Paragraph(f"• <b>{clean_text(c)}</b>: {clean_text(describe_certification(c))}", styles["body"]))
-            story.append(Spacer(1, 3))
- 
-    doc.addPageTemplates([PageTemplate(id=template_type, frames=[Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="main")], onPage=on_page)])
+            story.append(Paragraph(f"• <b>{clean_text(c)}</b>: {clean_text(describe_certification(c))}", styles["bullet"]))
+
+    def on_page(canvas, doc):
+        canvas.saveState()
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.HexColor("#666666"))
+        canvas.drawRightString(A4[0] - doc.rightMargin, 10*mm, f"Page {doc.page}")
+        canvas.restoreState()
+
+    doc.addPageTemplates([PageTemplate(id='main', frames=[Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="main")], onPage=on_page)])
     doc.build(story)
+    
     pdf_out = buffer.getvalue()
     buffer.close()
     return pdf_out
