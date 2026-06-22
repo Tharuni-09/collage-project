@@ -240,7 +240,21 @@
             localStorage.setItem('recentRequests', JSON.stringify(recentRequests.slice(0, 10)));
             updateRecentList();
             showToast(`✓ Outline generated! Redirecting to review...`);
-            window.location.href = data.review_url;
+            
+            // Create a hidden form to submit the JSON data via POST to bypass cookie limits
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/ppt-review';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'slides_data';
+            input.value = JSON.stringify(data.slides_data);
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            
           } else {
             showToast(`Error: ${data.error}`);
           }

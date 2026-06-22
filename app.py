@@ -1323,10 +1323,9 @@ Rules:
         from pptx.util import Inches, Pt
  
         slides_data = json.loads(raw)
-        session["ppt_review_data"] = slides_data
         return jsonify({
             "success": True,
-            "review_url": url_for("ppt_review")
+            "slides_data": slides_data
             })
  
 
@@ -1334,13 +1333,19 @@ Rules:
         logger.error(f"PPT generation error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
     
-@app.route("/ppt-review")
+@app.route("/ppt-review", methods=["GET", "POST"])
 def ppt_review():
+    if request.method == "POST":
+        try:
+            slides_data = json.loads(request.form.get("slides_data", "[]"))
+        except:
+            slides_data = []
+    else:
+        return redirect(url_for("faculty_dashboard"))
 
-    if "ppt_review_data" not in session:
-        return redirect("/faculty")
-
-    slides_data = session["ppt_review_data"]
+    if not slides_data:
+        flash("Failed to load slides data.", "error")
+        return redirect(url_for("faculty_dashboard"))
     
     # Convert JSON to a readable text format for editing
     content_lines = []
