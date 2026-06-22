@@ -59,3 +59,14 @@ CREATE TABLE IF NOT EXISTS notes (
     FOREIGN KEY (department_id) REFERENCES departments(id),
     FOREIGN KEY (faculty_id) REFERENCES users(id)
 );
+
+-- Faculty Todos table
+CREATE TABLE IF NOT EXISTS faculty_todos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    faculty_id INTEGER NOT NULL,
+    subject_name TEXT NOT NULL,
+    department_name TEXT NOT NULL,
+    details TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (faculty_id) REFERENCES users(uid)
+);

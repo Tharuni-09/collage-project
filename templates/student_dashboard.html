@@ -28,6 +28,84 @@
         </div>
     </div>
 
+    <!-- Performance Chart Section -->
+    <div class="card" style="margin: 30px auto; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px;">
+        <h3 class="section-title" style="text-align: center; margin-bottom: 20px; color: #0a1f44;">Performance Overview</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            // Assuming CGPA and SGPA are out of 10, scale them to 100 for comparison with attendance
+            const cgpa = {{ cgpa or 0 }};
+            const sgpa = {{ sgpa or 0 }};
+            const attendance = {{ attendance or 0 }};
+            
+            const cgpaPercent = cgpa * 10;
+            const sgpaPercent = sgpa * 10;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['CGPA (Scaled)', 'SGPA (Scaled)', 'Attendance (%)'],
+                    datasets: [{
+                        label: 'Student Metrics',
+                        data: [cgpaPercent, sgpaPercent, attendance],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataIndex === 0 || context.dataIndex === 1) {
+                                        label += (context.raw / 10).toFixed(2) + ' / 10';
+                                    } else {
+                                        label += context.raw + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) { return value + "%"; }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
     <section class="resumes-section">
         <h3 class="section-title">My Resumes</h3>
         {% if resumes %}

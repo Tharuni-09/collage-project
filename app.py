@@ -637,6 +637,13 @@ def login():
         if is_ajax:
             return jsonify({"success": False, "message": msg})
         return render_template("login.html", error=msg)
+        
+    if role == "admin" and db_role != "admin":
+        db.close()
+        msg = "This ID does not have Admin privileges."
+        if is_ajax:
+            return jsonify({"success": False, "message": msg})
+        return render_template("login.html", error=msg)
  
     db.close()
     session["uid"]    = db_uid
@@ -1054,17 +1061,18 @@ def generate():
     if uid:
         db = get_db()
         existing_resume = db.execute(
-            "SELECT id FROM resumes WHERE uid = ? AND title LIKE ?",
-            [uid, f"Resume ({template_choice.capitalize()})%"]
+            "SELECT id FROM resumes WHERE uid = ?",
+            [uid]
         ).fetchone()
+        
+        new_title = f"Resume ({template_choice.capitalize()})"
         if existing_resume:
-            db.execute("UPDATE resumes SET pdf_content = ?, created_at = ? WHERE id = ?",
-                       [pdf_content, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), existing_resume["id"]])
+            db.execute("UPDATE resumes SET title = ?, pdf_content = ?, created_at = ? WHERE id = ?",
+                       [new_title, pdf_content, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), existing_resume["id"]])
         else:
             db.execute(
                 "INSERT INTO resumes (uid, student_id, title, pdf_content, created_at) VALUES (?, ?, ?, ?, ?)",
-                [uid, uid, f"Resume ({template_choice.capitalize()})", pdf_content,
-                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+                [uid, uid, new_title, pdf_content, datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
             )
         db.commit()
         db.close()
@@ -1449,6 +1457,54 @@ def faculty_delete_student(roll):
     return redirect(url_for("faculty_dashboard"))
  
  
+# =====================================================================
+# FACULTY TO-DO LIST ROUTES
+# =====================================================================
+
+@app.route("/add_todo", methods=["POST"])
+def add_todo():
+    if session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    subject = request.form.get("subject_name")
+    department = request.form.get("department_name")
+    details = request.form.get("details")
+    if subject and department and details:
+        db = get_db()
+        db.execute(
+            "INSERT INTO faculty_todos (faculty_id, subject_name, department_name, details) VALUES (?, ?, ?, ?)",
+            [session["uid"], subject, department, details]
+        )
+        db.commit()
+        db.close()
+    return redirect(url_for("faculty_dashboard"))
+
+@app.route("/edit_todo/<int:todo_id>", methods=["POST"])
+def edit_todo(todo_id):
+    if session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    subject = request.form.get("subject_name")
+    department = request.form.get("department_name")
+    details = request.form.get("details")
+    if subject and department and details:
+        db = get_db()
+        db.execute(
+            "UPDATE faculty_todos SET subject_name = ?, department_name = ?, details = ? WHERE id = ? AND faculty_id = ?",
+            [subject, department, details, todo_id, session["uid"]]
+        )
+        db.commit()
+        db.close()
+    return redirect(url_for("faculty_dashboard"))
+
+@app.route("/delete_todo/<int:todo_id>", methods=["POST"])
+def delete_todo(todo_id):
+    if session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    db = get_db()
+    db.execute("DELETE FROM faculty_todos WHERE id = ? AND faculty_id = ?", [todo_id, session["uid"]])
+    db.commit()
+    db.close()
+    return redirect(url_for("faculty_dashboard"))
+
 @app.route("/faculty_dashboard")
 def faculty_dashboard():
     try:
@@ -1470,6 +1526,11 @@ def faculty_dashboard():
                 [department]
             ).fetchall()
  
+        todos = db.execute(
+            "SELECT * FROM faculty_todos WHERE faculty_id = ? ORDER BY created_at DESC",
+            [uid]
+        ).fetchall()
+
         context = {
             "students_acsml": get_students_for("ACSML"),
             "students_ncsml": get_students_for("NCSML"),
@@ -1477,6 +1538,7 @@ def faculty_dashboard():
             "resumes_acsml":  get_resumes_for("ACSML"),
             "resumes_ncsml":  get_resumes_for("NCSML"),
             "resumes_dcsml":  get_resumes_for("DCSML"),
+            "todos": todos,
             "session": session,
             "dept": dept,
         }
