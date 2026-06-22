@@ -1275,7 +1275,8 @@ def generate_ppt():
  
     file   = request.files.get("file")
     slides = request.form.get("slides", 20)
- 
+    topics = request.form.get("topics", "General Summary")
+
     if not file:
         return jsonify({"success": False, "error": "No file uploaded"}), 400
  
@@ -1296,22 +1297,24 @@ def generate_ppt():
         file_content = "Unable to extract text from file."
  
     prompt = f"""
-Create a structured outline for a {slides}-slide PowerPoint presentation based on the following content.
+Create a structured outline for a {slides}-slide PowerPoint presentation based ONLY on the following topics: {topics}.
+Extract relevant information from the provided content below. If the content does not contain enough information about the topics, do your best to generate accurate educational material.
  
 Content:
 {file_content[:6000]}
  
 Output format (JSON array):
 [
-  {{"slide": 1, "title": "...", "points": ["...", "...", "..."]}},
+  {{"slide": 1, "title": "...", "points": ["...", "...", "..."], "image_query": "high quality stock photo of ..."}},
   ...
 ]
  
 Rules:
-- Return ONLY valid JSON, no markdown
-- Max 5 bullet points per slide
-- Keep points concise (under 15 words each)
-- Include title slide, agenda, content slides, and conclusion
+- Return ONLY valid JSON, no markdown.
+- Max 5 bullet points per slide.
+- Keep points concise (under 15 words each).
+- The 'image_query' should be a highly descriptive 3-5 word search query for a relevant background/illustration image (e.g., 'neural network concept art', 'server room dark lighting').
+- Include title slide, agenda, content slides, and conclusion.
 """
     try:
         response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
@@ -1351,6 +1354,8 @@ def ppt_review():
     content_lines = []
     for slide in slides_data:
         content_lines.append(f"Slide: {slide.get('title', '')}")
+        if slide.get('image_query'):
+            content_lines.append(f"Image: {slide.get('image_query')}")
         for pt in slide.get('points', []):
             content_lines.append(f"- {pt}")
         content_lines.append("")
@@ -1379,7 +1384,9 @@ def download_ppt():
         if line.startswith("Slide:"):
             if current_slide:
                 slides_data.append(current_slide)
-            current_slide = {"title": line.replace("Slide:", "").strip(), "points": []}
+            current_slide = {"title": line.replace("Slide:", "").strip(), "points": [], "image_query": ""}
+        elif line.startswith("Image:") and current_slide is not None:
+            current_slide["image_query"] = line.replace("Image:", "").strip()
         elif line.startswith("-") and current_slide is not None:
             current_slide["points"].append(line[1:].strip())
             
@@ -1388,9 +1395,13 @@ def download_ppt():
         
     # Build PPT
     from pptx import Presentation
+    from pptx.util import Inches, Pt
+    import requests
+    import urllib.parse
+    
     prs = Presentation()
     for slide_info in slides_data:
-        layout     = prs.slide_layouts[1]
+        layout     = prs.slide_layouts[1] # Title and Content
         pptx_slide = prs.slides.add_slide(layout)
         title_ph   = pptx_slide.shapes.title
         body_ph    = pptx_slide.placeholders[1]
@@ -1402,6 +1413,27 @@ def download_ppt():
             p = tf.add_paragraph()
             p.text  = point
             p.level = 0
+            
+        # Download and insert image if requested
+        query = slide_info.get("image_query")
+        if query and query.strip():
+            try:
+                # Use pollinations.ai for dynamic image generation (free, no auth required)
+                safe_query = urllib.parse.quote(query.strip())
+                img_url = f"https://image.pollinations.ai/prompt/{safe_query}?width=800&height=600&nologo=true"
+                response = requests.get(img_url, timeout=10)
+                if response.status_code == 200:
+                    image_stream = io.BytesIO(response.content)
+                    # Add image to the right side of the slide
+                    left = Inches(5.5)
+                    top = Inches(2.0)
+                    height = Inches(4.5)
+                    pptx_slide.shapes.add_picture(image_stream, left, top, height=height)
+                    
+                    # Shrink text box to make room for image
+                    body_ph.width = Inches(5.0)
+            except Exception as e:
+                logger.warning(f"Failed to fetch image for slide '{slide_info.get('title')}': {e}")
 
     pptx_buf = io.BytesIO()
     prs.save(pptx_buf)
