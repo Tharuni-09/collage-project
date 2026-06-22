@@ -2,57 +2,213 @@
 {% block title %}Upload Notes - Faculty{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">📤 Upload Department Notes</h3>
-                </div>
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="title" class="form-label fw-bold">Note Title *</label>
-                            <input type="text" class="form-control" id="title" name="title" 
-                                   placeholder="e.g., Chapter 1 - Introduction to Machine Learning" required>
-                        </div>
+<style>
+    .upload-container {
+        max-width: 700px;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(10, 31, 68, 0.1);
+        overflow: hidden;
+    }
+    .upload-header {
+        background: linear-gradient(135deg, #0a1f44 0%, #1a365d 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    .upload-header h3 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .upload-body {
+        padding: 40px;
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #0a1f44;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+    .form-control, .form-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #0a1f44;
+        background: #fff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(10, 31, 68, 0.1);
+    }
+    .form-text {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 6px;
+        display: block;
+    }
+    .file-drop-area {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 40px 20px;
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        background: #f8fafc;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    .file-drop-area:hover, .file-drop-area.dragover {
+        background: #f1f5f9;
+        border-color: #0a1f44;
+    }
+    .file-drop-area input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .file-icon {
+        font-size: 40px;
+        margin-bottom: 15px;
+    }
+    .btn-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    .btn-custom {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-back {
+        background: #f1f5f9;
+        color: #475569;
+    }
+    .btn-back:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+    .btn-upload {
+        background: #0a1f44;
+        color: white;
+    }
+    .btn-upload:hover {
+        background: #1e3a8a;
+        transform: translateY(-2px);
+    }
+</style>
 
-                        <div class="mb-3">
-                            <label for="department_id" class="form-label fw-bold">Select Department *</label>
-                            <select class="form-select" id="department_id" name="department_id" required>
-                                <option value="">-- Choose Department --</option>
-                                {% for dept in departments %}
-                                <option value="{{ dept.id }}">{{ dept.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <small class="text-muted">Faculty can upload notes for any department</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="description" class="form-label fw-bold">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"
-                                      placeholder="Enter details about these notes..."></textarea>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="file" class="form-label fw-bold">Upload File *</label>
-                            <input type="file" class="form-control" id="file" name="file" 
-                                   accept=".pdf,.doc,.docx,.txt,.ppt,.pptx,.xls,.xlsx,.jpg,.png" required>
-                            <small class="text-muted">Supported: PDF, DOC, DOCX, TXT, PPT, XLS, JPG, PNG (Max 50MB)</small>
-                        </div>
-
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-secondary">
-                                ← Back to Dashboard
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                📤 Upload Notes
-                            </button>
-                        </div>
-                    </form>
-                </div>
+<div class="upload-container">
+    <div class="upload-header">
+        <h3><span style="font-size: 1.2em;">📤</span> Upload Department Notes</h3>
+        <p style="margin-top: 10px; opacity: 0.8; font-size: 14px;">Share educational resources with your students seamlessly.</p>
+    </div>
+    
+    <div class="upload-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Note Title <span style="color:#ef4444;">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" 
+                       placeholder="e.g., Chapter 1 - Introduction to Machine Learning" required>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label for="department_id">Select Department <span style="color:#ef4444;">*</span></label>
+                <select class="form-select" id="department_id" name="department_id" required>
+                    <option value="" disabled selected>-- Choose Department --</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+                <span class="form-text">You can upload notes for any department.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description (Optional)</label>
+                <textarea class="form-control" id="description" name="description" rows="3"
+                          placeholder="Briefly describe the contents of these notes..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Upload File <span style="color:#ef4444;">*</span></label>
+                <div class="file-drop-area">
+                    <span class="file-icon">📁</span>
+                    <span style="font-weight: 600; color: #0a1f44; margin-bottom: 5px;">Drag & drop your file here</span>
+                    <span class="form-text">or click to browse</span>
+                    <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.txt,.ppt,.pptx,.xls,.xlsx,.jpg,.png" required>
+                </div>
+                <span class="form-text mt-2 text-center" id="file-name-display">Supported formats: PDF, DOCX, PPT, TXT, images (Max 50MB)</span>
+            </div>
+
+            <div class="btn-actions">
+                <a href="{{ url_for('faculty_dashboard') }}" class="btn-custom btn-back">
+                    <span>←</span> Cancel
+                </a>
+                <button type="submit" class="btn-custom btn-upload">
+                    <span>📤</span> Upload Document
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
+<script>
+    const fileInput = document.getElementById('file');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    const dropArea = document.querySelector('.file-drop-area');
+
+    fileInput.addEventListener('change', function(e) {
+        if(this.files && this.files.length > 0) {
+            fileNameDisplay.innerHTML = `Selected File: <span style="color:#0a1f44; font-weight:600;">${this.files[0].name}</span>`;
+            dropArea.style.borderColor = '#10b981';
+            dropArea.style.background = '#ecfdf5';
+        }
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+    });
+</script>
 {% endblock %}

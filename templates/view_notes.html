@@ -2,73 +2,182 @@
 {% block title %}View Notes - {{ department.name if department else 'Notes' }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">📚 Department Notes</h2>
-                <span class="badge bg-primary fs-5">{{ department.name if department else 'Your Department' }}</span>
-            </div>
+<style>
+    .view-notes-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    .view-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    .view-header h2 {
+        color: #0a1f44;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .dept-badge {
+        background: linear-gradient(135deg, #0a1f44 0%, #1a365d 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 15px;
+        box-shadow: 0 4px 10px rgba(10,31,68,0.2);
+    }
+    .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
+    .note-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .note-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+        border-color: #cbd5e1;
+    }
+    .note-card-header {
+        background: #f8fafc;
+        padding: 20px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .note-card-title {
+        color: #0a1f44;
+        font-weight: 700;
+        font-size: 18px;
+        margin: 0;
+        line-height: 1.4;
+    }
+    .note-card-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .note-desc {
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+    .note-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 8px;
+    }
+    .file-badge {
+        background: #e0e7ff;
+        color: #4f46e5;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 12px;
+        display: inline-block;
+        margin-bottom: 15px;
+        word-break: break-all;
+    }
+    .btn-download-full {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: #0a1f44;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+        margin-top: auto;
+    }
+    .btn-download-full:hover {
+        background: #1a365d;
+        color: white;
+        transform: translateY(-2px);
+    }
+    .btn-back-dash {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+        margin-top: 40px;
+    }
+    .btn-back-dash:hover {
+        color: #0a1f44;
+    }
+</style>
 
-            {% if notes %}
-                <div class="row">
-                    {% for note in notes %}
-                    <div class="col-md-6 mb-3">
-                        <div class="card shadow-sm hover-card">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0 text-primary">📖 {{ note.title }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text text-muted">{{ note.description if note.description else 'No description provided' }}</p>
-                                
-                                <div class="mb-2">
-                                    <small class="badge bg-info text-dark">📄 {{ note.file_name }}</small>
-                                </div>
-                                
-                                <div class="mb-2">
-                                    <small class="text-muted">
-                                        👤 Uploaded by: {{ note.faculty_name }}
-                                    </small>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <small class="text-muted">
-                                        📅 {{ note.uploaded_at }}
-                                    </small>
-                                </div>
+<div class="view-notes-container">
+    <div class="view-header">
+        <h2><span style="font-size: 1.2em;">📚</span> Department Notes</h2>
+        <span class="dept-badge">{{ department.name if department else 'Your Department' }}</span>
+    </div>
 
-                                <a href="{{ url_for('download_note', filename=note.file_name) }}" 
-                                   class="btn btn-success btn-sm" download>
-                                    ⬇️ Download
-                                </a>
-                            </div>
+    {% if notes %}
+        <div class="notes-grid">
+            {% for note in notes %}
+            <div class="note-card">
+                <div class="note-card-header">
+                    <h3 class="note-card-title">{{ note.title }}</h3>
+                </div>
+                <div class="note-card-body">
+                    <span class="file-badge">📄 {{ note.file_name }}</span>
+                    
+                    <p class="note-desc">
+                        {{ note.description if note.description else 'No description provided for these notes.' }}
+                    </p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="note-meta-item">
+                            <span>👤</span> By: <strong style="color: #1e293b;">{{ note.faculty_name }}</strong>
+                        </div>
+                        <div class="note-meta-item">
+                            <span>📅</span> Date: {{ note.uploaded_at[:10] }}
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-info text-center">
-                    <h4>📭 No Notes Available</h4>
-                    <p>There are no notes uploaded for {{ department.name if department else 'your department' }} yet.</p>
-                </div>
-            {% endif %}
 
-            <div class="mt-4 text-center">
-                <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">
-                    ← Back to Student Dashboard
-                </a>
+                    <a href="{{ url_for('download_note', filename=note.file_name) }}" class="btn-download-full" download>
+                        ⬇️ Download Notes
+                    </a>
+                </div>
             </div>
+            {% endfor %}
         </div>
+    {% else %}
+        <div style="text-align: center; padding: 80px 20px; background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <div style="font-size: 60px; margin-bottom: 20px; opacity: 0.5;">📭</div>
+            <h3 style="color: #0a1f44; font-weight: 700; margin-bottom: 10px;">No Notes Available</h3>
+            <p style="color: #64748b; font-size: 16px;">There are currently no notes uploaded for {{ department.name if department else 'your department' }}. Check back later!</p>
+        </div>
+    {% endif %}
+
+    <div style="text-align: center;">
+        <a href="{{ url_for('student_dashboard') }}" class="btn-back-dash">
+            ← Back to Student Dashboard
+        </a>
     </div>
 </div>
-
-<style>
-.hover-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.hover-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-}
-</style>
 {% endblock %}
