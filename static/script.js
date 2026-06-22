@@ -10,9 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!hero) return;
 
   const images = [
-    "ml1.jpg",
-    "ml2.jpg",
-    "ml3.jpg"
+    "/static/images/ml_23_4.jpeg",
+    "/static/images/ai_24_3.jpeg",
+    "/static/images/dl_23_5.jpeg"
   ];
 
   let index = 0;

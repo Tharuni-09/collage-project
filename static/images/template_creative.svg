@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+  <rect width="100%" height="100%" fill="#fffaf0" stroke="#fff1d6" />
+  <rect x="0" y="0" width="100%" height="60" fill="#d97706" />
+  <text x="20" y="38" font-family="Arial" font-size="20" fill="#fff">Creative Professional</text>
+  <text x="20" y="100" font-family="Arial" font-size="12" fill="#4b2e83">Colorful accents, skill highlights, visual layout</text>
+  <rect x="280" y="70" width="80" height="80" fill="#fef3c7" stroke="#f3e5ab" />
+</svg>
