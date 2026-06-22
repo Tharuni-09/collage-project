@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Faculty Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4"> Faculty Dashboard</h2>
+            
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow hover-card text-center">
+                        <div class="card-body">
+                            <h3 class="card-title text-primary">📤 Upload Notes</h3>
+                            <p class="card-text text-muted">Upload notes for ACSML, NCSML, or DCSML</p>
+                            <a href="{{ url_for('upload_notes') }}" class="btn btn-primary btn-lg">
+                                Upload Notes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow hover-card text-center">
+                        <div class="card-body">
+                            <h3 class="card-title text-success">📋 My Notes</h3>
+                            <p class="card-text text-muted">View and manage your uploaded notes</p>
+                            <a href="{{ url_for('faculty_my_notes') }}" class="btn btn-success btn-lg">
+                                View My Notes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

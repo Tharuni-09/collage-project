@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student - {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h2 class="section-title">Edit Student Profile</h2>
+    
+    <div class="detail-section" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+        <form action="{{ url_for('faculty_edit_student', uid=student.uid) }}" method="POST" class="form-stacked">
+            <div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                
+                <!-- Identity Section -->
+                <div class="form-card" style="padding: 15px; border: 1px solid #edf2f7; border-radius: 10px;">
+                    <h4 style="color: #4a5568; margin-bottom: 15px; border-bottom: 2px solid #4f46e5; display: inline-block;">Identity</h4>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Full Name</label>
+                        <input type="text" name="name" value="{{ student.name }}" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Roll Number</label>
+                        <input type="text" name="roll" value="{{ student.roll }}" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Department</label>
+                        <select name="department" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                            <option value="ACSML" {% if student.department == 'ACSML' %}selected{% endif %}>ACSML</option>
+                            <option value="NCSML" {% if student.department == 'NCSML' %}selected{% endif %}>NCSML</option>
+                            <option value="DCSML" {% if student.department == 'DCSML' %}selected{% endif %}>DCSML</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Academic Section -->
+                <div class="form-card" style="padding: 15px; border: 1px solid #edf2f7; border-radius: 10px;">
+                    <h4 style="color: #4a5568; margin-bottom: 15px; border-bottom: 2px solid #10b981; display: inline-block;">Academics</h4>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">CGPA</label>
+                        <input type="number" step="0.01" name="cgpa" value="{{ student.cgpa }}" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">SGPA</label>
+                        <input type="number" step="0.01" name="sgpa" value="{{ student.sgpa }}" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Attendance (%)</label>
+                        <input type="number" name="attendance" value="{{ student.attendance }}" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="form-card" style="padding: 15px; border: 1px solid #edf2f7; border-radius: 10px; grid-column: span 1;">
+                    <h4 style="color: #4a5568; margin-bottom: 15px; border-bottom: 2px solid #ed8936; display: inline-block;">Contact</h4>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Email</label>
+                        <input type="email" name="email" value="{{ student.email or '' }}" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Phone</label>
+                        <input type="text" name="phone" value="{{ student.phone or '' }}" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+                <a href="{{ url_for('faculty_dashboard') }}" class="btn-secondary" style="background: #e2e8f0; color: #4a5568; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 600;">Cancel</a>
+                <button type="submit" class="btn-primary" style="background: #4f46e5; color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">Update Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

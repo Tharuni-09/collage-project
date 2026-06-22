@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Upload Notes - Faculty{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📤 Upload Department Notes</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-bold">Note Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="e.g., Chapter 1 - Introduction to Machine Learning" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="department_id" class="form-label fw-bold">Select Department *</label>
+                            <select class="form-select" id="department_id" name="department_id" required>
+                                <option value="">-- Choose Department --</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Faculty can upload notes for any department</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-bold">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"
+                                      placeholder="Enter details about these notes..."></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="file" class="form-label fw-bold">Upload File *</label>
+                            <input type="file" class="form-control" id="file" name="file" 
+                                   accept=".pdf,.doc,.docx,.txt,.ppt,.pptx,.xls,.xlsx,.jpg,.png" required>
+                            <small class="text-muted">Supported: PDF, DOC, DOCX, TXT, PPT, XLS, JPG, PNG (Max 50MB)</small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-secondary">
+                                ← Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                📤 Upload Notes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

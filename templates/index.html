@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Department of Machine Learning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<!-- ================= TOP NAVBAR ================= -->
+<nav class="topnav">
+    <div class="nav-left">
+        <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Department Logo" class="main-logo">
+        <span>Department of Machine Learning <br>
+            <p>Loyola Academy, Degree and PG College, Old Alwal, Secunderabad</p>
+        </span>
+    </div>
+
+<ul class="nav-links">
+    <li><a href="{{ url_for('index') }}">Home</a></li>
+    <li><a href="{{ url_for('outreach') }}">Out Reach</a></li>
+    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+    <li><a href="#contact">Contacts</a></li>
+    {% if 'role' in session %}
+        <li class="user"><a href="{% if session.role == 'faculty' %}{{ url_for('faculty_dashboard') }}{% else %}{{ url_for('student_dashboard') }}{% endif %}">Go to Dashboard</a></li>
+        <li class="logout"><a href="{{ url_for('logout') }}">Logout</a></li>
+    {% else %}
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+    {% endif %}
+</ul>
+</nav>
+
+<!-- ================= HERO SECTION ================= -->
+<section id="hero" class="dept-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h2>Advancing Education in Machine Learning & AI</h2>
+        <p>
+            A dedicated academic department focusing on Machine Learning,
+            Artificial Intelligence, Data Science, and intelligent systems
+            through curriculum-driven and practical learning.
+        </p>
+    </div>
+</section>
+
+<!-- ================= VISION & MISSION ================= -->
+<section id="vision-mission">
+    <!-- VISION -->
+    <h2 class="vision-title">Vision</h2>
+    <p class="vision-text">
+        To shape future-ready professionals by advancing excellence in Machine Learning,
+        Artificial Intelligence, and data-driven innovation.
+    </p>
+
+    <!-- MISSION -->
+    <div class="mission">
+        <h3>Mission</h3>
+        <ul>
+            <li>Deliver industry-aligned education in Machine Learning and AI.</li>
+            <li>Encourage innovation, research, and ethical practices.</li>
+            <li>Bridge academic learning with real-world applications.</li>
+            <li>Develop socially responsible and skilled professionals.</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ================= PROGRAMS OFFERED ================= -->
+<section id="programs">
+    <h2>Programs Offered</h2>
+    <div class="program-card">
+        <h3>B.Sc Computer Science and Machine Learning</h3>
+        <p>Duration: 3 Years</p>
+        <p>Focus: AI, Data Science, Deep Learning</p>
+    </div>
+</section>
+
+<!-- ================= CURRICULUM HIGHLIGHTS ================= -->
+<section id="programs">
+    <h2>Curriculum Highlights</h2>
+    <ul>
+        <li>
+            Industry-aligned Machine Learning curriculum
+        </li>
+        <li>
+            Strong foundation in Python, Mathematics, and Statistics
+        </li>
+        <li>
+            Core concepts of Supervised and Unsupervised Learning
+        </li>
+        <li>
+            Hands-on training through dedicated ML laboratories
+        </li>
+        <li>
+            Exposure to Data Science and Data Visualization
+        </li>
+        <li>
+            Introduction to Artificial Intelligence and Deep Learning
+        </li>
+        <li>
+            Real-world projects and case-based learning
+        </li>
+        <li>
+            Guest lectures, workshops, and industrial visits
+        </li>
+        <li>
+            Internship and certification guidance
+        </li>
+        <li>
+            Focus on innovation, research, and employability
+        </li>
+    </ul>
+</section>
+
+<!-- ================= LABS & INFRASTRUCTURE ================= -->
+<section id="programs">
+    <div class="section-container">
+        <h2>Laboratories & Infrastructure</h2>
+        <div class="lab-list">
+            <p>✔ Machine Learning Lab</p>
+            <p>✔ Artificial Intelligence Lab</p>
+            <p>✔ Data Science Lab</p>
+        </div>
+    </div>
+</section>
+
+<!-- ================= FACULTY SNAPSHOT ================= -->
+<section id="faculty">
+  
+  <h2>Faculty</h2>
+
+  <div class="faculty_det" id="facultyGrid">
+
+    <!-- Visible -->
+    <div class="faculty-card"><img src="venugopal sir.jpeg"><h3>Mr. A. Venugopal</h3><p class="role">Asst. Prof. in Comp. Sci & HoD</p></div>
+    <div class="faculty-card"><img src="shanthi mam.jpeg"><h3>Dr. C. Shanthi</h3><p class="role">Asst. Prof. Electronics</p></div>
+    <div class="faculty-card"><img src="rajini mam.jpeg"><h3>Dr. B. Rajini</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+    <div class="faculty-card"><img src="naveen sir.jpeg"><h3>Mr. N. Naveen</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+    <div class="faculty-card"><img src="kavya mam.jpeg"><h3>Mrs. B. Kavya</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+
+    <!-- Hidden -->
+    <div class="faculty-card extra-faculty"><img src="os_sir.jpeg"><h3>Mr. P. Venkata Jaya Krishna Ramana Teja</h3><p class="role">Asst. Prof. in Comp. Sci</p></div>
+    <div class="faculty-card extra-faculty"><img src="bindhu_mam.jpeg"><h3>Mrs. Bindu Babu</h3><p class="role">Asst. Prof. in Mathematics</p></div>
+    <div class="faculty-card extra-faculty"><img src="kiran_sir.jpeg"><h3>Mr. K. Kiran Kumar</h3><p class="role">Asst. Prof. in Mathematics</p></div>
+    <div class="faculty-card extra-faculty"><img src="sravani_mam.jpeg"><h3>Mrs. D. Sravani</h3><p class="role">Asst. Prof. in Statistics</p></div>
+    <div class="faculty-card extra-faculty"><img src="sirisha_mam.jpeg"><h3>Ms. Sirisha</h3><p class="role">Asst. Prof. in Mathematics</p></div>
+    <div class="faculty-card extra-faculty"><img src="pritivika_mam.jpeg"><h3>Dr. S. Pritivika</h3><p class="role">Asst. Prof. in English</p></div>
+    <div class="faculty-card extra-faculty"><img src="hep_mam.jpeg"><h3>Ms. B. Hepzibah Spoorthi</h3><p class="role">Asst. Prof. in English</p></div>
+    <div class="faculty-card extra-faculty"><img src="musalaya_sir.jpg"><h3>Dr. K. Musalaiah</h3><p class="role">Asst. Prof. in IHC</p></div>
+    <div class="faculty-card extra-faculty"><img src="evs.jpeg"><h3>Ms. O. Nikhila</h3><p class="role">Asst. Prof. in Environmental Science</p></div>
+      
+
+  </div>
+
+  <div class="faculty-btn-wrap">
+    <button id="viewBtn" class="btn">View All Faculty</button>
+  </div>
+
+</section>
+
+<!-- ================= LATEST OUTREACH ================= -->
+{% if latest_outreach %}
+<section id="latest-outreach" class="latest-outreach-section">
+    <h2>Latest Outreach</h2>
+    <div class="latest-outreach-card">
+        <div class="outreach-card-image">
+            {% if latest_outreach.photo %}
+                <img src="{{ url_for('static', filename='outreach/' + latest_outreach.photo) }}" 
+                     alt="{{ latest_outreach.title }}" 
+                     onerror="this.style.display='none'">
+            {% endif %}
+        </div>
+        <div class="outreach-card-body">
+            <span class="outreach-badge">🌟 Latest</span>
+            <h3>{{ latest_outreach.title }}</h3>
+            <p class="outreach-desc">{{ latest_outreach.description }}</p>
+            <div class="outreach-meta-row">
+                {% if latest_outreach.year %}
+                    <span class="outreach-meta-chip"><i class="fas fa-calendar-alt"></i> {{ latest_outreach.year }}</span>
+                {% endif %}
+                {% if latest_outreach.venue %}
+                    <span class="outreach-meta-chip"><i class="fas fa-map-marker-alt"></i> {{ latest_outreach.venue }}</span>
+                {% endif %}
+                {% if latest_outreach.participants %}
+                    <span class="outreach-meta-chip"><i class="fas fa-users"></i> {{ latest_outreach.participants }}+ Participants</span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('outreach') }}" class="outreach-view-all-btn">View All Outreach Programs →</a>
+        </div>
+    </div>
+</section>
+{% else %}
+<section id="latest-outreach" class="latest-outreach-section">
+    <h2>Latest Outreach</h2>
+    <div class="latest-outreach-card" style="text-align:center; padding:60px 40px;">
+        <div class="outreach-card-body">
+            <p style="font-size:1.1rem; color:#64748b;">No outreach programs available yet.</p>
+            <a href="{{ url_for('outreach') }}" class="outreach-view-all-btn" style="margin-top:20px;">View Outreach Page →</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+
+<!-- ================= FOOTER ================= -->
+ 
+<footer class="main-footer">
+    <div class="footer-content">
+        <!-- CENTER : Text + Map -->
+        <div class="footer-center">
+            <p>
+                © 2026 Department of Machine Learning<br>
+                LOYOLA ACADEMY Degree & PG College (Autonomous)
+            </p>
+            <div class="footer-map">
+                <iframe
+                    src="https://www.google.com/maps?q=Loyola%20Academy%20Alwal%20Hyderabad&output=embed"
+                    loading="lazy">
+                </iframe>
+            </div>
+        </div>
+
+        <!-- RIGHT : Social Icons -->
+         <div id = "contact">
+        <div class="footer-right">
+            <a href="tel:+918977012915" title="Call"><i class="fas fa-phone"></i></a>
+            <a href="mailto:Info@loyolaacademy.edu.in" title="Email"><i class="fas fa-envelope"></i></a>
+            <a href="#" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.instagram.com/loyola_cs_ml?igsh=MWU1Z2c3bmFvZnlhNw==" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+        </div>
+    </div>
+</footer>
+
+<!-- ================= FLOATING AI CHATBOX ================= -->
+<button id="idx-chat-icon" onclick="openIdxChat()" aria-label="Open AI Chat" title="Chat with AI Assistant">
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span class="idx-chat-badge">AI</span>
+</button>
+
+<div id="idx-chat-panel" role="dialog" aria-label="AI Chat Assistant">
+    <div class="idx-chat-header">
+        <div class="idx-chat-header-info">
+            <div class="idx-chat-avatar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a4 4 0 0 1 4 4v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6a4 4 0 0 1 4-4z"/>
+                    <path d="M8 8v1a4 4 0 0 0 8 0V8"/>
+                    <path d="M12 14v4"/>
+                    <path d="M8 18h8"/>
+                    <circle cx="12" cy="22" r="1"/>
+                </svg>
+            </div>
+            <div>
+                <span class="idx-chat-title">AI Assistant</span>
+                <span class="idx-chat-status">Powered by Gemini AI • Ask anything</span>
+            </div>
+        </div>
+        <button class="idx-chat-close-btn" onclick="closeIdxChat()" aria-label="Close chat">&times;</button>
+    </div>
+
+    <div id="idx-chat-messages" class="idx-chat-messages">
+        <div class="idx-chat-msg bot">
+            <div class="idx-chat-bubble">
+                👋 Hi! I'm your AI Assistant powered by Gemini. Ask me <strong>anything</strong> — academics, programming, science, career advice, general knowledge, or department info!
+            </div>
+            <span class="idx-chat-time">just now</span>
+        </div>
+    </div>
+
+    <div class="idx-chat-typing" id="idx-chat-typing" style="display:none;">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div class="idx-chat-input-row">
+        <input type="text" id="idx-chat-input" placeholder="Ask me anything…"
+               onkeydown="handleIdxChatEnter(event)" autocomplete="off" maxlength="1000">
+        <button class="idx-chat-send-btn" onclick="sendIdxChat()" aria-label="Send message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script>
+/* ---- Index-page Chat Widget ---- */
+let idxChatOpen = false;
+
+function openIdxChat() {
+    const panel = document.getElementById("idx-chat-panel");
+    const icon  = document.getElementById("idx-chat-icon");
+    if (panel && icon) {
+        panel.classList.add("visible");
+        icon.style.display = "none";
+        idxChatOpen = true;
+        const inp = document.getElementById("idx-chat-input");
+        if (inp) setTimeout(() => inp.focus(), 200);
+    }
+}
+
+function closeIdxChat() {
+    const panel = document.getElementById("idx-chat-panel");
+    const icon  = document.getElementById("idx-chat-icon");
+    if (panel && icon) {
+        panel.classList.remove("visible");
+        icon.style.display = "flex";
+        idxChatOpen = false;
+    }
+}
+
+function handleIdxChatEnter(e) {
+    if (e.key === "Enter") sendIdxChat();
+}
+
+function idxFormatTime() {
+    return new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+}
+
+function idxFormatMarkdown(text) {
+    // Convert markdown-style formatting to HTML
+    let html = text;
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Italic
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code style="background:#1e293b;padding:2px 6px;border-radius:4px;font-size:0.85em;">$1</code>');
+    // Line breaks
+    html = html.replace(/\n/g, '<br/>');
+    // Bullet points
+    html = html.replace(/^[-•]\s/gm, '• ');
+    return html;
+}
+
+function idxAppendMessage(text, type) {
+    const messages = document.getElementById("idx-chat-messages");
+    const wrapper  = document.createElement("div");
+    wrapper.className = `idx-chat-msg ${type}`;
+
+    const bubble = document.createElement("div");
+    bubble.className = "idx-chat-bubble";
+    
+    if (type === 'bot') {
+        bubble.innerHTML = idxFormatMarkdown(text);
+    } else {
+        bubble.textContent = text;
+    }
+
+    const timeEl = document.createElement("span");
+    timeEl.className = "idx-chat-time";
+    timeEl.textContent = idxFormatTime();
+
+    // Copy button for bot messages
+    if (type === 'bot') {
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "idx-copy-btn";
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+        copyBtn.onclick = function() {
+            navigator.clipboard.writeText(text).then(() => {
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied';
+                setTimeout(() => copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy', 1500);
+            });
+        };
+        wrapper.appendChild(bubble);
+        wrapper.appendChild(timeEl);
+        wrapper.appendChild(copyBtn);
+    } else {
+        wrapper.appendChild(bubble);
+        wrapper.appendChild(timeEl);
+    }
+
+    messages.appendChild(wrapper);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function sendIdxChat() {
+    const input   = document.getElementById("idx-chat-input");
+    const typing  = document.getElementById("idx-chat-typing");
+    const userMsg = input.value.trim();
+    if (!userMsg) return;
+
+    idxAppendMessage(userMsg, "user");
+    input.value = "";
+
+    if (typing) typing.style.display = "flex";
+    const messages = document.getElementById("idx-chat-messages");
+    if (messages) messages.scrollTop = messages.scrollHeight;
+
+    fetch("/chat", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ message: userMsg })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (typing) typing.style.display = "none";
+        idxAppendMessage(data.reply || "No reply received.", "bot");
+    })
+    .catch(() => {
+        if (typing) typing.style.display = "none";
+        idxAppendMessage("⚠️ Could not reach the server. Please try again.", "bot");
+    });
+}
+
+/* Init on load */
+document.addEventListener("DOMContentLoaded", () => {
+    const panel = document.getElementById("idx-chat-panel");
+    const icon  = document.getElementById("idx-chat-icon");
+    if (panel) panel.classList.remove("visible");
+    if (icon)  icon.style.display = "flex";
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+  <rect width="100%" height="100%" fill="#ffffff" stroke="#e6e6e6" />
+  <text x="20" y="36" font-family="Arial" font-size="20" fill="#000">Minimal Tech</text>
+  <line x1="20" y1="50" x2="380" y2="50" stroke="#e6e6e6" />
+  <text x="20" y="90" font-family="Arial" font-size="12" fill="#374151">Monochrome, left-aligned, concise sections</text>
+  <text x="20" y="120" font-family="Arial" font-size="12" fill="#374151">Emphasis on technical skills & links</text>
+</svg>
