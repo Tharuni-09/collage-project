@@ -243,111 +243,6 @@
         opacity: 0.5;
     }
 
-    /* Timetable Grid */
-    .timetable-wrapper {
-        overflow-x: auto;
-    }
-    
-    .timetable {
-        width: 100%;
-        min-width: 800px;
-        border-collapse: separate;
-        border-spacing: 4px;
-    }
-
-    .timetable th {
-        background: #0a1f44;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-    }
-
-    .timetable .day-cell {
-        background: #f8fafc;
-        color: #0a1f44;
-        font-weight: 700;
-        padding: 10px;
-        border-radius: 8px;
-        text-align: center;
-        width: 90px;
-        font-size: 14px;
-    }
-
-    .timetable .lunch-col {
-        background: #f1f5f9;
-        color: #64748b;
-        font-weight: 700;
-        text-align: center;
-        border-radius: 8px;
-        width: 40px;
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
-        transform: rotate(180deg);
-        letter-spacing: 2px;
-        padding: 10px 0;
-        font-size: 12px;
-    }
-
-    .timetable .period-cell {
-        background: #ffffff;
-        border: 2px dashed #e2e8f0;
-        border-radius: 8px;
-        padding: 8px 4px;
-        text-align: center;
-        transition: all 0.2s;
-        position: relative;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 56px;
-    }
-
-    .timetable .period-cell:hover {
-        border-color: #3b82f6;
-        background: #f0fdf4;
-    }
-
-    .timetable .period-cell.filled {
-        border: 2px solid #10b981;
-        background: #ecfdf5;
-    }
-
-    .timetable .period-cell .subject {
-        font-weight: 700;
-        color: #065f46;
-        font-size: 12px;
-        margin-bottom: 2px;
-        line-height: 1.2;
-    }
-
-    .timetable .period-cell .dept {
-        font-size: 10px;
-        color: #047857;
-        background: #d1fae5;
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-weight: 600;
-    }
-
-    .timetable .period-cell .add-icon {
-        color: #94a3b8;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 11px;
-        font-weight: 600;
-    }
-
-    .timetable .period-cell:hover .add-icon {
-        color: #3b82f6;
-    }
-
     /* Modal Styling */
     .modal-content {
         border-radius: 16px;
@@ -382,66 +277,155 @@
     <div class="section-card">
         <div class="section-header">
             <i data-lucide="calendar-clock" class="w-8 h-8"></i>
-            <h3>Weekly Timetable</h3>
+            <h3>Day Order Timetable</h3>
         </div>
 
-        <div class="timetable-wrapper">
-            <table class="timetable">
+        <div class="form-wrapper">
+            <form action="{{ url_for('add_timetable') }}" method="POST" class="modern-form">
+                <div class="form-group">
+                    <label class="form-label">Subject Name</label>
+                    <input type="text" name="subject_name" class="modern-input" placeholder="e.g. Machine Learning" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <select name="department_name" class="modern-input" required>
+                        <option value="" disabled selected>Dept...</option>
+                        <option value="ACSML">ACSML</option>
+                        <option value="NCSML">NCSML</option>
+                        <option value="DCSML">DCSML</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Day Order</label>
+                    <select name="day_order" class="modern-input" required>
+                        <option value="" disabled selected>Select Day...</option>
+                        <option value="Day 1">Day 1</option>
+                        <option value="Day 2">Day 2</option>
+                        <option value="Day 3">Day 3</option>
+                        <option value="Day 4">Day 4</option>
+                        <option value="Day 5">Day 5</option>
+                        <option value="Day 6">Day 6</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Period</label>
+                    <select name="period" class="modern-input" required>
+                        <option value="" disabled selected>Period...</option>
+                        <option value="1">Period 1</option>
+                        <option value="2">Period 2</option>
+                        <option value="3">Period 3</option>
+                        <option value="4">Period 4</option>
+                        <option value="5">Period 5</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-action">
+                    <i data-lucide="plus"></i> Add Class
+                </button>
+            </form>
+        </div>
+
+        {% if timetable_list %}
+        <div class="table-responsive" style="overflow-x: auto;">
+            <table class="custom-table">
                 <thead>
                     <tr>
-                        <th>Day</th>
-                        <th>Period 1</th>
-                        <th>Period 2</th>
-                        <th>Period 3</th>
-                        <th>Lunch</th>
-                        <th>Period 4</th>
-                        <th>Period 5</th>
+                        <th>Day Order</th>
+                        <th>Period</th>
+                        <th>Subject</th>
+                        <th>Department</th>
+                        <th style="width: 100px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
-                    {% for day in days %}
+                    {% for tt in timetable_list %}
                     <tr>
-                        <td class="day-cell">{{ day }}</td>
-                        
-                        <!-- Period 1, 2, 3 -->
-                        {% for p in range(1, 4) %}
-                            {% set cell = timetable_map[day].get(p) %}
-                            <td class="period-cell {% if cell %}filled{% endif %}" onclick="openTimetableModal('{{ day }}', {{ p }}, '{{ cell.subject_name if cell else '' }}', '{{ cell.department_name if cell else '' }}')">
-                                {% if cell %}
-                                    <div class="subject">{{ cell.subject_name }}</div>
-                                    <div class="dept">{{ cell.department_name }}</div>
-                                {% else %}
-                                    <div class="add-icon"><i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add</div>
-                                {% endif %}
-                            </td>
-                        {% endfor %}
-
-                        <!-- Lunch Break -->
-                        {% if loop.index == 1 %}
-                        <td rowspan="5" class="lunch-col">
-                            <i data-lucide="utensils" style="margin: 0 auto 6px; width: 16px; height: 16px; transform: rotate(180deg);"></i>
-                            LUNCH
+                        <td>
+                            <span class="date-badge"><i data-lucide="calendar" style="width: 14px; height: 14px; display: inline; margin-right: 4px;"></i>{{ tt.day_of_week }}</span>
                         </td>
-                        {% endif %}
-
-                        <!-- Period 4, 5 -->
-                        {% for p in range(4, 6) %}
-                            {% set cell = timetable_map[day].get(p) %}
-                            <td class="period-cell {% if cell %}filled{% endif %}" onclick="openTimetableModal('{{ day }}', {{ p }}, '{{ cell.subject_name if cell else '' }}', '{{ cell.department_name if cell else '' }}')">
-                                {% if cell %}
-                                    <div class="subject">{{ cell.subject_name }}</div>
-                                    <div class="dept">{{ cell.department_name }}</div>
-                                {% else %}
-                                    <div class="add-icon"><i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add</div>
-                                {% endif %}
-                            </td>
-                        {% endfor %}
+                        <td>
+                            <span class="period-badge">Period {{ tt.period_number }}</span>
+                        </td>
+                        <td style="font-weight: 500; color: #0f172a;">{{ tt.subject_name }}</td>
+                        <td>
+                            <span class="dept-badge dept-{{ tt.department_name }}">{{ tt.department_name }}</span>
+                        </td>
+                        <td>
+                            <div class="action-cell">
+                                <button type="button" class="btn-icon" data-bs-toggle="modal" data-bs-target="#editTtModal{{ tt.id }}" title="Edit Class">
+                                    <i data-lucide="edit-2" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <form action="{{ url_for('delete_timetable', tt_id=tt.id) }}" method="POST" style="margin:0;">
+                                    <button type="submit" class="btn-icon delete" onclick="return confirm('Are you sure you want to delete this class?');" title="Delete Class">
+                                        <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
+
+                    <!-- Edit Timetable Modal -->
+                    <div class="modal fade" id="editTtModal{{ tt.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <form action="{{ url_for('edit_timetable', tt_id=tt.id) }}" method="POST">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title font-bold text-[#0a1f44]">Edit Class</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-4">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Subject Name</label>
+                                            <input type="text" name="subject_name" class="modern-input" value="{{ tt.subject_name }}" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Department</label>
+                                            <select name="department_name" class="modern-input" required>
+                                                <option value="ACSML" {% if tt.department_name == 'ACSML' %}selected{% endif %}>ACSML</option>
+                                                <option value="NCSML" {% if tt.department_name == 'NCSML' %}selected{% endif %}>NCSML</option>
+                                                <option value="DCSML" {% if tt.department_name == 'DCSML' %}selected{% endif %}>DCSML</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Day Order</label>
+                                            <select name="day_order" class="modern-input" required>
+                                                <option value="Day 1" {% if tt.day_of_week == 'Day 1' %}selected{% endif %}>Day 1</option>
+                                                <option value="Day 2" {% if tt.day_of_week == 'Day 2' %}selected{% endif %}>Day 2</option>
+                                                <option value="Day 3" {% if tt.day_of_week == 'Day 3' %}selected{% endif %}>Day 3</option>
+                                                <option value="Day 4" {% if tt.day_of_week == 'Day 4' %}selected{% endif %}>Day 4</option>
+                                                <option value="Day 5" {% if tt.day_of_week == 'Day 5' %}selected{% endif %}>Day 5</option>
+                                                <option value="Day 6" {% if tt.day_of_week == 'Day 6' %}selected{% endif %}>Day 6</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Period</label>
+                                            <select name="period" class="modern-input" required>
+                                                <option value="1" {% if tt.period_number == 1 %}selected{% endif %}>Period 1</option>
+                                                <option value="2" {% if tt.period_number == 2 %}selected{% endif %}>Period 2</option>
+                                                <option value="3" {% if tt.period_number == 3 %}selected{% endif %}>Period 3</option>
+                                                <option value="4" {% if tt.period_number == 4 %}selected{% endif %}>Period 4</option>
+                                                <option value="5" {% if tt.period_number == 5 %}selected{% endif %}>Period 5</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600;">Cancel</button>
+                                        <button type="submit" class="btn-action" style="height: auto; padding: 10px 20px;">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% else %}
+        <div class="empty-state">
+            <i data-lucide="check-circle-2"></i>
+            <h4>No Classes Scheduled!</h4>
+            <p>Your timetable is currently empty.</p>
+        </div>
+        {% endif %}
     </div>
 
     <!-- To-Do Section -->
@@ -585,58 +569,9 @@
     </div>
 </div>
 
-<!-- Timetable JS Modal -->
-<div class="modal fade" id="timetableModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form action="{{ url_for('update_timetable') }}" method="POST">
-                <input type="hidden" name="day_of_week" id="tt_day">
-                <input type="hidden" name="period_number" id="tt_period">
-                <div class="modal-header">
-                    <h5 class="modal-title font-bold text-[#0a1f44]">
-                        Update Schedule <span id="tt_title_badge" class="period-badge ml-2" style="font-size:12px;"></span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-muted text-sm mb-4">Leave fields blank to clear this period from your timetable.</p>
-                    <div class="mb-4">
-                        <label class="form-label" style="display:block; margin-bottom:8px;">Subject Name</label>
-                        <input type="text" name="subject_name" id="tt_subject" class="modern-input" placeholder="e.g. Machine Learning">
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label" style="display:block; margin-bottom:8px;">Department</label>
-                        <select name="department_name" id="tt_dept" class="modern-input">
-                            <option value="">-- None --</option>
-                            <option value="ACSML">ACSML</option>
-                            <option value="NCSML">NCSML</option>
-                            <option value="DCSML">DCSML</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600;">Cancel</button>
-                    <button type="submit" class="btn-action" style="height: auto; padding: 10px 20px;">Save Period</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         lucide.createIcons();
     });
-
-    function openTimetableModal(day, period, subject, dept) {
-        document.getElementById('tt_day').value = day;
-        document.getElementById('tt_period').value = period;
-        document.getElementById('tt_subject').value = subject;
-        document.getElementById('tt_dept').value = dept;
-        document.getElementById('tt_title_badge').innerText = day + ' - Period ' + period;
-        
-        var myModal = new bootstrap.Modal(document.getElementById('timetableModal'));
-        myModal.show();
-    }
 </script>
 {% endblock %}

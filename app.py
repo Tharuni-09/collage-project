@@ -1580,25 +1580,55 @@ def delete_todo(todo_id):
     db.close()
     return redirect(url_for("faculty_dashboard"))
 
-@app.route("/update_timetable", methods=["POST"])
-def update_timetable():
+@app.route("/add_timetable", methods=["POST"])
+def add_timetable():
     if session.get("role") != "faculty":
         return redirect(url_for("login"))
-    day_of_week = request.form.get("day_of_week")
-    period_number = request.form.get("period_number")
+    day_order = request.form.get("day_order")
+    period_number = request.form.get("period")
     subject_name = request.form.get("subject_name", "")
     department_name = request.form.get("department_name", "")
     
-    if day_of_week and period_number:
+    if day_order and period_number and subject_name and department_name:
         db = get_db()
         db.execute("""
             INSERT INTO faculty_timetable (faculty_id, day_of_week, period_number, subject_name, department_name)
             VALUES (?, ?, ?, ?, ?)
             ON CONFLICT(faculty_id, day_of_week, period_number) 
             DO UPDATE SET subject_name=excluded.subject_name, department_name=excluded.department_name
-        """, [session["uid"], day_of_week, int(period_number), subject_name, department_name])
+        """, [session["uid"], day_order, int(period_number), subject_name, department_name])
         db.commit()
         db.close()
+    return redirect(url_for("faculty_dashboard"))
+
+@app.route("/edit_timetable/<int:tt_id>", methods=["POST"])
+def edit_timetable(tt_id):
+    if session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    day_order = request.form.get("day_order")
+    period_number = request.form.get("period")
+    subject_name = request.form.get("subject_name", "")
+    department_name = request.form.get("department_name", "")
+    
+    if day_order and period_number and subject_name and department_name:
+        db = get_db()
+        db.execute("""
+            UPDATE faculty_timetable 
+            SET day_of_week = ?, period_number = ?, subject_name = ?, department_name = ?
+            WHERE id = ? AND faculty_id = ?
+        """, [day_order, int(period_number), subject_name, department_name, tt_id, session["uid"]])
+        db.commit()
+        db.close()
+    return redirect(url_for("faculty_dashboard"))
+
+@app.route("/delete_timetable/<int:tt_id>", methods=["POST"])
+def delete_timetable(tt_id):
+    if session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    db = get_db()
+    db.execute("DELETE FROM faculty_timetable WHERE id = ? AND faculty_id = ?", [tt_id, session["uid"]])
+    db.commit()
+    db.close()
     return redirect(url_for("faculty_dashboard"))
 
 @app.route("/faculty_dashboard")
@@ -1627,15 +1657,11 @@ def faculty_dashboard():
             [uid]
         ).fetchall()
         
-        # Fetch timetable
-        timetable_rows = db.execute("SELECT * FROM faculty_timetable WHERE faculty_id = ?", [uid]).fetchall()
-        # Build dictionary for easy frontend access: timetable_map[day_of_week][period_number] = row
-        timetable_map = {"Monday":{}, "Tuesday":{}, "Wednesday":{}, "Thursday":{}, "Friday":{}}
-        for row in timetable_rows:
-            day = row["day_of_week"]
-            period = row["period_number"]
-            if day in timetable_map:
-                timetable_map[day][period] = row
+        # Fetch timetable as a flat list
+        timetable_list = db.execute(
+            "SELECT * FROM faculty_timetable WHERE faculty_id = ? ORDER BY day_of_week ASC, period_number ASC", 
+            [uid]
+        ).fetchall()
 
         context = {
             "students_acsml": get_students_for("ACSML"),
@@ -1645,7 +1671,7 @@ def faculty_dashboard():
             "resumes_ncsml":  get_resumes_for("NCSML"),
             "resumes_dcsml":  get_resumes_for("DCSML"),
             "todos": todos,
-            "timetable_map": timetable_map,
+            "timetable_list": timetable_list,
             "session": session,
             "dept": dept,
         }
