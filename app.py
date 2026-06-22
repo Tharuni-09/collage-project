@@ -1159,34 +1159,7 @@ Rules:
             "review_url": url_for("ppt_review")
             })
  
-        for slide_info in slides_data:
-            layout     = prs.slide_layouts[1]
-            pptx_slide = prs.slides.add_slide(layout)
-            title_ph   = pptx_slide.shapes.title
-            body_ph    = pptx_slide.placeholders[1]
- 
-            title_ph.text = slide_info.get("title", "")
-            tf = body_ph.text_frame
-            tf.clear()
-            for point in slide_info.get("points", []):
-                p = tf.add_paragraph()
-                p.text  = point
-                p.level = 0
- 
-        pptx_buf = io.BytesIO()
-        prs.save(pptx_buf)
-        pptx_buf.seek(0)
- 
-        # Save to static for download
-        out_filename = f"ppt_{session.get('uid', 'anon')}_{int(time.time())}.pptx"
-        out_path     = os.path.join(BASE_DIR, "static", "uploads", "generated", out_filename)
-        os.makedirs(os.path.dirname(out_path), exist_ok=True)
-        with open(out_path, "wb") as f:
-            f.write(pptx_buf.getvalue())
- 
-        download_url = url_for("static", filename=f"uploads/generated/{out_filename}")
-        return jsonify({"success": True, "slides_data": slides_data})
- 
+
     except Exception as e:
         logger.error(f"PPT generation error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
@@ -1198,10 +1171,72 @@ def ppt_review():
         return redirect("/faculty")
 
     slides_data = session["ppt_review_data"]
+    
+    # Convert JSON to a readable text format for editing
+    content_lines = []
+    for slide in slides_data:
+        content_lines.append(f"Slide: {slide.get('title', '')}")
+        for pt in slide.get('points', []):
+            content_lines.append(f"- {pt}")
+        content_lines.append("")
+        
+    text_content = "\n".join(content_lines)
 
     return render_template(
         "ppt_review.html",
-        slides=slides_data
+        content=text_content
+    )
+
+@app.route("/download_ppt", methods=["POST"])
+def download_ppt():
+    if "uid" not in session:
+        return redirect(url_for("login"))
+        
+    text_content = request.form.get("content", "")
+    
+    # Parse back into structured slides
+    slides_data = []
+    current_slide = None
+    for line in text_content.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("Slide:"):
+            if current_slide:
+                slides_data.append(current_slide)
+            current_slide = {"title": line.replace("Slide:", "").strip(), "points": []}
+        elif line.startswith("-") and current_slide is not None:
+            current_slide["points"].append(line[1:].strip())
+            
+    if current_slide:
+        slides_data.append(current_slide)
+        
+    # Build PPT
+    from pptx import Presentation
+    prs = Presentation()
+    for slide_info in slides_data:
+        layout     = prs.slide_layouts[1]
+        pptx_slide = prs.slides.add_slide(layout)
+        title_ph   = pptx_slide.shapes.title
+        body_ph    = pptx_slide.placeholders[1]
+
+        title_ph.text = slide_info.get("title", "")
+        tf = body_ph.text_frame
+        tf.clear()
+        for point in slide_info.get("points", []):
+            p = tf.add_paragraph()
+            p.text  = point
+            p.level = 0
+
+    pptx_buf = io.BytesIO()
+    prs.save(pptx_buf)
+    pptx_buf.seek(0)
+
+    return send_file(
+        pptx_buf,
+        as_attachment=True,
+        download_name=f"presentation_{int(time.time())}.pptx",
+        mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation"
     )
  
  

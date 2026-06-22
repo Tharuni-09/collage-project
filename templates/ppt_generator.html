@@ -100,7 +100,7 @@
        </div>
        <div class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"></i> <span>Professional styling</span>
        </div>
-      </div><input type="number" id="ppt-slides" placeholder="Number of slides (default: 20)" min="5" max="100" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-400 mb-3 focus:outline-none focus:border-blue-400 text-sm"> <button id="ppt-btn" onclick="generatePPT()" class="btn-gen w-full font-bold py-3 rounded-lg flex items-center justify-center gap-2"> <i data-lucide="sparkles" class="w-4 h-4"></i> <span id="ppt-btn-text">Generate PPT</span> </button>
+      </div><input type="number" id="ppt-slides" placeholder="Number of slides (default: 20)" min="5" max="100" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-400 mb-3 focus:outline-none focus:border-blue-400 text-sm"> <button id="ppt-btn" onclick="generatePPT()" class="btn-gen w-full font-bold py-3 rounded-lg flex items-center justify-center gap-2"> <i data-lucide="sparkles" class="w-4 h-4"></i> <span id="ppt-btn-text">Generate Outline</span> </button>
      </div><!-- Notes Card -->
      <div class="feature-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:border-green-200 transition">
       <div class="flex items-start justify-between mb-4">
@@ -219,23 +219,13 @@
       
       btn.disabled = true;
       btnText.innerHTML = '<span class="spinner"></span> Generating...';
-      fetch("/generate", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "prompt=" + encodeURIComponent(userText)
-})
-.then(res => res.json())
-.then(data => {
-    console.log(data.response);
-});
+      
       fetch("/generate-ppt", {method: "POST", body: formData})
         .then(res => res.json())
         .then(data => {
           btn.disabled = false;
-          btnText.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Generate PPT';
-          lucide.createIcons(); // Re-render lucide icons after changing innerHTML
+          btnText.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Generate Outline';
+          lucide.createIcons();
 
           if(data.success) {
             const request = {
@@ -249,16 +239,16 @@
             recentRequests.unshift(request);
             localStorage.setItem('recentRequests', JSON.stringify(recentRequests.slice(0, 10)));
             updateRecentList();
-            showToast(`✓ PPT generated! Ready for download.`);
-            window.location.href = data.download_url;
+            showToast(`✓ Outline generated! Redirecting to review...`);
+            window.location.href = data.review_url;
           } else {
             showToast(`Error: ${data.error}`);
           }
         })
         .catch(error => {
-          console.error("Error generating PPT:", error);
+          console.error("Error generating PPT Outline:", error);
           btn.disabled = false;
-          btn.innerHTML ='<i data-lucide="pen-tool" class="w-4 h-4"></i> Generate Notes';
+          btnText.innerHTML ='<i data-lucide="sparkles" class="w-4 h-4"></i> Generate Outline';
           lucide.createIcons();
           showToast("Server Error - Check Flask Console");
         });

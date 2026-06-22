@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .review-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    .review-header {
+        margin-bottom: 30px;
+    }
+    .review-header h2 {
+        color: #0a1f44;
+        font-weight: 700;
+        margin: 0 0 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .review-header p {
+        color: #64748b;
+        font-size: 16px;
+        margin: 0;
+    }
+    .review-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(10,31,68,0.08);
+        overflow: hidden;
+        border: 1px solid #f1f5f9;
+    }
+    .review-card-header {
+        background: linear-gradient(135deg, #0a1f44 0%, #1a365d 100%);
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .review-card-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .review-body {
+        padding: 30px;
+        background: #f8fafc;
+    }
+    .textarea-custom {
+        width: 100%;
+        min-height: 400px;
+        padding: 20px;
+        border-radius: 12px;
+        border: 2px solid #cbd5e1;
+        font-family: monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #1e293b;
+        resize: vertical;
+        transition: all 0.3s;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .textarea-custom:focus {
+        outline: none;
+        border-color: #0a1f44;
+        box-shadow: 0 0 0 3px rgba(10,31,68,0.1);
+        background: #ffffff;
+    }
+    .actions {
+        padding: 20px 30px;
+        background: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+    .btn-primary {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.2);
+    }
+    .btn-primary:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16,185,129,0.3);
+    }
+</style>
+
+<div class="review-container">
+    <div class="review-header">
+        <h2><span style="font-size: 1.2em;">📝</span> Review Your Outline</h2>
+        <p>Edit the AI-generated outline below. Once you're satisfied, click build to generate your presentation.</p>
+    </div>
+
+    <form action="{{ url_for('download_ppt') }}" method="POST">
+        <div class="review-card">
+            <div class="review-card-header">
+                <h3>Slide Content</h3>
+                <span style="font-size: 13px; opacity: 0.8;">Format: "Slide: Title" followed by "- points"</span>
+            </div>
+            
+            <div class="review-body">
+                <textarea name="content" class="textarea-custom" spellcheck="false">{{ content }}</textarea>
+            </div>
+            
+            <div class="actions">
+                <a href="{{ url_for('ppt_generator') }}" class="btn-secondary">
+                    ← Cancel
+                </a>
+                <button type="submit" class="btn-primary" onclick="this.innerHTML='<span class=\'spinner\' style=\'width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top:2px solid white;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;\'></span> Building PPT...';">
+                    <span>✨</span> Build Final PPT
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+@keyframes spin { 100% { transform: rotate(360deg); } }
+</style>
+{% endblock %}
