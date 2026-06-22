@@ -19,10 +19,11 @@ logger = logging.getLogger(__name__)
  #-------------------------------------
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY not found")
-
-client = genai.Client(api_key=GEMINI_API_KEY)
+if GEMINI_API_KEY:
+    client = genai.Client(api_key=GEMINI_API_KEY)
+else:
+    logger.warning("GEMINI_API_KEY not found. AI features will be disabled.")
+    client = None
  
 import sqlite3
 import hashlib
@@ -401,6 +402,10 @@ def chat():
     message = data.get("message", "").strip()
     if not message:
         return jsonify({"reply": "Please type a message."})
+        
+    if not client:
+        return jsonify({"reply": "⚠️ **Configuration Error**: The AI is currently offline. Please ensure the `GEMINI_API_KEY` environment variable is set in the Render deployment dashboard."})
+        
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",

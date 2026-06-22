@@ -6,10 +6,10 @@ load_dotenv()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not API_KEY:
-    raise ValueError("GEMINI_API_KEY is missing in environment variables")
-
-client = genai.Client(api_key=API_KEY)
+if API_KEY:
+    client = genai.Client(api_key=API_KEY)
+else:
+    client = None
 
 
 def generate_text(prompt: str) -> str:
