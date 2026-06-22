@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Portal{% endblock %} — Admin</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #020617;
+            --bg-surface: rgba(15,23,42,0.7);
+            --bg-card: rgba(30,41,59,0.6);
+            --border: rgba(255,255,255,0.08);
+            --border-hover: rgba(99,179,237,0.35);
+            --accent-blue: #38bdf8;
+            --accent-purple: #a78bfa;
+            --accent-green: #34d399;
+            --accent-red: #f87171;
+            --text-primary: #f1f5f9;
+            --text-muted: #94a3b8;
+            --sidebar-w: 260px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Background Orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 70%);
+            top: -150px; left: -150px;
+            border-radius: 50%;
+            pointer-events: none; z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
+            bottom: -200px; right: -200px;
+            border-radius: 50%;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* ── SIDEBAR ─────────────────────────────── */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: rgba(10,18,35,0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            padding: 0 0 24px;
+        }
+
+        .sidebar-logo {
+            padding: 28px 24px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 14px;
+        }
+
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(59,130,246,0.4);
+        }
+
+        .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+        .logo-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+
+        .nav-section { padding: 20px 16px 8px; }
+        .nav-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+            color: var(--text-muted); text-transform: uppercase;
+            padding: 0 8px; margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px; font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+        }
+        .nav-link.active {
+            background: rgba(56,189,248,0.12);
+            color: var(--accent-blue);
+            border: 1px solid rgba(56,189,248,0.2);
+        }
+        .nav-link.active .nav-icon { color: var(--accent-blue); }
+        .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .admin-badge {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+        }
+        .admin-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .admin-info-name { font-size: 13px; font-weight: 600; }
+        .admin-info-role { font-size: 11px; color: var(--accent-blue); }
+
+        .btn-logout {
+            display: flex; align-items: center; gap: 8px;
+            width: 100%; padding: 9px 12px;
+            background: rgba(248,113,113,0.08);
+            border: 1px solid rgba(248,113,113,0.2);
+            border-radius: 8px;
+            color: var(--accent-red);
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(248,113,113,0.15); }
+
+        /* ── MAIN CONTENT ─────────────────────── */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .topbar {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(2,6,23,0.4);
+            backdrop-filter: blur(12px);
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .page-title { font-size: 20px; font-weight: 700; }
+        .page-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+        .page-body { padding: 32px; }
+
+        /* ── REUSABLE COMPONENTS ─────────────────── */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 18px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none; border-radius: 10px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+
+        .btn-danger {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: rgba(248,113,113,0.1);
+            border: 1px solid rgba(248,113,113,0.3);
+            color: var(--accent-red);
+            border-radius: 8px;
+            font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-danger:hover { background: rgba(248,113,113,0.2); }
+
+        .btn-warn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: rgba(251,191,36,0.1);
+            border: 1px solid rgba(251,191,36,0.3);
+            color: #fbbf24;
+            border-radius: 8px;
+            font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-warn:hover { background: rgba(251,191,36,0.2); }
+
+        /* Table */
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th {
+            background: rgba(15,23,42,0.8);
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+        .admin-table td {
+            padding: 14px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: middle;
+        }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tbody tr { transition: background 0.15s; }
+        .admin-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+            width: 100%; max-width: 460px;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input {
+            width: 100%; padding: 11px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border 0.2s;
+            outline: none;
+        }
+        .form-input:focus { border-color: var(--accent-blue); background: rgba(56,189,248,0.05); }
+        .form-input::placeholder { color: #475569; }
+
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+        .btn-cancel {
+            padding: 9px 18px;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-muted); border-radius: 10px;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-cancel:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+
+        /* Search */
+        .search-bar-wrap { position: relative; }
+        .search-bar-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px; }
+        .search-input {
+            padding: 9px 14px 9px 38px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 13px; outline: none;
+            transition: all 0.2s; width: 240px;
+        }
+        .search-input:focus { border-color: var(--accent-blue); background: rgba(56,189,248,0.05); }
+        .search-input::placeholder { color: #475569; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 32px; right: 32px;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px; font-weight: 600;
+            display: none; align-items: center; gap: 10px;
+            z-index: 999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            animation: slideInRight 0.3s ease;
+        }
+        .toast.success { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); color: var(--accent-green); display: flex; }
+        .toast.error { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: var(--accent-red); display: flex; }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        select.form-input option { background: #0f172a; }
+    </style>
+    {% block extra_style %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <i data-lucide="shield-check" style="width:20px;height:20px;color:white;"></i>
+            </div>
+            <div>
+                <div class="logo-text">Admin Portal</div>
+                <div class="logo-sub">Management Console</div>
+            </div>
+        </div>
+
+        <div class="nav-section" style="padding-top:24px;">
+            <div class="nav-label">Main</div>
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                <i data-lucide="layout-dashboard" class="nav-icon"></i> Dashboard
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Manage</div>
+            <a href="{{ url_for('admin_students') }}" class="nav-link {% if request.endpoint == 'admin_students' %}active{% endif %}">
+                <i data-lucide="users" class="nav-icon"></i> Students
+            </a>
+            <a href="{{ url_for('admin_faculty') }}" class="nav-link {% if request.endpoint == 'admin_faculty' %}active{% endif %}">
+                <i data-lucide="user-check" class="nav-icon"></i> Faculty
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Content</div>
+            <a href="{{ url_for('admin_notes') }}" class="nav-link {% if request.endpoint == 'admin_notes' %}active{% endif %}">
+                <i data-lucide="book-open" class="nav-icon"></i> Notes
+            </a>
+            <a href="{{ url_for('admin_resumes') }}" class="nav-link {% if request.endpoint == 'admin_resumes' %}active{% endif %}">
+                <i data-lucide="file-text" class="nav-icon"></i> Resumes
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="admin-badge">
+                <div class="admin-avatar">A</div>
+                <div>
+                    <div class="admin-info-name">{{ session.get('name', 'Administrator') }}</div>
+                    <div class="admin-info-role">Super Admin</div>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">
+                <i data-lucide="log-out" style="width:15px;height:15px;"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="page-title">{% block page_title %}Dashboard{% endblock %}</div>
+                <div class="page-sub">{% block page_sub %}Overview{% endblock %}</div>
+            </div>
+            <div class="topbar-actions">{% block topbar_actions %}{% endblock %}</div>
+        </div>
+        <div class="page-body">{% block content %}{% endblock %}</div>
+    </main>
+
+    <!-- Global Toast -->
+    <div class="toast" id="globalToast"></div>
+
+    <script>
+        lucide.createIcons();
+        function showToast(message, type='success') {
+            const t = document.getElementById('globalToast');
+            t.textContent = message;
+            t.className = 'toast ' + type;
+            setTimeout(() => { t.className = 'toast'; }, 3500);
+        }
+    </script>
+    {% block extra_script %}{% endblock %}
+</body>
+</html>

@@ -778,48 +778,87 @@ def admin_dashboard():
 
 @app.route("/admin/students")
 def admin_students():
-
     if session.get("role") != "admin":
         return redirect(url_for("admin_login"))
 
     db = get_db()
-
     students = db.execute("""
-        SELECT uid, name, username
-        FROM users
-        WHERE role='student'
+        SELECT u.uid, u.name, u.username, u.email, u.phone, 
+               s.roll, s.department, s.cgpa
+        FROM users u
+        LEFT JOIN students s ON u.uid = s.uid
+        WHERE u.role='student'
     """).fetchall()
-
     db.close()
 
-    return render_template(
-        "admin/manage_students.html",
-        students=students
-    )
+    return render_template("admin/manage_students.html", students=students)
 
 @app.route("/admin/faculty")
 def admin_faculty():
-    
     if session.get("role") != "admin":
         return redirect(url_for("admin_login"))
 
     db = get_db()
-
     faculty = db.execute("""
-        SELECT
-            uid,
-            name,
-            username
-        FROM users
-        WHERE role='faculty'
+        SELECT u.uid, u.name, u.username, u.email, u.phone,
+               COUNT(n.id) as notes_count
+        FROM users u
+        LEFT JOIN notes n ON u.uid = n.faculty_id
+        WHERE u.role='faculty'
+        GROUP BY u.uid
     """).fetchall()
-
     db.close()
 
-    return render_template(
-        "admin/manage_faculty.html",
-        faculty=faculty
-    )
+    return render_template("admin/manage_faculty.html", faculty=faculty)
+
+@app.route("/admin/delete_user/<uid>", methods=["POST"])
+def admin_delete_user(uid):
+    if session.get("role") != "admin":
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+    
+    db = get_db()
+    try:
+        # Check if user exists
+        user = db.execute("SELECT role FROM users WHERE uid = ?", [uid]).fetchone()
+        if not user:
+            return jsonify({"success": False, "error": "User not found"}), 404
+            
+        role = user['role']
+        
+        # Cascading deletes
+        db.execute("DELETE FROM resumes WHERE uid = ?", [uid])
+        db.execute("DELETE FROM notes WHERE faculty_id = ?", [uid])
+        db.execute("DELETE FROM students WHERE uid = ?", [uid])
+        db.execute("DELETE FROM users WHERE uid = ?", [uid])
+        
+        db.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        db.close()
+
+@app.route("/admin/reset_password/<uid>", methods=["POST"])
+def admin_reset_password(uid):
+    if session.get("role") != "admin":
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+        
+    data = request.get_json()
+    new_password = data.get("new_password")
+    if not new_password:
+        return jsonify({"success": False, "error": "Password required"}), 400
+        
+    hashed = hashlib.sha256(new_password.encode()).hexdigest()
+    
+    db = get_db()
+    try:
+        db.execute("UPDATE users SET password = ? WHERE uid = ?", [hashed, uid])
+        db.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        db.close()
 
 @app.route("/admin/resumes")
 def admin_resumes():
@@ -849,28 +888,21 @@ def admin_resumes():
 
 @app.route("/admin/notes")
 def admin_notes():
-
     if session.get("role") != "admin":
         return redirect(url_for("admin_login"))
 
     db = get_db()
-
     notes = db.execute("""
-        SELECT
-            id,
-            title,
-            file_name,
-            uploaded_at
-        FROM notes
-        ORDER BY uploaded_at DESC
+        SELECT n.id, n.title, n.file_name, n.uploaded_at,
+               u.name AS faculty_name, d.name AS dept_name
+        FROM notes n
+        LEFT JOIN users u ON n.faculty_id = u.uid
+        LEFT JOIN departments d ON n.department_id = d.id
+        ORDER BY n.uploaded_at DESC
     """).fetchall()
-
     db.close()
 
-    return render_template(
-        "admin/manage_notes.html",
-        notes=notes
-    )
+    return render_template("admin/manage_notes.html", notes=notes)
 
 @app.route("/admin/papers")
 def admin_papers():

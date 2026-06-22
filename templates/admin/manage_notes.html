@@ -1,0 +1,47 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Admin Notes{% endblock %}
+{% block page_title %}Notes{% endblock %}
+{% block page_sub %}Browse all notes uploaded by faculty members{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    {% if notes %}
+    <div style="overflow-x:auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Faculty</th>
+                    <th>Department</th>
+                    <th>File</th>
+                    <th>Date</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for note in notes %}
+                <tr>
+                    <td style="font-weight:600;">{{ note.title }}</td>
+                    <td style="color:var(--text-muted); font-size:13px;">{{ note.faculty_name }}</td>
+                    <td><span style="background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.2); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700;">{{ note.dept_name }}</span></td>
+                    <td style="font-family:monospace; font-size:12px; color:var(--text-muted);">{{ note.file_name }}</td>
+                    <td style="font-size:12px; color:var(--text-muted);">{{ note.uploaded_at[:10] }}</td>
+                    <td style="text-align:right;">
+                        <a href="{{ url_for('view_note_file', note_id=note.id) }}" target="_blank" class="btn-warn" style="text-decoration:none;">
+                            <i data-lucide="eye" style="width:12px;height:12px;"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:60px 20px;">
+        <div style="font-size:52px;opacity:0.4;margin-bottom:16px;">📚</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px;">No Notes Found</div>
+        <div style="font-size:14px;color:var(--text-muted);">No notes have been uploaded by faculty yet.</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_sub %}Welcome back, {{ session.get('name', 'Admin') }}. Here's an overview of the system.{% endblock %}
+
+{% block extra_style %}
+<style>
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .metric-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .metric-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: -30px; right: -30px;
+        width: 100px; height: 100px;
+        border-radius: 50%;
+        opacity: 0.12;
+    }
+    .metric-card.blue::before { background: #38bdf8; }
+    .metric-card.purple::before { background: #a78bfa; }
+    .metric-card.green::before { background: #34d399; }
+    .metric-card.orange::before { background: #fb923c; }
+
+    .metric-icon {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 16px;
+    }
+    .metric-card.blue .metric-icon { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .metric-card.purple .metric-icon { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .metric-card.green .metric-icon { background: rgba(52,211,153,0.15); color: #34d399; }
+    .metric-card.orange .metric-icon { background: rgba(251,146,60,0.15); color: #fb923c; }
+
+    .metric-value { font-size: 36px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+    .metric-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .action-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex; flex-direction: column; gap: 12px;
+        text-decoration: none; color: var(--text-primary);
+        transition: all 0.2s;
+    }
+    .action-card:hover {
+        border-color: var(--border-hover);
+        transform: translateY(-2px);
+        background: rgba(56,189,248,0.05);
+    }
+    .action-card-icon { font-size: 24px; }
+    .action-card-title { font-size: 14px; font-weight: 700; }
+    .action-card-desc { font-size: 12px; color: var(--text-muted); }
+
+    .section-title {
+        font-size: 15px; font-weight: 700;
+        margin-bottom: 16px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after {
+        content: ''; flex: 1; height: 1px;
+        background: var(--border);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Metrics -->
+<div class="metrics-grid">
+    <div class="metric-card blue">
+        <div class="metric-icon"><i data-lucide="users" style="width:22px;height:22px;"></i></div>
+        <div class="metric-value">{{ total_students }}</div>
+        <div class="metric-label">Total Students</div>
+    </div>
+    <div class="metric-card purple">
+        <div class="metric-icon"><i data-lucide="user-check" style="width:22px;height:22px;"></i></div>
+        <div class="metric-value">{{ total_faculty }}</div>
+        <div class="metric-label">Total Faculty</div>
+    </div>
+    <div class="metric-card green">
+        <div class="metric-icon"><i data-lucide="file-text" style="width:22px;height:22px;"></i></div>
+        <div class="metric-value">{{ total_resumes }}</div>
+        <div class="metric-label">Resumes Generated</div>
+    </div>
+    <div class="metric-card orange">
+        <div class="metric-icon"><i data-lucide="book-open" style="width:22px;height:22px;"></i></div>
+        <div class="metric-value">{{ total_notes }}</div>
+        <div class="metric-label">Notes Uploaded</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="section-title">Quick Actions</div>
+<div class="quick-actions">
+    <a href="{{ url_for('admin_students') }}" class="action-card">
+        <div class="action-card-icon">👥</div>
+        <div class="action-card-title">Manage Students</div>
+        <div class="action-card-desc">Add, view or remove student accounts</div>
+    </a>
+    <a href="{{ url_for('admin_faculty') }}" class="action-card">
+        <div class="action-card-icon">🧑‍🏫</div>
+        <div class="action-card-title">Manage Faculty</div>
+        <div class="action-card-desc">Add, view or remove faculty accounts</div>
+    </a>
+    <a href="{{ url_for('admin_notes') }}" class="action-card">
+        <div class="action-card-icon">📚</div>
+        <div class="action-card-title">View All Notes</div>
+        <div class="action-card-desc">Browse notes uploaded by faculty</div>
+    </a>
+    <a href="{{ url_for('admin_resumes') }}" class="action-card">
+        <div class="action-card-icon">📄</div>
+        <div class="action-card-title">View Resumes</div>
+        <div class="action-card-desc">Browse all generated student resumes</div>
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,274 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Manage Students{% endblock %}
+{% block page_title %}Students{% endblock %}
+{% block page_sub %}Manage student accounts — add, remove and reset passwords{% endblock %}
+
+{% block topbar_actions %}
+<button class="btn-primary" onclick="openModal('addStudentModal')">
+    <i data-lucide="user-plus" style="width:15px;height:15px;"></i> Add Student
+</button>
+{% endblock %}
+
+{% block extra_style %}
+<style>
+    .table-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    }
+    .table-count { font-size: 13px; color: var(--text-muted); }
+    .table-count span { color: var(--accent-blue); font-weight: 700; }
+
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; flex-shrink: 0;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    }
+    .user-name { font-size: 14px; font-weight: 600; }
+    .user-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+    .badge {
+        display: inline-block; padding: 3px 10px;
+        border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+    .badge-dept { background: rgba(56,189,248,0.12); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); }
+    .badge-na { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+
+    .actions-cell { display: flex; gap: 8px; }
+
+    /* Modal reset */
+    #addStudentModal .modal-icon { font-size: 28px; margin-bottom: 8px; }
+
+    .empty-state {
+        text-align: center; padding: 60px 20px;
+    }
+    .empty-state-icon { font-size: 52px; margin-bottom: 16px; opacity: 0.4; }
+    .empty-state-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .empty-state-desc { font-size: 14px; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <div class="table-header">
+        <div class="table-count">Showing <span id="studentCount">{{ students|length }}</span> students</div>
+        <div class="search-bar-wrap">
+            <i data-lucide="search"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search by name or roll..." oninput="filterTable()">
+        </div>
+    </div>
+
+    {% if students %}
+    <div style="overflow-x: auto;">
+        <table class="admin-table" id="studentsTable">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Roll Number</th>
+                    <th>Department</th>
+                    <th>CGPA</th>
+                    <th>Contact</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr id="row-{{ s.uid }}" data-search="{{ (s.name or '')|lower }} {{ (s.roll or '')|lower }}">
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">{{ (s.name or 'S')[0].upper() }}</div>
+                            <div>
+                                <div class="user-name">{{ s.name or 'Unknown' }}</div>
+                                <div class="user-meta">@{{ s.username or '—' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-family:monospace; font-size:13px; color:var(--text-muted);">{{ s.roll or '—' }}</td>
+                    <td>
+                        {% if s.department %}
+                        <span class="badge badge-dept">{{ s.department }}</span>
+                        {% else %}
+                        <span class="badge badge-na">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight:700; color:var(--accent-green);">{{ s.cgpa or '—' }}</td>
+                    <td style="font-size:12px; color:var(--text-muted);">
+                        {{ s.email or '—' }}<br>{{ s.phone or '' }}
+                    </td>
+                    <td>
+                        <div class="actions-cell" style="justify-content:flex-end;">
+                            <button class="btn-warn" onclick="openResetModal('{{ s.uid }}', '{{ s.name or s.username }}')">
+                                <i data-lucide="key" style="width:12px;height:12px;"></i> Reset PW
+                            </button>
+                            <button class="btn-danger" onclick="confirmDelete('{{ s.uid }}', '{{ s.name or s.username }}')">
+                                <i data-lucide="trash-2" style="width:12px;height:12px;"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <div class="empty-state-title">No Students Found</div>
+        <div class="empty-state-desc">No student accounts registered yet. Add the first one!</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ── ADD STUDENT MODAL ── -->
+<div class="modal-overlay" id="addStudentModal">
+    <div class="modal-box">
+        <div class="modal-icon">👤</div>
+        <div class="modal-title">Add New Student</div>
+        <div class="modal-sub">Create a student account. They can log in immediately.</div>
+        <form id="addStudentForm" method="POST" action="/signup" onsubmit="handleAddStudent(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input name="name" class="form-input" placeholder="e.g. Priya Sharma" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input name="username" class="form-input" placeholder="e.g. priya01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input name="email" type="email" class="form-input" placeholder="priya@college.edu" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input name="phone" class="form-input" placeholder="9876543210">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input name="password" type="password" class="form-input" placeholder="Set initial password" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <input name="role" class="form-input" value="student" readonly style="color:var(--text-muted);">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('addStudentModal')">Cancel</button>
+                <button type="submit" class="btn-primary" id="addStudentBtn">
+                    <i data-lucide="user-plus" style="width:14px;height:14px;"></i> Create Account
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ── RESET PASSWORD MODAL ── -->
+<div class="modal-overlay" id="resetModal">
+    <div class="modal-box">
+        <div class="modal-icon">🔑</div>
+        <div class="modal-title">Reset Password</div>
+        <div class="modal-sub" id="resetModalSub">Reset password for user</div>
+        <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input id="newPasswordInput" class="form-input" type="password" placeholder="Enter new password" minlength="6">
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('resetModal')">Cancel</button>
+            <button class="btn-primary" onclick="doReset()">
+                <i data-lucide="key" style="width:14px;height:14px;"></i> Reset Password
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-icon">⚠️</div>
+        <div class="modal-title">Delete Student?</div>
+        <div class="modal-sub" id="deleteModalSub">This action is permanent and cannot be undone. All resumes and data for this student will also be deleted.</div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+            <button class="btn-danger" style="padding:9px 18px;" onclick="doDelete()">
+                <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    let _targetUid = null;
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); lucide.createIcons(); }
+
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#studentsTable tbody tr');
+        let visible = 0;
+        rows.forEach(row => {
+            const match = (row.dataset.search || '').includes(q);
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        document.getElementById('studentCount').textContent = visible;
+    }
+
+    function openResetModal(uid, name) {
+        _targetUid = uid;
+        document.getElementById('resetModalSub').textContent = `Resetting password for: ${name}`;
+        document.getElementById('newPasswordInput').value = '';
+        openModal('resetModal');
+    }
+
+    async function doReset() {
+        const pw = document.getElementById('newPasswordInput').value;
+        if (!pw || pw.length < 6) { showToast('Password must be at least 6 characters.', 'error'); return; }
+        const res = await fetch(`/admin/reset_password/${_targetUid}`, {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({new_password: pw})
+        });
+        const data = await res.json();
+        if (data.success) { closeModal('resetModal'); showToast('Password reset successfully!'); }
+        else showToast(data.error || 'Reset failed.', 'error');
+    }
+
+    function confirmDelete(uid, name) {
+        _targetUid = uid;
+        document.getElementById('deleteModalSub').textContent = `You are about to permanently delete "${name}" and all their data. This cannot be undone!`;
+        openModal('deleteModal');
+    }
+
+    async function doDelete() {
+        const res = await fetch(`/admin/delete_user/${_targetUid}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            closeModal('deleteModal');
+            const row = document.getElementById(`row-${_targetUid}`);
+            if (row) row.remove();
+            showToast('Student deleted successfully.');
+        } else showToast(data.error || 'Delete failed.', 'error');
+    }
+
+    async function handleAddStudent(e) {
+        e.preventDefault();
+        const form = e.target;
+        const btn = document.getElementById('addStudentBtn');
+        btn.textContent = 'Creating...'; btn.disabled = true;
+        const data = new FormData(form);
+        const res = await fetch('/signup', { method: 'POST', body: data });
+        btn.innerHTML = '<i data-lucide="user-plus" style="width:14px;height:14px;"></i> Create Account';
+        btn.disabled = false;
+        if (res.ok || res.redirected) {
+            closeModal('addStudentModal');
+            showToast('Student account created! Page will refresh...');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('Error creating account. Check if username/email is already taken.', 'error');
+        }
+    }
+</script>
+{% endblock %}

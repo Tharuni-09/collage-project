@@ -1,0 +1,266 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Manage Faculty{% endblock %}
+{% block page_title %}Faculty{% endblock %}
+{% block page_sub %}Manage faculty accounts — add, remove and reset passwords{% endblock %}
+
+{% block topbar_actions %}
+<button class="btn-primary" onclick="openModal('addFacultyModal')">
+    <i data-lucide="user-plus" style="width:15px;height:15px;"></i> Add Faculty
+</button>
+{% endblock %}
+
+{% block extra_style %}
+<style>
+    .table-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    }
+    .table-count { font-size: 13px; color: var(--text-muted); }
+    .table-count span { color: var(--accent-purple); font-weight: 700; }
+
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; flex-shrink: 0;
+        background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    }
+    .user-name { font-size: 14px; font-weight: 600; }
+    .user-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+    .notes-count {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 13px; font-weight: 700; color: var(--accent-green);
+    }
+
+    .actions-cell { display: flex; gap: 8px; }
+
+    .empty-state {
+        text-align: center; padding: 60px 20px;
+    }
+    .empty-state-icon { font-size: 52px; margin-bottom: 16px; opacity: 0.4; }
+    .empty-state-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .empty-state-desc { font-size: 14px; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <div class="table-header">
+        <div class="table-count">Showing <span id="facultyCount">{{ faculty|length }}</span> faculty members</div>
+        <div class="search-bar-wrap">
+            <i data-lucide="search"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search by name..." oninput="filterTable()">
+        </div>
+    </div>
+
+    {% if faculty %}
+    <div style="overflow-x: auto;">
+        <table class="admin-table" id="facultyTable">
+            <thead>
+                <tr>
+                    <th>Faculty Member</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Notes Uploaded</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in faculty %}
+                <tr id="row-{{ f.uid }}" data-search="{{ (f.name or '')|lower }}">
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">{{ (f.name or 'F')[0].upper() }}</div>
+                            <div>
+                                <div class="user-name">{{ f.name or 'Unknown' }}</div>
+                                <div class="user-meta">@{{ f.username or '—' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size:13px; color:var(--text-muted);">{{ f.email or '—' }}</td>
+                    <td style="font-size:13px; color:var(--text-muted);">{{ f.phone or '—' }}</td>
+                    <td>
+                        <div class="notes-count">
+                            <i data-lucide="book-open" style="width:13px;height:13px;"></i>
+                            {{ f.notes_count }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="actions-cell" style="justify-content:flex-end;">
+                            <button class="btn-warn" onclick="openResetModal('{{ f.uid }}', '{{ f.name or f.username }}')">
+                                <i data-lucide="key" style="width:12px;height:12px;"></i> Reset PW
+                            </button>
+                            <button class="btn-danger" onclick="confirmDelete('{{ f.uid }}', '{{ f.name or f.username }}')">
+                                <i data-lucide="trash-2" style="width:12px;height:12px;"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🧑‍🏫</div>
+        <div class="empty-state-title">No Faculty Found</div>
+        <div class="empty-state-desc">No faculty accounts registered yet. Add the first one!</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ── ADD FACULTY MODAL ── -->
+<div class="modal-overlay" id="addFacultyModal">
+    <div class="modal-box">
+        <div style="font-size:28px;margin-bottom:8px;">🧑‍🏫</div>
+        <div class="modal-title">Add New Faculty</div>
+        <div class="modal-sub">Create a faculty account. They can log in immediately.</div>
+        <form id="addFacultyForm" onsubmit="handleAddFaculty(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input name="name" class="form-input" placeholder="e.g. Dr. Ravi Kumar" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input name="username" class="form-input" placeholder="e.g. ravi.kumar" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input name="email" type="email" class="form-input" placeholder="ravi@college.edu" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input name="phone" class="form-input" placeholder="9876543210">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">Password</label>
+                    <input name="password" type="password" class="form-input" placeholder="Set initial password" required>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('addFacultyModal')">Cancel</button>
+                <button type="submit" class="btn-primary" id="addFacultyBtn">
+                    <i data-lucide="user-plus" style="width:14px;height:14px;"></i> Create Account
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ── RESET PASSWORD MODAL ── -->
+<div class="modal-overlay" id="resetModal">
+    <div class="modal-box">
+        <div style="font-size:28px;margin-bottom:8px;">🔑</div>
+        <div class="modal-title">Reset Password</div>
+        <div class="modal-sub" id="resetModalSub">Reset password for faculty</div>
+        <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input id="newPasswordInput" class="form-input" type="password" placeholder="Enter new password" minlength="6">
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('resetModal')">Cancel</button>
+            <button class="btn-primary" onclick="doReset()">
+                <i data-lucide="key" style="width:14px;height:14px;"></i> Reset Password
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div style="font-size:28px;margin-bottom:8px;">⚠️</div>
+        <div class="modal-title">Delete Faculty Member?</div>
+        <div class="modal-sub" id="deleteModalSub">This will permanently remove the account and all their uploaded notes.</div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+            <button class="btn-danger" style="padding:9px 18px;" onclick="doDelete()">
+                <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    let _targetUid = null;
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); lucide.createIcons(); }
+
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#facultyTable tbody tr');
+        let visible = 0;
+        rows.forEach(row => {
+            const match = (row.dataset.search || '').includes(q);
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        document.getElementById('facultyCount').textContent = visible;
+    }
+
+    function openResetModal(uid, name) {
+        _targetUid = uid;
+        document.getElementById('resetModalSub').textContent = `Resetting password for: ${name}`;
+        document.getElementById('newPasswordInput').value = '';
+        openModal('resetModal');
+    }
+
+    async function doReset() {
+        const pw = document.getElementById('newPasswordInput').value;
+        if (!pw || pw.length < 6) { showToast('Password must be at least 6 characters.', 'error'); return; }
+        const res = await fetch(`/admin/reset_password/${_targetUid}`, {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({new_password: pw})
+        });
+        const data = await res.json();
+        if (data.success) { closeModal('resetModal'); showToast('Password reset successfully!'); }
+        else showToast(data.error || 'Reset failed.', 'error');
+    }
+
+    function confirmDelete(uid, name) {
+        _targetUid = uid;
+        document.getElementById('deleteModalSub').textContent = `You are about to permanently delete "${name}" and all their notes. This cannot be undone!`;
+        openModal('deleteModal');
+    }
+
+    async function doDelete() {
+        const res = await fetch(`/admin/delete_user/${_targetUid}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            closeModal('deleteModal');
+            const row = document.getElementById(`row-${_targetUid}`);
+            if (row) row.remove();
+            showToast('Faculty member deleted successfully.');
+        } else showToast(data.error || 'Delete failed.', 'error');
+    }
+
+    async function handleAddFaculty(e) {
+        e.preventDefault();
+        const form = e.target;
+        const btn = document.getElementById('addFacultyBtn');
+        btn.textContent = 'Creating...'; btn.disabled = true;
+
+        // Build form data with role=faculty
+        const formData = new FormData(form);
+        formData.set('role', 'faculty');
+
+        const res = await fetch('/signup', { method: 'POST', body: formData });
+        btn.innerHTML = '<i data-lucide="user-plus" style="width:14px;height:14px;"></i> Create Account';
+        btn.disabled = false;
+        lucide.createIcons();
+
+        if (res.ok || res.redirected) {
+            closeModal('addFacultyModal');
+            showToast('Faculty account created! Refreshing...');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('Error creating account. Check if username/email is already taken.', 'error');
+        }
+    }
+</script>
+{% endblock %}
