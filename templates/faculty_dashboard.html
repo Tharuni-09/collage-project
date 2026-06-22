@@ -7,7 +7,7 @@
 
 <style>
     .dashboard-container {
-        max-width: 1200px;
+        max-width: 1300px;
         margin: 40px auto;
         padding: 0 20px;
     }
@@ -26,78 +26,17 @@
         gap: 12px;
     }
     
-    /* Quick Action Cards */
-    .action-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 24px;
-        margin-bottom: 40px;
-    }
-    
-    .action-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 30px;
-        text-align: center;
-        text-decoration: none;
-        border: 1px solid #f1f5f9;
-        box-shadow: 0 10px 30px rgba(10,31,68,0.06);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .action-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(10,31,68,0.1);
-        border-color: #cbd5e1;
-    }
-    
-    .icon-wrapper {
-        width: 64px;
-        height: 64px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        color: white;
-    }
-    
-    .icon-upload {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        box-shadow: 0 8px 16px rgba(59,130,246,0.25);
-    }
-    
-    .icon-notes {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        box-shadow: 0 8px 16px rgba(16,185,129,0.25);
-    }
-    
-    .action-card h3 {
-        color: #0a1f44;
-        font-weight: 700;
-        font-size: 20px;
-        margin-bottom: 10px;
-    }
-    
-    .action-card p {
-        color: #64748b;
-        font-size: 15px;
-        margin-bottom: 0;
-    }
-
-    /* To-Do Section */
-    .todo-section {
+    /* Section Cards */
+    .section-card {
         background: #ffffff;
         border-radius: 20px;
         padding: 35px;
         box-shadow: 0 10px 30px rgba(10,31,68,0.08);
         border: 1px solid #f1f5f9;
+        margin-bottom: 40px;
     }
 
-    .todo-header {
+    .section-header {
         display: flex;
         align-items: center;
         gap: 12px;
@@ -106,19 +45,19 @@
         border-bottom: 1px solid #f1f5f9;
     }
 
-    .todo-header h3 {
+    .section-header h3 {
         color: #0a1f44;
         font-weight: 700;
         font-size: 24px;
         margin: 0;
     }
 
-    .todo-header i {
-        color: #8b5cf6;
+    .section-header i {
+        color: #3b82f6;
     }
 
-    /* Modern Form */
-    .todo-form-wrapper {
+    /* Modern Form for To-Do */
+    .form-wrapper {
         background: #f8fafc;
         padding: 25px;
         border-radius: 16px;
@@ -128,7 +67,7 @@
 
     .modern-form {
         display: grid;
-        grid-template-columns: 1.5fr 1fr 2fr auto;
+        grid-template-columns: 2fr 1fr 1fr 1fr auto;
         gap: 16px;
         align-items: end;
     }
@@ -164,11 +103,7 @@
         box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     }
 
-    .modern-input::placeholder {
-        color: #94a3b8;
-    }
-
-    .btn-add {
+    .btn-action {
         background: #0a1f44;
         color: white;
         border: none;
@@ -185,7 +120,7 @@
         white-space: nowrap;
     }
 
-    .btn-add:hover {
+    .btn-action:hover {
         background: #1a365d;
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(10,31,68,0.15);
@@ -240,13 +175,18 @@
         transform: translateY(-2px);
     }
 
-    .date-badge {
+    .date-badge, .period-badge {
         background: #f1f5f9;
         color: #475569;
         padding: 6px 12px;
         border-radius: 6px;
         font-size: 13px;
         font-weight: 600;
+    }
+
+    .period-badge {
+        background: #eef2ff;
+        color: #4f46e5;
     }
 
     .dept-badge {
@@ -303,6 +243,108 @@
         opacity: 0.5;
     }
 
+    /* Timetable Grid */
+    .timetable-wrapper {
+        overflow-x: auto;
+    }
+    
+    .timetable {
+        width: 100%;
+        min-width: 900px;
+        border-collapse: separate;
+        border-spacing: 8px;
+    }
+
+    .timetable th {
+        background: #0a1f44;
+        color: white;
+        padding: 16px;
+        text-align: center;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+
+    .timetable .day-cell {
+        background: #f8fafc;
+        color: #0a1f44;
+        font-weight: 700;
+        padding: 16px;
+        border-radius: 12px;
+        text-align: center;
+        width: 120px;
+    }
+
+    .timetable .lunch-col {
+        background: #f1f5f9;
+        color: #64748b;
+        font-weight: 700;
+        text-align: center;
+        border-radius: 12px;
+        width: 80px;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        transform: rotate(180deg);
+        letter-spacing: 4px;
+        padding: 20px 0;
+    }
+
+    .timetable .period-cell {
+        background: #ffffff;
+        border: 2px dashed #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        transition: all 0.2s;
+        position: relative;
+        cursor: pointer;
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .timetable .period-cell:hover {
+        border-color: #3b82f6;
+        background: #f0fdf4;
+    }
+
+    .timetable .period-cell.filled {
+        border: 2px solid #10b981;
+        background: #ecfdf5;
+    }
+
+    .timetable .period-cell .subject {
+        font-weight: 700;
+        color: #065f46;
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+
+    .timetable .period-cell .dept {
+        font-size: 12px;
+        color: #047857;
+        background: #d1fae5;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .timetable .period-cell .add-icon {
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .timetable .period-cell:hover .add-icon {
+        color: #3b82f6;
+    }
+
     /* Modal Styling */
     .modal-content {
         border-radius: 16px;
@@ -325,10 +367,6 @@
         .modern-form {
             grid-template-columns: 1fr;
         }
-        .btn-add {
-            width: 100%;
-            justify-content: center;
-        }
     }
 </style>
 
@@ -337,33 +375,80 @@
         <h2><i data-lucide="layout-dashboard"></i> Faculty Dashboard</h2>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="action-grid">
-        <a href="{{ url_for('upload_notes') }}" class="action-card">
-            <div class="icon-wrapper icon-upload">
-                <i data-lucide="upload-cloud"></i>
-            </div>
-            <h3>Upload Notes</h3>
-            <p>Share materials with your students</p>
-        </a>
+    <!-- Timetable Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <i data-lucide="calendar-clock" class="w-8 h-8"></i>
+            <h3>Weekly Timetable</h3>
+        </div>
 
-        <a href="{{ url_for('faculty_my_notes') }}" class="action-card">
-            <div class="icon-wrapper icon-notes">
-                <i data-lucide="library"></i>
-            </div>
-            <h3>My Notes</h3>
-            <p>View and manage uploaded content</p>
-        </a>
+        <div class="timetable-wrapper">
+            <table class="timetable">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Period 1</th>
+                        <th>Period 2</th>
+                        <th>Period 3</th>
+                        <th>Lunch</th>
+                        <th>Period 4</th>
+                        <th>Period 5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                    {% for day in days %}
+                    <tr>
+                        <td class="day-cell">{{ day }}</td>
+                        
+                        <!-- Period 1, 2, 3 -->
+                        {% for p in range(1, 4) %}
+                            {% set cell = timetable_map[day].get(p) %}
+                            <td class="period-cell {% if cell %}filled{% endif %}" onclick="openTimetableModal('{{ day }}', {{ p }}, '{{ cell.subject_name if cell else '' }}', '{{ cell.department_name if cell else '' }}')">
+                                {% if cell %}
+                                    <div class="subject">{{ cell.subject_name }}</div>
+                                    <div class="dept">{{ cell.department_name }}</div>
+                                {% else %}
+                                    <div class="add-icon"><i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i> Add Class</div>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+
+                        <!-- Lunch Break -->
+                        {% if loop.index == 1 %}
+                        <td rowspan="5" class="lunch-col">
+                            <i data-lucide="utensils" style="margin: 0 auto 10px; width: 24px; height: 24px; transform: rotate(180deg);"></i>
+                            LUNCH BREAK
+                        </td>
+                        {% endif %}
+
+                        <!-- Period 4, 5 -->
+                        {% for p in range(4, 6) %}
+                            {% set cell = timetable_map[day].get(p) %}
+                            <td class="period-cell {% if cell %}filled{% endif %}" onclick="openTimetableModal('{{ day }}', {{ p }}, '{{ cell.subject_name if cell else '' }}', '{{ cell.department_name if cell else '' }}')">
+                                {% if cell %}
+                                    <div class="subject">{{ cell.subject_name }}</div>
+                                    <div class="dept">{{ cell.department_name }}</div>
+                                {% else %}
+                                    <div class="add-icon"><i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i> Add Class</div>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- To-Do Section -->
-    <div class="todo-section">
-        <div class="todo-header">
-            <i data-lucide="list-todo" class="w-8 h-8"></i>
-            <h3>My To-Do List</h3>
+    <div class="section-card">
+        <div class="section-header">
+            <i data-lucide="list-todo" class="w-8 h-8" style="color: #8b5cf6;"></i>
+            <h3>Upcoming Classes & Tasks</h3>
         </div>
 
-        <div class="todo-form-wrapper">
+        <div class="form-wrapper">
             <form action="{{ url_for('add_todo') }}" method="POST" class="modern-form">
                 <div class="form-group">
                     <label class="form-label">Subject Name</label>
@@ -372,18 +457,29 @@
                 <div class="form-group">
                     <label class="form-label">Department</label>
                     <select name="department_name" class="modern-input" required>
-                        <option value="" disabled selected>Select Dept...</option>
+                        <option value="" disabled selected>Dept...</option>
                         <option value="ACSML">ACSML</option>
                         <option value="NCSML">NCSML</option>
                         <option value="DCSML">DCSML</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Task Details</label>
-                    <input type="text" name="details" class="modern-input" placeholder="e.g. Upload assignment 3" required>
+                    <label class="form-label">Date</label>
+                    <input type="date" name="task_date" class="modern-input" required>
                 </div>
-                <button type="submit" class="btn-add">
-                    <i data-lucide="plus"></i> Add Task
+                <div class="form-group">
+                    <label class="form-label">Period</label>
+                    <select name="period" class="modern-input" required>
+                        <option value="" disabled selected>Period...</option>
+                        <option value="Period 1">Period 1</option>
+                        <option value="Period 2">Period 2</option>
+                        <option value="Period 3">Period 3</option>
+                        <option value="Period 4">Period 4</option>
+                        <option value="Period 5">Period 5</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-action">
+                    <i data-lucide="plus"></i> Add Event
                 </button>
             </form>
         </div>
@@ -394,9 +490,9 @@
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Period</th>
                         <th>Subject</th>
                         <th>Department</th>
-                        <th>Details</th>
                         <th style="width: 100px;">Actions</th>
                     </tr>
                 </thead>
@@ -404,20 +500,22 @@
                     {% for todo in todos %}
                     <tr>
                         <td>
-                            <span class="date-badge">{{ todo.created_at[:10] }}</span>
+                            <span class="date-badge"><i data-lucide="calendar" style="width: 14px; height: 14px; display: inline; margin-right: 4px;"></i>{{ todo.task_date }}</span>
+                        </td>
+                        <td>
+                            <span class="period-badge">{{ todo.period }}</span>
                         </td>
                         <td style="font-weight: 500; color: #0f172a;">{{ todo.subject_name }}</td>
                         <td>
                             <span class="dept-badge dept-{{ todo.department_name }}">{{ todo.department_name }}</span>
                         </td>
-                        <td>{{ todo.details }}</td>
                         <td>
                             <div class="action-cell">
-                                <button type="button" class="btn-icon" data-bs-toggle="modal" data-bs-target="#editModal{{ todo.id }}" title="Edit Task">
+                                <button type="button" class="btn-icon" data-bs-toggle="modal" data-bs-target="#editTodoModal{{ todo.id }}" title="Edit Event">
                                     <i data-lucide="edit-2" style="width: 18px; height: 18px;"></i>
                                 </button>
                                 <form action="{{ url_for('delete_todo', todo_id=todo.id) }}" method="POST" style="margin:0;">
-                                    <button type="submit" class="btn-icon delete" onclick="return confirm('Are you sure you want to delete this task?');" title="Delete Task">
+                                    <button type="submit" class="btn-icon delete" onclick="return confirm('Are you sure you want to delete this event?');" title="Delete Event">
                                         <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
                                     </button>
                                 </form>
@@ -425,13 +523,13 @@
                         </td>
                     </tr>
 
-                    <!-- Edit Modal -->
-                    <div class="modal fade" id="editModal{{ todo.id }}" tabindex="-1" aria-hidden="true">
+                    <!-- Edit To-Do Modal -->
+                    <div class="modal fade" id="editTodoModal{{ todo.id }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <form action="{{ url_for('edit_todo', todo_id=todo.id) }}" method="POST">
                                     <div class="modal-header">
-                                        <h5 class="modal-title font-bold text-[#0a1f44]">Edit Task</h5>
+                                        <h5 class="modal-title font-bold text-[#0a1f44]">Edit Event</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -440,21 +538,31 @@
                                             <input type="text" name="subject_name" class="modern-input" value="{{ todo.subject_name }}" required>
                                         </div>
                                         <div class="mb-4">
-                                            <label class="form-label" style="display:block; margin-bottom:8px;">Department Name</label>
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Department</label>
                                             <select name="department_name" class="modern-input" required>
                                                 <option value="ACSML" {% if todo.department_name == 'ACSML' %}selected{% endif %}>ACSML</option>
                                                 <option value="NCSML" {% if todo.department_name == 'NCSML' %}selected{% endif %}>NCSML</option>
                                                 <option value="DCSML" {% if todo.department_name == 'DCSML' %}selected{% endif %}>DCSML</option>
                                             </select>
                                         </div>
+                                        <div class="mb-4">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Date</label>
+                                            <input type="date" name="task_date" class="modern-input" value="{{ todo.task_date }}" required>
+                                        </div>
                                         <div class="mb-2">
-                                            <label class="form-label" style="display:block; margin-bottom:8px;">Details</label>
-                                            <input type="text" name="details" class="modern-input" value="{{ todo.details }}" required>
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Period</label>
+                                            <select name="period" class="modern-input" required>
+                                                <option value="Period 1" {% if todo.period == 'Period 1' %}selected{% endif %}>Period 1</option>
+                                                <option value="Period 2" {% if todo.period == 'Period 2' %}selected{% endif %}>Period 2</option>
+                                                <option value="Period 3" {% if todo.period == 'Period 3' %}selected{% endif %}>Period 3</option>
+                                                <option value="Period 4" {% if todo.period == 'Period 4' %}selected{% endif %}>Period 4</option>
+                                                <option value="Period 5" {% if todo.period == 'Period 5' %}selected{% endif %}>Period 5</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600;">Cancel</button>
-                                        <button type="submit" class="btn-add" style="height: auto; padding: 10px 20px;">Save Changes</button>
+                                        <button type="submit" class="btn-action" style="height: auto; padding: 10px 20px;">Save Changes</button>
                                     </div>
                                 </form>
                             </div>
@@ -467,10 +575,48 @@
         {% else %}
         <div class="empty-state">
             <i data-lucide="check-circle-2"></i>
-            <h4>All Caught Up!</h4>
-            <p>You have no tasks in your to-do list right now.</p>
+            <h4>Clear Schedule!</h4>
+            <p>You have no upcoming events scheduled.</p>
         </div>
         {% endif %}
+    </div>
+</div>
+
+<!-- Timetable JS Modal -->
+<div class="modal fade" id="timetableModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{ url_for('update_timetable') }}" method="POST">
+                <input type="hidden" name="day_of_week" id="tt_day">
+                <input type="hidden" name="period_number" id="tt_period">
+                <div class="modal-header">
+                    <h5 class="modal-title font-bold text-[#0a1f44]">
+                        Update Schedule <span id="tt_title_badge" class="period-badge ml-2" style="font-size:12px;"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted text-sm mb-4">Leave fields blank to clear this period from your timetable.</p>
+                    <div class="mb-4">
+                        <label class="form-label" style="display:block; margin-bottom:8px;">Subject Name</label>
+                        <input type="text" name="subject_name" id="tt_subject" class="modern-input" placeholder="e.g. Machine Learning">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" style="display:block; margin-bottom:8px;">Department</label>
+                        <select name="department_name" id="tt_dept" class="modern-input">
+                            <option value="">-- None --</option>
+                            <option value="ACSML">ACSML</option>
+                            <option value="NCSML">NCSML</option>
+                            <option value="DCSML">DCSML</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600;">Cancel</button>
+                    <button type="submit" class="btn-action" style="height: auto; padding: 10px 20px;">Save Period</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -478,5 +624,16 @@
     document.addEventListener("DOMContentLoaded", function() {
         lucide.createIcons();
     });
+
+    function openTimetableModal(day, period, subject, dept) {
+        document.getElementById('tt_day').value = day;
+        document.getElementById('tt_period').value = period;
+        document.getElementById('tt_subject').value = subject;
+        document.getElementById('tt_dept').value = dept;
+        document.getElementById('tt_title_badge').innerText = day + ' - Period ' + period;
+        
+        var myModal = new bootstrap.Modal(document.getElementById('timetableModal'));
+        myModal.show();
+    }
 </script>
 {% endblock %}

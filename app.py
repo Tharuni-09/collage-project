@@ -357,15 +357,30 @@ def init_database():
             VALUES(1,1,1,1,1,1)
             """)
 
+        db.execute("DROP TABLE IF EXISTS faculty_todos")
         db.execute("""
             CREATE TABLE IF NOT EXISTS faculty_todos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 faculty_id INTEGER NOT NULL,
                 subject_name TEXT NOT NULL,
                 department_name TEXT NOT NULL,
-                details TEXT NOT NULL,
+                task_date TEXT NOT NULL,
+                period TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (faculty_id) REFERENCES users(uid)
+            )
+        """)
+
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS faculty_timetable (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                faculty_id INTEGER NOT NULL,
+                day_of_week TEXT NOT NULL,
+                period_number INTEGER NOT NULL,
+                subject_name TEXT NOT NULL,
+                department_name TEXT NOT NULL,
+                FOREIGN KEY (faculty_id) REFERENCES users(uid),
+                UNIQUE(faculty_id, day_of_week, period_number)
             )
         """)
         
@@ -1525,12 +1540,13 @@ def add_todo():
         return redirect(url_for("login"))
     subject = request.form.get("subject_name")
     department = request.form.get("department_name")
-    details = request.form.get("details")
-    if subject and department and details:
+    task_date = request.form.get("task_date")
+    period = request.form.get("period")
+    if subject and department and task_date and period:
         db = get_db()
         db.execute(
-            "INSERT INTO faculty_todos (faculty_id, subject_name, department_name, details) VALUES (?, ?, ?, ?)",
-            [session["uid"], subject, department, details]
+            "INSERT INTO faculty_todos (faculty_id, subject_name, department_name, task_date, period) VALUES (?, ?, ?, ?, ?)",
+            [session["uid"], subject, department, task_date, period]
         )
         db.commit()
         db.close()
@@ -1542,12 +1558,13 @@ def edit_todo(todo_id):
         return redirect(url_for("login"))
     subject = request.form.get("subject_name")
     department = request.form.get("department_name")
-    details = request.form.get("details")
-    if subject and department and details:
+    task_date = request.form.get("task_date")
+    period = request.form.get("period")
+    if subject and department and task_date and period:
         db = get_db()
         db.execute(
-            "UPDATE faculty_todos SET subject_name = ?, department_name = ?, details = ? WHERE id = ? AND faculty_id = ?",
-            [subject, department, details, todo_id, session["uid"]]
+            "UPDATE faculty_todos SET subject_name = ?, department_name = ?, task_date = ?, period = ? WHERE id = ? AND faculty_id = ?",
+            [subject, department, task_date, period, todo_id, session["uid"]]
         )
         db.commit()
         db.close()
@@ -1561,6 +1578,27 @@ def delete_todo(todo_id):
     db.execute("DELETE FROM faculty_todos WHERE id = ? AND faculty_id = ?", [todo_id, session["uid"]])
     db.commit()
     db.close()
+    return redirect(url_for("faculty_dashboard"))
+
+@app.route("/update_timetable", methods=["POST"])
+def update_timetable():
+    if session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    day_of_week = request.form.get("day_of_week")
+    period_number = request.form.get("period_number")
+    subject_name = request.form.get("subject_name", "")
+    department_name = request.form.get("department_name", "")
+    
+    if day_of_week and period_number:
+        db = get_db()
+        db.execute("""
+            INSERT INTO faculty_timetable (faculty_id, day_of_week, period_number, subject_name, department_name)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(faculty_id, day_of_week, period_number) 
+            DO UPDATE SET subject_name=excluded.subject_name, department_name=excluded.department_name
+        """, [session["uid"], day_of_week, int(period_number), subject_name, department_name])
+        db.commit()
+        db.close()
     return redirect(url_for("faculty_dashboard"))
 
 @app.route("/faculty_dashboard")
@@ -1585,9 +1623,19 @@ def faculty_dashboard():
             ).fetchall()
  
         todos = db.execute(
-            "SELECT * FROM faculty_todos WHERE faculty_id = ? ORDER BY created_at DESC",
+            "SELECT * FROM faculty_todos WHERE faculty_id = ? ORDER BY task_date ASC",
             [uid]
         ).fetchall()
+        
+        # Fetch timetable
+        timetable_rows = db.execute("SELECT * FROM faculty_timetable WHERE faculty_id = ?", [uid]).fetchall()
+        # Build dictionary for easy frontend access: timetable_map[day_of_week][period_number] = row
+        timetable_map = {"Monday":{}, "Tuesday":{}, "Wednesday":{}, "Thursday":{}, "Friday":{}}
+        for row in timetable_rows:
+            day = row["day_of_week"]
+            period = row["period_number"]
+            if day in timetable_map:
+                timetable_map[day][period] = row
 
         context = {
             "students_acsml": get_students_for("ACSML"),
@@ -1597,6 +1645,7 @@ def faculty_dashboard():
             "resumes_ncsml":  get_resumes_for("NCSML"),
             "resumes_dcsml":  get_resumes_for("DCSML"),
             "todos": todos,
+            "timetable_map": timetable_map,
             "session": session,
             "dept": dept,
         }
