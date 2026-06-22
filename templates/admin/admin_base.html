@@ -358,10 +358,13 @@
         <div class="nav-section">
             <div class="nav-label">Content</div>
             <a href="{{ url_for('admin_notes') }}" class="nav-link {% if request.endpoint == 'admin_notes' %}active{% endif %}">
-                <i data-lucide="book-open" class="nav-icon"></i> Notes
+                <span class="nav-icon">📚</span> Notes
             </a>
             <a href="{{ url_for('admin_resumes') }}" class="nav-link {% if request.endpoint == 'admin_resumes' %}active{% endif %}">
-                <i data-lucide="file-text" class="nav-icon"></i> Resumes
+                <span class="nav-icon">📄</span> Resumes
+            </a>
+            <a href="{{ url_for('admin_approvals') }}" class="nav-link {% if request.endpoint == 'admin_approvals' %}active{% endif %}">
+                <span class="nav-icon">⚖️</span> Approvals
             </a>
         </div>
 

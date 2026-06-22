@@ -1,0 +1,142 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Manage Approvals{% endblock %}
+{% block page_title %}Pending Approvals{% endblock %}
+{% block page_sub %}Review and moderate outreach programs and previous year papers submitted by users.{% endblock %}
+
+{% block extra_style %}
+<style>
+    .approval-tabs {
+        display: flex; gap: 10px; margin-bottom: 24px;
+        border-bottom: 1px solid var(--border); padding-bottom: 16px;
+    }
+    .approval-tab {
+        padding: 8px 16px;
+        background: transparent; border: 1px solid var(--border);
+        color: var(--text-muted); border-radius: 8px;
+        font-size: 14px; font-weight: 600; cursor: pointer;
+        transition: all 0.2s;
+    }
+    .approval-tab.active {
+        background: rgba(56,189,248,0.15);
+        border-color: rgba(56,189,248,0.3);
+        color: var(--accent-blue);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .item-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px;
+        margin-bottom: 16px; display: flex; gap: 20px; align-items: center;
+    }
+    .item-info { flex: 1; }
+    .item-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .item-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+    .item-desc { font-size: 13px; color: var(--text-primary); background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+    .item-actions { display: flex; gap: 8px; flex-direction: column; min-width: 120px; }
+
+    .empty-state {
+        text-align: center; padding: 40px 20px;
+    }
+    .empty-state-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state-title { font-size: 16px; font-weight: 700; color: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="approval-tabs">
+    <button class="approval-tab active" onclick="switchTab('outreach')">Outreach Programs ({{ pending_outreach|length }})</button>
+    <button class="approval-tab" onclick="switchTab('papers')">Previous Papers ({{ pending_papers|length }})</button>
+</div>
+
+<!-- OUTREACH TAB -->
+<div id="tab-outreach" class="tab-content active">
+    {% if pending_outreach %}
+        {% for o in pending_outreach %}
+        <div class="item-card" id="outreach-{{ o.id }}">
+            {% if o.photo %}
+            <div style="width:100px; height:100px; border-radius:8px; overflow:hidden; flex-shrink:0;">
+                <img src="{{ url_for('static', filename='outreach/' + o.photo) }}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            {% endif %}
+            <div class="item-info">
+                <div class="item-title">{{ o.title }}</div>
+                <div class="item-meta">
+                    <strong>Year:</strong> {{ o.year }} &nbsp;|&nbsp; 
+                    <strong>Venue:</strong> {{ o.venue }} &nbsp;|&nbsp; 
+                    <strong>Participants:</strong> {{ o.participants }}
+                </div>
+                <div class="item-desc">{{ o.description }}</div>
+            </div>
+            <div class="item-actions">
+                <button class="btn-primary" onclick="handleAction('outreach', {{ o.id }}, 'approve')">✅ Approve</button>
+                <button class="btn-danger" onclick="handleAction('outreach', {{ o.id }}, 'reject')">❌ Reject</button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🎉</div>
+            <div class="empty-state-title">No pending outreach programs.</div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- PAPERS TAB -->
+<div id="tab-papers" class="tab-content">
+    {% if pending_papers %}
+        {% for p in pending_papers %}
+        <div class="item-card" id="paper-{{ p.id }}">
+            <div style="width:60px; height:60px; background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">
+                📄
+            </div>
+            <div class="item-info">
+                <div class="item-title">{{ p.subject }}</div>
+                <div class="item-meta">
+                    <strong>Branch:</strong> {{ p.branch }} &nbsp;|&nbsp; 
+                    <strong>Year:</strong> {{ p.year }} &nbsp;|&nbsp; 
+                    <strong>Semester:</strong> {{ p.semester }}
+                </div>
+            </div>
+            <div class="item-actions">
+                <button class="btn-primary" onclick="handleAction('paper', {{ p.id }}, 'approve')">✅ Approve</button>
+                <button class="btn-danger" onclick="handleAction('paper', {{ p.id }}, 'reject')">❌ Reject</button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📚</div>
+            <div class="empty-state-title">No pending papers.</div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    function switchTab(tabId) {
+        document.querySelectorAll('.approval-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    async function handleAction(type, id, action) {
+        if (action === 'reject' && !confirm('Are you sure you want to permanently delete this submission?')) return;
+
+        const endpoint = type === 'outreach' ? `/admin/approve_outreach/${id}/${action}` : `/admin/approve_paper/${id}/${action}`;
+        const res = await fetch(endpoint, { method: 'POST' });
+        const data = await res.json();
+        
+        if (data.success) {
+            document.getElementById(`${type}-${id}`).style.display = 'none';
+            showToast(`Submission ${action}d successfully!`);
+        } else {
+            showToast(data.error || `Failed to ${action}.`, 'error');
+        }
+    }
+</script>
+{% endblock %}

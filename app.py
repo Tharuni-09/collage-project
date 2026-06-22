@@ -278,6 +278,19 @@ def init_database():
             db.execute("ALTER TABLE users ADD COLUMN is_hod INTEGER DEFAULT 0")
         except Exception:
             pass
+            
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS outreach_programs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                year TEXT NOT NULL,
+                venue TEXT NOT NULL,
+                participants TEXT NOT NULL,
+                description TEXT,
+                photo TEXT,
+                approved INTEGER DEFAULT 0
+            )
+        """)
  
         db.execute("""
             CREATE TABLE IF NOT EXISTS previous_year_papers (
@@ -286,9 +299,20 @@ def init_database():
                 branch TEXT NOT NULL,
                 year INTEGER NOT NULL,
                 semester INTEGER NOT NULL,
-                photo_limit INTEGER DEFAULT 1
+                photo_limit INTEGER DEFAULT 1,
+                approved INTEGER DEFAULT 0
             )
         """)
+        
+        # Add approved columns to existing DBs if they are missing
+        try:
+            db.execute("ALTER TABLE previous_year_papers ADD COLUMN approved INTEGER DEFAULT 0")
+        except Exception:
+            pass
+        try:
+            db.execute("ALTER TABLE outreach_programs ADD COLUMN approved INTEGER DEFAULT 0")
+        except Exception:
+            pass
         db.execute("""
             CREATE TABLE IF NOT EXISTS paper_photos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -327,12 +351,23 @@ def init_database():
                 description TEXT,
                 file_path TEXT NOT NULL,
                 file_name TEXT NOT NULL,
+                file_content BLOB,
+                mime_type TEXT DEFAULT 'application/octet-stream',
                 department_id INTEGER NOT NULL,
                 faculty_id TEXT NOT NULL,
                 uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (department_id) REFERENCES departments(id)
             )
         """)
+        # Add file_content column if it doesn't exist (migration for existing DBs)
+        try:
+            db.execute("ALTER TABLE notes ADD COLUMN file_content BLOB")
+        except Exception:
+            pass
+        try:
+            db.execute("ALTER TABLE notes ADD COLUMN mime_type TEXT DEFAULT 'application/octet-stream'")
+        except Exception:
+            pass
 
         db.execute("""
             CREATE TABLE IF NOT EXISTS admin_settings(
@@ -409,7 +444,7 @@ def index():
         conn = get_db()
         row = conn.execute(
             "SELECT id, title, year, venue, participants, description, photo "
-            "FROM outreach_programs ORDER BY id DESC LIMIT 1"
+            "FROM outreach_programs WHERE approved = 1 ORDER BY year DESC, id DESC LIMIT 1"
         ).fetchone()
         conn.close()
         if row:
@@ -446,7 +481,7 @@ def chat():
         
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=(
                 "You are an advanced, knowledgeable AI assistant. "
                 "You can answer ANY question on ANY topic — academics, science, technology, "
@@ -521,11 +556,12 @@ def add_outreach_program():
     file.save(os.path.join('static/outreach', filename))
     conn = get_db()
     conn.execute("""
-        INSERT INTO outreach_programs (title, year, venue, participants, description, photo)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO outreach_programs (title, year, venue, participants, description, photo, approved)
+        VALUES (?, ?, ?, ?, ?, ?, 0)
     """, (title, year, venue, participants, description, filename))
     conn.commit()
     conn.close()
+    flash('Outreach program submitted for admin approval.', 'success')
     return redirect(url_for('outreach'))
  
  
@@ -548,17 +584,23 @@ def init_paper_grid_db():
  
 @app.route("/add_paper_grid", methods=["POST"])
 def add_paper_grid():
-    regulation = request.form.get("regulation")
-    year       = request.form.get("year")
-    semester   = request.form.get("semester")
-    subject    = request.form.get("subject")
+    if not session.get("uid"):
+        return redirect(url_for("login"))
+    
+    branch     = request.form.get("branch", "N/A")
+    year       = request.form.get("year", 1)
+    semester   = request.form.get("semester", 1)
+    subject    = request.form.get("subject", "Unknown")
+    
     conn = get_db()
     conn.execute("""
-        INSERT INTO paper_grid (regulation, year, semester, subject)
-        VALUES (?, ?, ?, ?)
-    """, (regulation, year, semester, subject))
+        INSERT INTO previous_year_papers (subject, branch, year, semester, photo_limit, approved)
+        VALUES (?, ?, ?, ?, 10, 0)
+    """, (subject, branch, year, semester))
     conn.commit()
     conn.close()
+    
+    flash("Paper submitted and is pending admin approval.", "success")
     return redirect(url_for("previous_year_papers"))
  
  
@@ -567,7 +609,7 @@ def previous_year_papers():
     db     = get_db()
     papers = []
     # ── FIX 7: was querying "papers" table (wrong name); correct table is "previous_year_papers"
-    papers_rows = db.execute("SELECT * FROM previous_year_papers").fetchall()
+    papers_rows = db.execute("SELECT * FROM previous_year_papers WHERE approved = 1").fetchall()
     for row in papers_rows:
         paper  = dict(row)
         photos = db.execute(
@@ -885,6 +927,64 @@ def admin_resumes():
         "admin/manage_resumes.html",
         resumes=resumes
     )
+
+@app.route("/admin/approvals")
+def admin_approvals():
+    if session.get("role") != "admin":
+        return redirect(url_for("admin_login"))
+
+    db = get_db()
+    pending_papers = db.execute("SELECT * FROM previous_year_papers WHERE approved = 0").fetchall()
+    pending_outreach = db.execute("SELECT * FROM outreach_programs WHERE approved = 0").fetchall()
+    db.close()
+
+    return render_template("admin/manage_approvals.html", 
+                           pending_papers=pending_papers, 
+                           pending_outreach=pending_outreach)
+
+@app.route("/admin/approve_paper/<int:pid>/<action>", methods=["POST"])
+def admin_approve_paper(pid, action):
+    if session.get("role") != "admin":
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+    db = get_db()
+    try:
+        if action == "approve":
+            db.execute("UPDATE previous_year_papers SET approved = 1 WHERE id = ?", [pid])
+        elif action == "reject":
+            # Delete associated photos first
+            photos = db.execute("SELECT image_path FROM paper_photos WHERE paper_id = ?", [pid]).fetchall()
+            for p in photos:
+                try: os.remove(os.path.join(app.static_folder, "images", p['image_path']))
+                except: pass
+            db.execute("DELETE FROM paper_photos WHERE paper_id = ?", [pid])
+            db.execute("DELETE FROM previous_year_papers WHERE id = ?", [pid])
+        db.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        db.close()
+
+@app.route("/admin/approve_outreach/<int:oid>/<action>", methods=["POST"])
+def admin_approve_outreach(oid, action):
+    if session.get("role") != "admin":
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+    db = get_db()
+    try:
+        if action == "approve":
+            db.execute("UPDATE outreach_programs SET approved = 1 WHERE id = ?", [oid])
+        elif action == "reject":
+            outreach = db.execute("SELECT photo FROM outreach_programs WHERE id = ?", [oid]).fetchone()
+            if outreach and outreach['photo']:
+                try: os.remove(os.path.join('static/outreach', outreach['photo']))
+                except: pass
+            db.execute("DELETE FROM outreach_programs WHERE id = ?", [oid])
+        db.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        db.close()
 
 @app.route("/admin/notes")
 def admin_notes():
@@ -1214,7 +1314,7 @@ Rules:
 - Include title slide, agenda, content slides, and conclusion
 """
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
         raw      = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
  
         # Build a real PPTX using python-pptx
@@ -2113,16 +2213,26 @@ def upload_notes():
         if not file or file.filename == '':
             flash('Please select a file', 'error')
             return redirect(url_for('upload_notes'))
-        filename        = secure_filename(file.filename)
-        timestamp       = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = secure_filename(file.filename)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         unique_filename = f"{timestamp}_{filename}"
-        filepath        = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-        file.save(filepath)
+        
+        # Determine MIME type
+        ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+        mime_map = {'pdf': 'application/pdf', 'ppt': 'application/vnd.ms-powerpoint',
+                    'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'doc': 'application/msword', 'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'txt': 'text/plain', 'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg'}
+        mime_type = mime_map.get(ext, 'application/octet-stream')
+        
+        # Read file content into memory (persists in DB, survives Render restarts)
+        file_content = file.read()
+        
         conn = get_db()
         conn.execute("""
-            INSERT INTO notes (title, description, file_path, file_name, department_id, faculty_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (title, description, unique_filename, filename, department_id, uid))
+            INSERT INTO notes (title, description, file_path, file_name, file_content, mime_type, department_id, faculty_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (title, description, unique_filename, filename, file_content, mime_type, department_id, uid))
         conn.commit()
         conn.close()
         flash('Notes uploaded successfully!', 'success')
@@ -2178,32 +2288,38 @@ def view_notes():
     return render_template('view_notes.html', notes=notes, department=department)
  
  
-# ── FIX 12: Added /download_note route (used in view_notes.html) ─────────────
+# ── Download and View notes served from DB BLOB (survives Render restarts) ──
 @app.route('/download_note/<int:note_id>')
 def download_note(note_id):
     conn = get_db()
-    note = conn.execute("SELECT file_path, file_name FROM notes WHERE id = ?", [note_id]).fetchone()
+    note = conn.execute("SELECT file_name, file_content, mime_type FROM notes WHERE id = ?", [note_id]).fetchone()
     conn.close()
     if not note:
         return "Note not found", 404
-        
-    note_path = os.path.join(app.config['UPLOAD_FOLDER'], note['file_path'])
-    if not os.path.exists(note_path):
-        return "File not found on server", 404
-    return send_file(note_path, download_name=note['file_name'], as_attachment=True)
+    if not note['file_content']:
+        return "File content not available. Please re-upload this note.", 404
+    return send_file(
+        io.BytesIO(note['file_content']),
+        download_name=note['file_name'],
+        as_attachment=True,
+        mimetype=note['mime_type'] or 'application/octet-stream'
+    )
 
 @app.route('/view_note_file/<int:note_id>')
 def view_note_file(note_id):
     conn = get_db()
-    note = conn.execute("SELECT file_path, file_name FROM notes WHERE id = ?", [note_id]).fetchone()
+    note = conn.execute("SELECT file_name, file_content, mime_type FROM notes WHERE id = ?", [note_id]).fetchone()
     conn.close()
     if not note:
         return "Note not found", 404
-        
-    note_path = os.path.join(app.config['UPLOAD_FOLDER'], note['file_path'])
-    if not os.path.exists(note_path):
-        return "File not found on server", 404
-    return send_file(note_path, as_attachment=False)
+    if not note['file_content']:
+        return "File content not available. Please re-upload this note.", 404
+    return send_file(
+        io.BytesIO(note['file_content']),
+        download_name=note['file_name'],
+        as_attachment=False,
+        mimetype=note['mime_type'] or 'application/octet-stream'
+    )
  
  
 @app.route('/delete_note/<int:note_id>')
