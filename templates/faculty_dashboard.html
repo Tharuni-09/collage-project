@@ -250,19 +250,19 @@
     
     .timetable {
         width: 100%;
-        min-width: 900px;
+        min-width: 800px;
         border-collapse: separate;
-        border-spacing: 8px;
+        border-spacing: 4px;
     }
 
     .timetable th {
         background: #0a1f44;
         color: white;
-        padding: 16px;
+        padding: 10px;
         text-align: center;
-        border-radius: 12px;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
         letter-spacing: 0.5px;
     }
 
@@ -270,10 +270,11 @@
         background: #f8fafc;
         color: #0a1f44;
         font-weight: 700;
-        padding: 16px;
-        border-radius: 12px;
+        padding: 10px;
+        border-radius: 8px;
         text-align: center;
-        width: 120px;
+        width: 90px;
+        font-size: 14px;
     }
 
     .timetable .lunch-col {
@@ -281,29 +282,30 @@
         color: #64748b;
         font-weight: 700;
         text-align: center;
-        border-radius: 12px;
-        width: 80px;
+        border-radius: 8px;
+        width: 40px;
         writing-mode: vertical-rl;
         text-orientation: mixed;
         transform: rotate(180deg);
-        letter-spacing: 4px;
-        padding: 20px 0;
+        letter-spacing: 2px;
+        padding: 10px 0;
+        font-size: 12px;
     }
 
     .timetable .period-cell {
         background: #ffffff;
         border: 2px dashed #e2e8f0;
-        border-radius: 12px;
-        padding: 16px;
+        border-radius: 8px;
+        padding: 8px 4px;
         text-align: center;
         transition: all 0.2s;
         position: relative;
         cursor: pointer;
-        min-height: 80px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        min-height: 56px;
     }
 
     .timetable .period-cell:hover {
@@ -319,15 +321,16 @@
     .timetable .period-cell .subject {
         font-weight: 700;
         color: #065f46;
-        font-size: 15px;
-        margin-bottom: 4px;
+        font-size: 12px;
+        margin-bottom: 2px;
+        line-height: 1.2;
     }
 
     .timetable .period-cell .dept {
-        font-size: 12px;
+        font-size: 10px;
         color: #047857;
         background: #d1fae5;
-        padding: 2px 8px;
+        padding: 2px 6px;
         border-radius: 10px;
         font-weight: 600;
     }
@@ -336,8 +339,8 @@
         color: #94a3b8;
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 13px;
+        gap: 4px;
+        font-size: 11px;
         font-weight: 600;
     }
 
@@ -409,7 +412,7 @@
                                     <div class="subject">{{ cell.subject_name }}</div>
                                     <div class="dept">{{ cell.department_name }}</div>
                                 {% else %}
-                                    <div class="add-icon"><i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i> Add Class</div>
+                                    <div class="add-icon"><i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add</div>
                                 {% endif %}
                             </td>
                         {% endfor %}
@@ -417,8 +420,8 @@
                         <!-- Lunch Break -->
                         {% if loop.index == 1 %}
                         <td rowspan="5" class="lunch-col">
-                            <i data-lucide="utensils" style="margin: 0 auto 10px; width: 24px; height: 24px; transform: rotate(180deg);"></i>
-                            LUNCH BREAK
+                            <i data-lucide="utensils" style="margin: 0 auto 6px; width: 16px; height: 16px; transform: rotate(180deg);"></i>
+                            LUNCH
                         </td>
                         {% endif %}
 
@@ -430,7 +433,7 @@
                                     <div class="subject">{{ cell.subject_name }}</div>
                                     <div class="dept">{{ cell.department_name }}</div>
                                 {% else %}
-                                    <div class="add-icon"><i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i> Add Class</div>
+                                    <div class="add-icon"><i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add</div>
                                 {% endif %}
                             </td>
                         {% endfor %}
