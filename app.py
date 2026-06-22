@@ -2057,7 +2057,7 @@ Rules:
 - Return only the bullet points
 """
     try:
-        response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
         return jsonify({"success": True, "description": response.text})
     except Exception as e:
         logger.error(f"Gemini Error: {str(e)}")
