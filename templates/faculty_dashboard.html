@@ -2,152 +2,481 @@
 {% block title %}Faculty Dashboard{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4"> Faculty Dashboard</h2>
-            
-            <div class="row mt-4">
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow hover-card text-center">
-                        <div class="card-body">
-                            <h3 class="card-title text-primary">📤 Upload Notes</h3>
-                            <p class="card-text text-muted">Upload notes for ACSML, NCSML, or DCSML</p>
-                            <a href="{{ url_for('upload_notes') }}" class="btn btn-primary btn-lg">
-                                Upload Notes
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<!-- Include Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
 
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow hover-card text-center">
-                        <div class="card-body">
-                            <h3 class="card-title text-success">📋 My Notes</h3>
-                            <p class="card-text text-muted">View and manage your uploaded notes</p>
-                            <a href="{{ url_for('faculty_my_notes') }}" class="btn btn-success btn-lg">
-                                View My Notes
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    
+    .dashboard-header {
+        margin-bottom: 40px;
+    }
+    
+    .dashboard-header h2 {
+        color: #0a1f44;
+        font-weight: 800;
+        font-size: 32px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    /* Quick Action Cards */
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+    
+    .action-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 30px rgba(10,31,68,0.06);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(10,31,68,0.1);
+        border-color: #cbd5e1;
+    }
+    
+    .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        color: white;
+    }
+    
+    .icon-upload {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        box-shadow: 0 8px 16px rgba(59,130,246,0.25);
+    }
+    
+    .icon-notes {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 8px 16px rgba(16,185,129,0.25);
+    }
+    
+    .action-card h3 {
+        color: #0a1f44;
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .action-card p {
+        color: #64748b;
+        font-size: 15px;
+        margin-bottom: 0;
+    }
+
+    /* To-Do Section */
+    .todo-section {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 35px;
+        box-shadow: 0 10px 30px rgba(10,31,68,0.08);
+        border: 1px solid #f1f5f9;
+    }
+
+    .todo-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .todo-header h3 {
+        color: #0a1f44;
+        font-weight: 700;
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .todo-header i {
+        color: #8b5cf6;
+    }
+
+    /* Modern Form */
+    .todo-form-wrapper {
+        background: #f8fafc;
+        padding: 25px;
+        border-radius: 16px;
+        margin-bottom: 35px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .modern-form {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 2fr auto;
+        gap: 16px;
+        align-items: end;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .modern-input {
+        width: 100%;
+        padding: 12px 16px;
+        background: #ffffff;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 15px;
+        color: #1e293b;
+        transition: all 0.2s;
+    }
+
+    .modern-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    .modern-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .btn-add {
+        background: #0a1f44;
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 50px;
+        white-space: nowrap;
+    }
+
+    .btn-add:hover {
+        background: #1a365d;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(10,31,68,0.15);
+    }
+
+    /* Data Grid */
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+    
+    .custom-table th {
+        background: transparent;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 0 20px 10px;
+        border: none;
+    }
+    
+    .custom-table td {
+        background: #ffffff;
+        padding: 20px;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        color: #334155;
+    }
+    
+    .custom-table tr td:first-child {
+        border-left: 1px solid #f1f5f9;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+    
+    .custom-table tr td:last-child {
+        border-right: 1px solid #f1f5f9;
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .custom-table tr {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        transition: all 0.2s;
+    }
+    
+    .custom-table tr:hover {
+        box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+        transform: translateY(-2px);
+    }
+
+    .date-badge {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .dept-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    
+    .dept-ACSML { background: #e0e7ff; color: #4338ca; }
+    .dept-NCSML { background: #dcfce7; color: #15803d; }
+    .dept-DCSML { background: #fce7f3; color: #be185d; }
+
+    .action-cell {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .btn-icon:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .btn-icon.delete:hover {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .modal-header {
+        border-bottom: 1px solid #f1f5f9;
+        padding: 20px 24px;
+    }
+    .modal-body {
+        padding: 24px;
+    }
+    .modal-footer {
+        border-top: 1px solid #f1f5f9;
+        padding: 20px 24px;
+    }
+
+    @media (max-width: 900px) {
+        .modern-form {
+            grid-template-columns: 1fr;
+        }
+        .btn-add {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h2><i data-lucide="layout-dashboard"></i> Faculty Dashboard</h2>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="action-grid">
+        <a href="{{ url_for('upload_notes') }}" class="action-card">
+            <div class="icon-wrapper icon-upload">
+                <i data-lucide="upload-cloud"></i>
             </div>
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h3 class="card-title text-info mb-4">📝 My To-Do List</h3>
-                            
-                            <!-- Add To-Do Form -->
-                            <form action="{{ url_for('add_todo') }}" method="POST" class="mb-4">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <input type="text" name="subject_name" class="form-control" placeholder="Subject Name" required>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <select name="department_name" class="form-control" required>
-                                            <option value="" disabled selected>Select Department</option>
-                                            <option value="ACSML">ACSML</option>
-                                            <option value="NCSML">NCSML</option>
-                                            <option value="DCSML">DCSML</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <input type="text" name="details" class="form-control" placeholder="Task Details" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button type="submit" class="btn btn-info w-100">Add Task</button>
-                                    </div>
-                                </div>
-                            </form>
+            <h3>Upload Notes</h3>
+            <p>Share materials with your students</p>
+        </a>
 
-                            <!-- To-Do Table -->
-                            {% if todos %}
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Subject</th>
-                                            <th>Department</th>
-                                            <th>Details</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for todo in todos %}
-                                        <tr>
-                                            <td>{{ todo.created_at[:10] }}</td>
-                                            <td>{{ todo.subject_name }}</td>
-                                            <td>{{ todo.department_name }}</td>
-                                            <td>{{ todo.details }}</td>
-                                            <td>
-                                                <!-- Edit Button triggers modal -->
-                                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ todo.id }}">Edit</button>
-                                                <!-- Delete Form -->
-                                                <form action="{{ url_for('delete_todo', todo_id=todo.id) }}" method="POST" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this task?');">Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-
-                                        <!-- Edit Modal -->
-                                        <div class="modal fade" id="editModal{{ todo.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ todo.id }}" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <form action="{{ url_for('edit_todo', todo_id=todo.id) }}" method="POST">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="editModalLabel{{ todo.id }}">Edit Task</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Subject Name</label>
-                                                                <input type="text" name="subject_name" class="form-control" value="{{ todo.subject_name }}" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Department Name</label>
-                                                                <select name="department_name" class="form-control" required>
-                                                                    <option value="ACSML" {% if todo.department_name == 'ACSML' %}selected{% endif %}>ACSML</option>
-                                                                    <option value="NCSML" {% if todo.department_name == 'NCSML' %}selected{% endif %}>NCSML</option>
-                                                                    <option value="DCSML" {% if todo.department_name == 'DCSML' %}selected{% endif %}>DCSML</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Details</label>
-                                                                <input type="text" name="details" class="form-control" value="{{ todo.details }}" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% else %}
-                            <p class="text-muted">No tasks currently. Enjoy your day!</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+        <a href="{{ url_for('faculty_my_notes') }}" class="action-card">
+            <div class="icon-wrapper icon-notes">
+                <i data-lucide="library"></i>
             </div>
+            <h3>My Notes</h3>
+            <p>View and manage uploaded content</p>
+        </a>
+    </div>
+
+    <!-- To-Do Section -->
+    <div class="todo-section">
+        <div class="todo-header">
+            <i data-lucide="list-todo" class="w-8 h-8"></i>
+            <h3>My To-Do List</h3>
         </div>
+
+        <div class="todo-form-wrapper">
+            <form action="{{ url_for('add_todo') }}" method="POST" class="modern-form">
+                <div class="form-group">
+                    <label class="form-label">Subject Name</label>
+                    <input type="text" name="subject_name" class="modern-input" placeholder="e.g. Machine Learning" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <select name="department_name" class="modern-input" required>
+                        <option value="" disabled selected>Select Dept...</option>
+                        <option value="ACSML">ACSML</option>
+                        <option value="NCSML">NCSML</option>
+                        <option value="DCSML">DCSML</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Task Details</label>
+                    <input type="text" name="details" class="modern-input" placeholder="e.g. Upload assignment 3" required>
+                </div>
+                <button type="submit" class="btn-add">
+                    <i data-lucide="plus"></i> Add Task
+                </button>
+            </form>
+        </div>
+
+        {% if todos %}
+        <div class="table-responsive" style="overflow-x: auto;">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Department</th>
+                        <th>Details</th>
+                        <th style="width: 100px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for todo in todos %}
+                    <tr>
+                        <td>
+                            <span class="date-badge">{{ todo.created_at[:10] }}</span>
+                        </td>
+                        <td style="font-weight: 500; color: #0f172a;">{{ todo.subject_name }}</td>
+                        <td>
+                            <span class="dept-badge dept-{{ todo.department_name }}">{{ todo.department_name }}</span>
+                        </td>
+                        <td>{{ todo.details }}</td>
+                        <td>
+                            <div class="action-cell">
+                                <button type="button" class="btn-icon" data-bs-toggle="modal" data-bs-target="#editModal{{ todo.id }}" title="Edit Task">
+                                    <i data-lucide="edit-2" style="width: 18px; height: 18px;"></i>
+                                </button>
+                                <form action="{{ url_for('delete_todo', todo_id=todo.id) }}" method="POST" style="margin:0;">
+                                    <button type="submit" class="btn-icon delete" onclick="return confirm('Are you sure you want to delete this task?');" title="Delete Task">
+                                        <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editModal{{ todo.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <form action="{{ url_for('edit_todo', todo_id=todo.id) }}" method="POST">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title font-bold text-[#0a1f44]">Edit Task</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-4">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Subject Name</label>
+                                            <input type="text" name="subject_name" class="modern-input" value="{{ todo.subject_name }}" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Department Name</label>
+                                            <select name="department_name" class="modern-input" required>
+                                                <option value="ACSML" {% if todo.department_name == 'ACSML' %}selected{% endif %}>ACSML</option>
+                                                <option value="NCSML" {% if todo.department_name == 'NCSML' %}selected{% endif %}>NCSML</option>
+                                                <option value="DCSML" {% if todo.department_name == 'DCSML' %}selected{% endif %}>DCSML</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label" style="display:block; margin-bottom:8px;">Details</label>
+                                            <input type="text" name="details" class="modern-input" value="{{ todo.details }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600;">Cancel</button>
+                                        <button type="submit" class="btn-add" style="height: auto; padding: 10px 20px;">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i data-lucide="check-circle-2"></i>
+            <h4>All Caught Up!</h4>
+            <p>You have no tasks in your to-do list right now.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
-<style>
-.hover-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.hover-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-}
-</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        lucide.createIcons();
+    });
+</script>
 {% endblock %}
