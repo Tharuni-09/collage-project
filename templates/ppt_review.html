@@ -3,8 +3,8 @@
 {% block content %}
 <style>
     .review-container {
-        max-width: 900px;
-        margin: 40px auto;
+        max-width: 1000px;
+        margin: 30px auto;
         padding: 0 20px;
     }
     .review-header {
@@ -13,134 +13,319 @@
     .review-header h2 {
         color: #0a1f44;
         font-weight: 700;
-        margin: 0 0 10px 0;
+        margin: 0 0 8px 0;
         display: flex;
         align-items: center;
         gap: 12px;
+        font-size: 26px;
     }
     .review-header p {
         color: #64748b;
-        font-size: 16px;
+        font-size: 15px;
         margin: 0;
     }
-    .review-card {
-        background: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(10,31,68,0.08);
-        overflow: hidden;
-        border: 1px solid #f1f5f9;
+
+    /* Slide Card Preview */
+    .slides-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 30px;
     }
-    .review-card-header {
+    .slide-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 16px rgba(10,31,68,0.06);
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+    .slide-card:hover {
+        box-shadow: 0 8px 24px rgba(10,31,68,0.1);
+    }
+    .slide-card-header {
         background: linear-gradient(135deg, #0a1f44 0%, #1a365d 100%);
         color: white;
-        padding: 20px 30px;
+        padding: 14px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
-    .review-card-header h3 {
-        margin: 0;
-        font-size: 18px;
+    .slide-number {
+        background: rgba(255,255,255,0.15);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 600;
     }
-    .review-body {
-        padding: 30px;
-        background: #f8fafc;
-    }
-    .textarea-custom {
-        width: 100%;
-        min-height: 400px;
-        padding: 20px;
-        border-radius: 12px;
-        border: 2px solid #cbd5e1;
-        font-family: monospace;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #1e293b;
-        resize: vertical;
-        transition: all 0.3s;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-    }
-    .textarea-custom:focus {
+    .slide-title-input {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        flex: 1;
+        margin-left: 12px;
         outline: none;
-        border-color: #0a1f44;
-        box-shadow: 0 0 0 3px rgba(10,31,68,0.1);
-        background: #ffffff;
     }
-    .actions {
-        padding: 20px 30px;
-        background: #ffffff;
-        border-top: 1px solid #f1f5f9;
+    .slide-title-input::placeholder { color: rgba(255,255,255,0.5); }
+
+    .slide-card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .image-query-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f0fdf4;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid #bbf7d0;
+    }
+    .image-query-row label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #15803d;
+        white-space: nowrap;
+    }
+    .image-query-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: #166534;
+        font-size: 13px;
+        outline: none;
+    }
+    
+    .points-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .point-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .point-item:last-child { border-bottom: none; }
+    .point-bullet {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #3b82f6;
+        margin-top: 6px;
+        flex-shrink: 0;
+    }
+    .point-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: #334155;
+        font-size: 14px;
+        line-height: 1.5;
+        outline: none;
+        padding: 2px 0;
+    }
+    .point-input:focus {
+        background: #f8fafc;
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+    .btn-remove-point {
+        background: none;
+        border: none;
+        color: #cbd5e1;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .btn-remove-point:hover { color: #ef4444; background: #fef2f2; }
+
+    .btn-add-point {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        color: #94a3b8;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+    .btn-add-point:hover { background: #f1f5f9; color: #64748b; border-color: #94a3b8; }
+
+    /* Bottom Actions */
+    .review-actions {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 20px 0;
     }
-    .btn-secondary {
+    .btn-cancel {
         background: #f1f5f9;
         color: #475569;
         border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
+        padding: 14px 28px;
+        border-radius: 10px;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s;
+        font-size: 15px;
     }
-    .btn-secondary:hover {
-        background: #e2e8f0;
-        color: #1e293b;
-    }
-    .btn-primary {
-        background: #10b981;
+    .btn-cancel:hover { background: #e2e8f0; color: #1e293b; }
+    .btn-proceed {
+        background: linear-gradient(135deg, #10b981, #059669);
         color: white;
         border: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: 600;
+        padding: 14px 36px;
+        border-radius: 10px;
+        font-weight: 700;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         font-size: 16px;
         transition: all 0.2s;
-        box-shadow: 0 4px 12px rgba(16,185,129,0.2);
+        box-shadow: 0 4px 14px rgba(16,185,129,0.3);
     }
-    .btn-primary:hover {
-        background: #059669;
+    .btn-proceed:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(16,185,129,0.3);
+        box-shadow: 0 6px 20px rgba(16,185,129,0.4);
+    }
+    .btn-proceed:disabled {
+        background: #94a3b8;
+        box-shadow: none;
+        transform: none;
+        cursor: not-allowed;
+    }
+
+    .slide-count-badge {
+        background: #eff6ff;
+        color: #1d4ed8;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .spinner-sm {
+        display: inline-block;
+        width: 16px; height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
     }
 </style>
 
 <div class="review-container">
     <div class="review-header">
-        <h2><span style="font-size: 1.2em;">📝</span> Review Your Outline</h2>
-        <p>Edit the AI-generated outline below. Once you're satisfied, click build to generate your presentation.</p>
+        <h2><span>📝</span> Review & Verify Your Presentation</h2>
+        <p>Review the AI-generated outline below. Edit slide titles, bullet points, and image queries. Once satisfied, click <b>Proceed & Build PPT</b>.</p>
     </div>
 
-    <form action="{{ url_for('download_ppt') }}" method="POST">
-        <div class="review-card">
-            <div class="review-card-header">
-                <h3>Slide Content</h3>
-                <span style="font-size: 13px; opacity: 0.8;">Format: "Slide: Title" followed by "- points"</span>
+    <div class="slide-count-badge" style="margin-bottom: 20px;">
+        <span id="slide-count">{{ slides | length }}</span> Slides Generated
+    </div>
+
+    <div class="slides-preview" id="slides-container">
+        {% for slide in slides %}
+        <div class="slide-card" data-slide-index="{{ loop.index0 }}">
+            <div class="slide-card-header">
+                <span class="slide-number">Slide {{ loop.index }}</span>
+                <input type="text" class="slide-title-input" value="{{ slide.title }}" placeholder="Slide Title">
             </div>
-            
-            <div class="review-body">
-                <textarea name="content" class="textarea-custom" spellcheck="false">{{ content }}</textarea>
-            </div>
-            
-            <div class="actions">
-                <a href="{{ url_for('ppt_generator') }}" class="btn-secondary">
-                    ← Cancel
-                </a>
-                <button type="submit" class="btn-primary" onclick="this.innerHTML='<span class=\'spinner\' style=\'width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top:2px solid white;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;\'></span> Building PPT...';">
-                    <span>✨</span> Build Final PPT
-                </button>
+            <div class="slide-card-body">
+                {% if slide.image_query %}
+                <div class="image-query-row">
+                    <label>🖼️ Image:</label>
+                    <input type="text" class="image-query-input" value="{{ slide.image_query }}" placeholder="e.g. neural network diagram">
+                </div>
+                {% else %}
+                <div class="image-query-row">
+                    <label>🖼️ Image:</label>
+                    <input type="text" class="image-query-input" value="" placeholder="e.g. neural network diagram (leave empty for no image)">
+                </div>
+                {% endif %}
+                <ul class="points-list">
+                    {% for point in slide.points %}
+                    <li class="point-item">
+                        <span class="point-bullet"></span>
+                        <input type="text" class="point-input" value="{{ point }}">
+                        <button class="btn-remove-point" onclick="this.parentElement.remove()" title="Remove point">✕</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="btn-add-point" onclick="addPoint(this)">+ Add bullet point</div>
             </div>
         </div>
-    </form>
+        {% endfor %}
+    </div>
+
+    <div class="review-actions">
+        <a href="{{ url_for('ppt_generator') }}" class="btn-cancel">← Back to Generator</a>
+        <button class="btn-proceed" id="proceed-btn" onclick="buildPPT()">
+            <span>✨</span> <span id="proceed-text">Proceed & Build PPT</span>
+        </button>
+    </div>
 </div>
 
-<style>
-@keyframes spin { 100% { transform: rotate(360deg); } }
-</style>
+<!-- Hidden form for final submission -->
+<form id="download-form" action="{{ url_for('download_ppt') }}" method="POST" style="display:none;">
+    <textarea name="content" id="final-content"></textarea>
+</form>
+
+<script>
+function addPoint(btn) {
+    const ul = btn.previousElementSibling;
+    const li = document.createElement('li');
+    li.className = 'point-item';
+    li.innerHTML = `
+        <span class="point-bullet"></span>
+        <input type="text" class="point-input" value="" placeholder="New bullet point...">
+        <button class="btn-remove-point" onclick="this.parentElement.remove()" title="Remove point">✕</button>
+    `;
+    ul.appendChild(li);
+    li.querySelector('.point-input').focus();
+}
+
+function buildPPT() {
+    const btn = document.getElementById('proceed-btn');
+    const btnText = document.getElementById('proceed-text');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner-sm"></span> Building PPT (fetching images)...';
+    
+    // Rebuild the text format from the visual cards
+    const cards = document.querySelectorAll('.slide-card');
+    let lines = [];
+    
+    cards.forEach(card => {
+        const title = card.querySelector('.slide-title-input').value.trim();
+        const imageQuery = card.querySelector('.image-query-input').value.trim();
+        const points = card.querySelectorAll('.point-input');
+        
+        lines.push('Slide: ' + title);
+        if (imageQuery) {
+            lines.push('Image: ' + imageQuery);
+        }
+        points.forEach(pt => {
+            const val = pt.value.trim();
+            if (val) lines.push('- ' + val);
+        });
+        lines.push('');
+    });
+    
+    document.getElementById('final-content').value = lines.join('\n');
+    document.getElementById('download-form').submit();
+}
+</script>
 {% endblock %}

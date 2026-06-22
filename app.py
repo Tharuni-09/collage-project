@@ -4,7 +4,10 @@ from google import genai
 import os
 import logging
 import time
+import json
+import io
 import requests
+import urllib.parse
  
 try:
     from dotenv import load_dotenv
@@ -28,7 +31,7 @@ else:
 import sqlite3
 import hashlib
 import re
-import io
+
 from flask import url_for
 from datetime import datetime, timedelta
 from reportlab.lib.pagesizes import A4
@@ -1318,12 +1321,15 @@ Rules:
 """
     try:
         response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
-        raw      = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
- 
-        # Build a real PPTX using python-pptx
-        import json
-        from pptx import Presentation
-        from pptx.util import Inches, Pt
+        raw = response.text.strip()
+        
+        # Extract json array by finding first [ and last ]
+        start_idx = raw.find('[')
+        end_idx = raw.rfind(']')
+        if start_idx != -1 and end_idx != -1:
+            raw = raw[start_idx:end_idx+1]
+        else:
+            raise Exception("No JSON array found in AI response")
  
         slides_data = json.loads(raw)
         return jsonify({
@@ -1349,22 +1355,10 @@ def ppt_review():
     if not slides_data:
         flash("Failed to load slides data.", "error")
         return redirect(url_for("faculty_dashboard"))
-    
-    # Convert JSON to a readable text format for editing
-    content_lines = []
-    for slide in slides_data:
-        content_lines.append(f"Slide: {slide.get('title', '')}")
-        if slide.get('image_query'):
-            content_lines.append(f"Image: {slide.get('image_query')}")
-        for pt in slide.get('points', []):
-            content_lines.append(f"- {pt}")
-        content_lines.append("")
-        
-    text_content = "\n".join(content_lines)
 
     return render_template(
         "ppt_review.html",
-        content=text_content
+        slides=slides_data
     )
 
 @app.route("/download_ppt", methods=["POST"])
@@ -1396,8 +1390,6 @@ def download_ppt():
     # Build PPT
     from pptx import Presentation
     from pptx.util import Inches, Pt
-    import requests
-    import urllib.parse
     
     prs = Presentation()
     for slide_info in slides_data:
@@ -1494,7 +1486,6 @@ Rules:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         raw      = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
  
-        import json
         notes_data = json.loads(raw)
  
         # Build a text/HTML notes file
