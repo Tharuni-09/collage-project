@@ -174,7 +174,10 @@
                         </td>
                         <td>
                             <div class="action-btns" style="justify-content: flex-end;">
-                                <a href="{{ url_for('download_note', filename=note.file_name) }}" class="btn-download" download>
+                                <a href="{{ url_for('view_note_file', note_id=note.id) }}" target="_blank" class="btn-download" style="background: #f1f5f9; color: #475569; border-color: #cbd5e1;">
+                                    View
+                                </a>
+                                <a href="{{ url_for('download_note', note_id=note.id) }}" class="btn-download" download>
                                     Download
                                 </a>
                                 <form action="{{ url_for('delete_note', note_id=note.id) }}" method="POST" style="margin: 0;">

@@ -2057,7 +2057,7 @@ Rules:
 - Return only the bullet points
 """
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
         return jsonify({"success": True, "description": response.text})
     except Exception as e:
         logger.error(f"Gemini Error: {str(e)}")
@@ -2147,12 +2147,31 @@ def view_notes():
  
  
 # ── FIX 12: Added /download_note route (used in view_notes.html) ─────────────
-@app.route('/download_note/<filename>')
-def download_note(filename):
-    note_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/download_note/<int:note_id>')
+def download_note(note_id):
+    conn = get_db()
+    note = conn.execute("SELECT file_path, file_name FROM notes WHERE id = ?", [note_id]).fetchone()
+    conn.close()
+    if not note:
+        return "Note not found", 404
+        
+    note_path = os.path.join(app.config['UPLOAD_FOLDER'], note['file_path'])
     if not os.path.exists(note_path):
-        return "File not found", 404
-    return send_file(note_path, as_attachment=True)
+        return "File not found on server", 404
+    return send_file(note_path, download_name=note['file_name'], as_attachment=True)
+
+@app.route('/view_note_file/<int:note_id>')
+def view_note_file(note_id):
+    conn = get_db()
+    note = conn.execute("SELECT file_path, file_name FROM notes WHERE id = ?", [note_id]).fetchone()
+    conn.close()
+    if not note:
+        return "Note not found", 404
+        
+    note_path = os.path.join(app.config['UPLOAD_FOLDER'], note['file_path'])
+    if not os.path.exists(note_path):
+        return "File not found on server", 404
+    return send_file(note_path, as_attachment=False)
  
  
 @app.route('/delete_note/<int:note_id>')

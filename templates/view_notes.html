@@ -159,9 +159,14 @@
                         </div>
                     </div>
 
-                    <a href="{{ url_for('download_note', filename=note.file_name) }}" class="btn-download-full" download>
-                        ⬇️ Download Notes
-                    </a>
+                    <div style="display: flex; gap: 10px; margin-top: auto;">
+                        <a href="{{ url_for('view_note_file', note_id=note.id) }}" target="_blank" class="btn-download-full" style="background: #e2e8f0; color: #1e293b;">
+                            👁️ View
+                        </a>
+                        <a href="{{ url_for('download_note', note_id=note.id) }}" class="btn-download-full" download>
+                            ⬇️ Download
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endfor %}
