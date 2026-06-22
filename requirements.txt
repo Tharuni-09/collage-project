@@ -6,3 +6,6 @@ reportlab
 gunicorn
 python-dotenv
 google-genai
+requests
+python-pptx
+pdfplumber
