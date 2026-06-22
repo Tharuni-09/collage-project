@@ -356,6 +356,29 @@ def init_database():
             )
             VALUES(1,1,1,1,1,1)
             """)
+
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS faculty_todos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                faculty_id INTEGER NOT NULL,
+                subject_name TEXT NOT NULL,
+                department_name TEXT NOT NULL,
+                details TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (faculty_id) REFERENCES users(uid)
+            )
+        """)
+        
+        # Ensure the admin account exists
+        admin_exists = db.execute("SELECT 1 FROM users WHERE username = 'admin'").fetchone()
+        if not admin_exists:
+            import hashlib
+            admin_hash = hashlib.sha256("admin123".encode()).hexdigest()
+            db.execute(
+                "INSERT INTO users (username, password_hash, role, name) VALUES (?, ?, ?, ?)",
+                ("admin", admin_hash, "admin", "System Admin")
+            )
+
         db.commit()
     finally:
         db.close()
@@ -2344,9 +2367,10 @@ def test_ai():
 # STARTUP
 # =====================================================================
  
-if __name__ == "__main__":
+# Call init_database during module initialization so Gunicorn runs it
+init_database()
 
-    init_database()
+if __name__ == "__main__":
 
     port = int(os.environ.get("PORT", 5000))
 
