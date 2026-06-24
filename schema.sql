@@ -75,3 +75,5 @@ ALTER TABLE papers ADD COLUMN image_path TEXT;
 ALTER TABLE papers ADD COLUMN status TEXT DEFAULT 'pending';
 ALTER TABLE papers ADD COLUMN approved_by TEXT;
 ALTER TABLE papers ADD COLUMN approved_at TEXT;
+
+ALTER TABLE previous_year_papers ADD COLUMN branch TEXT;
