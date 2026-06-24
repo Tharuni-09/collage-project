@@ -3,92 +3,160 @@
 {% block title %}Outreach Programs{% endblock %}
 
 {% block content %}
+<style>
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+.add-btn {
+    background: #10b981;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 20px;
+}
+.add-btn:hover { background: #059669; }
+.submit-btn {
+    background: #0a1f44;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+.cancel-btn {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+</style>
 
 <section class="outreach-wrapper">
-        <header class="outreach-header">
+    <header class="outreach-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div>
             <h2>Outreach Programs</h2>
             <p>
                 Our department extends learning beyond classrooms through impactful
                 outreach initiatives that empower society and nurture future talent.
             </p>
-        </header>
+        </div>
+        {% if session.role == 'faculty' %}
+        <button onclick="document.getElementById('outreach-modal').style.display='flex'" class="add-btn">+ Add Outreach</button>
+        {% endif %}
+    </header>
 
-        <!-- Program 1 -->
-        <div class="program-card">
-            <div class="program-gallery">
-                <img src="{{ url_for('static', filename='images/acsml 1.jpeg') }}" onerror="this.style.display='none'">
-                <!-- <img src="./acsmlo2.jpeg"> -->
-            </div>
-
-            <div class="program-details">
-                <span class="program-tag">Coca-Cola Factory Visit</span>
-                <h2>Coca-Cola Factory Visit</h2>
-                <p>
-                   The visit to the Coca-Cola factory was insightful and memorable, offering a complete guided tour of the facility. The production process is highly advanced, relying on 
-                   modern automated machinery to ensure efficiency, quality, and hygiene. Manufacturing is organized into different stages, from raw material handling to bottling, labeling, 
-                   and packaging. Quality checks are conducted at multiple levels to meet Coca-Cola’s global standards. The coordination between skilled staff and technology highlighted effective 
-                   teamwork. The warm welcome and refreshments added to an overall informative and enjoyable experience.
-                </p>
-
-                <div class="program-meta">
-                    <div><strong>Date</strong><span>2025</span></div>
-                    <div><strong>Venue</strong><span>Coca-Cola Factory</span></div>
-                    <div><strong>Participants</strong><span>50+</span></div>
-                </div>
-            </div>
+    {% for p in programs %}
+    <div class="program-card {% if loop.index is even %}reverse{% endif %}">
+        <div class="program-gallery">
+            <img src="{{ url_for('static', filename='outreach/' + p.photo) }}" alt="Outreach Image" onerror="this.src='{{ url_for('static', filename='images/do.jpeg') }}'">
         </div>
 
-        <!-- Program 2 -->
-        <div class="program-card reverse">
-            <div class="program-gallery">
-                <img src="{{ url_for('static', filename='images/do.jpeg') }}" onerror="this.style.display='none'">
-                <!-- <img src="./nout.jpeg"> -->
-            </div>
+        <div class="program-details">
+            <span class="program-tag">{{ p.department or 'ML Dept' }}</span>
+            <h2>{{ p.title }}</h2>
+            <p>{{ p.description }}</p>
 
-            <div class="program-details">
-                <span class="program-tag">BSNL Industrial Visit</span>
-                <h2>BSNL Industrial Visit</h2>
-                <p>
-                    The visit to BSNL provided students with practical exposure to telecommunication infrastructure and its role in strengthening the nation’s telecom network. 
-                    The first session on telecommunication networking explained transmission media, data transmission techniques, and landline communication using copper and fiber optics. 
-                    The second session focused on battery and power connections, covering current supply, battery functions, and power systems used in telecom operations. The networking lab sessions 
-                    demonstrated router usage, network access, and different types of routers for business and personal use. Overall, the program at RTTC Hyderabad helped bridge the gap between academic 
-                    knowledge and real-world telecom applications while supporting skill development.
-                </p>
-
-                <div class="program-meta">
-                    <div><strong>Date</strong><span>2024</span></div>
-                    <div><strong>Venue</strong><span>BSNL Industrial Visit</span></div>
-                    <div><strong>Participants</strong><span>80+</span></div>
-                </div>
+            <div class="program-meta">
+                <div><strong>Year</strong><span>{{ p.year }}</span></div>
+                {% if p.date %}<div><strong>Date</strong><span>{{ p.date }}</span></div>{% endif %}
+                <div><strong>Venue</strong><span>{{ p.venue }}</span></div>
+                <div><strong>Participants</strong><span>{{ p.participants }}</span></div>
             </div>
         </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; color: #666;">
+        No approved outreach programs available.
+    </div>
+    {% endfor %}
+</section>
 
-        <!-- Program 3 -->
-        <div class="program-card">
-            <div class="program-gallery">
-                <img src="{{ url_for('static', filename='images/nout.jpeg') }}" onerror="this.style.display='none'">
-            
+<!-- Add Outreach Modal -->
+{% if session.role == 'faculty' %}
+<div id="outreach-modal" class="modal">
+    <div class="modal-content">
+        <h3>Add Outreach Program</h3>
+        <form action="{{ url_for('add_outreach_program') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required>
             </div>
-
-            <div class="program-details">
-                <span class="program-tag">T-Hub Industrial Visit</span>
-                <h2>T-Hub Industrial Visit</h2>
-                <p>
-                    The Department organized an Industrial Visit to T-Hub, Hyderabad, to expose students to innovation, entrepreneurship, and industry-oriented learning.
-                     The visit began with a warm welcome, followed by an interactive session by Mr. Srinivas Rao Mahankali, Vice President of T-Hub, who shared insights into T-Hub’s vision,
-                      growth, and startup ecosystem. Students from four colleges actively participated, presenting startup ideas and engaging in discussions. After lunch, a guided tour of the
-                       facility allowed students to explore the working environment and interact with professionals. Overall, the visit provided valuable real-world exposure and enhanced students
-                        understanding of entrepreneurship and collaboration.
-                </p>
-
-                <div class="program-meta">
-                    <div><strong>Date</strong><span> 2025</span></div>
-                    <div><strong>Venue</strong><span>T-Hub Industrial Visit</span></div>
-                    <div><strong>Participants</strong><span>50+</span></div>
-                </div>
+            <div class="form-group">
+                <label>Department</label>
+                <select name="department" required>
+                    <option value="ACSML">ACSML</option>
+                    <option value="NCSML">NCSML</option>
+                    <option value="DCSML">DCSML</option>
+                </select>
             </div>
-        </div>
- 
-    </section>
+            <div class="form-group">
+                <label>Year</label>
+                <input type="text" name="year" required placeholder="e.g., 2024">
+            </div>
+            <div class="form-group">
+                <label>Date (Optional)</label>
+                <input type="date" name="date">
+            </div>
+            <div class="form-group">
+                <label>Venue</label>
+                <input type="text" name="venue" required>
+            </div>
+            <div class="form-group">
+                <label>Participants Count</label>
+                <input type="text" name="participants" required placeholder="e.g., 50+">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Photo</label>
+                <input type="file" name="photo" accept="image/*" required>
+            </div>
+            <button type="submit" class="submit-btn">Submit for Approval</button>
+            <button type="button" onclick="document.getElementById('outreach-modal').style.display='none'" class="cancel-btn">Cancel</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

@@ -70,3 +70,8 @@ CREATE TABLE IF NOT EXISTS faculty_todos (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (faculty_id) REFERENCES users(uid)
 );
+
+ALTER TABLE papers ADD COLUMN image_path TEXT;
+ALTER TABLE papers ADD COLUMN status TEXT DEFAULT 'pending';
+ALTER TABLE papers ADD COLUMN approved_by TEXT;
+ALTER TABLE papers ADD COLUMN approved_at TEXT;

@@ -2231,3 +2231,34 @@ opacity: 0.85;
         max-height: 75vh;
     }
 }
+/* Mobile Responsive */
+
+img{
+    max-width:100%;
+    height:auto;
+}
+
+.table-responsive{
+    overflow-x:auto;
+}
+
+@media (max-width:768px){
+
+    .container{
+        padding-left:10px;
+        padding-right:10px;
+    }
+
+    .card{
+        margin-bottom:15px;
+    }
+
+    .btn{
+        width:100%;
+        margin-bottom:8px;
+    }
+
+    table{
+        font-size:14px;
+    }
+}

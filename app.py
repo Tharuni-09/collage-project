@@ -287,6 +287,8 @@ def init_database():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 year TEXT NOT NULL,
+                date TEXT,
+                department TEXT,
                 venue TEXT NOT NULL,
                 participants TEXT NOT NULL,
                 description TEXT,
@@ -296,26 +298,59 @@ def init_database():
         """)
  
         db.execute("""
+            CREATE TABLE IF NOT EXISTS gallery_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT,
+                description TEXT,
+                department TEXT,
+                date TEXT,
+                photo TEXT NOT NULL,
+                approved INTEGER DEFAULT 0,
+                faculty_id INTEGER
+            )
+        """)
+ 
+        db.execute("""
             CREATE TABLE IF NOT EXISTS previous_year_papers (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 subject TEXT NOT NULL,
                 branch TEXT NOT NULL,
+                department TEXT,
                 year INTEGER NOT NULL,
                 semester INTEGER NOT NULL,
+                no_of_pages INTEGER DEFAULT 0,
                 photo_limit INTEGER DEFAULT 1,
                 approved INTEGER DEFAULT 0
             )
         """)
         
-        # Add approved columns to existing DBs if they are missing
+        # Add columns to existing DBs if they are missing
         try:
             db.execute("ALTER TABLE previous_year_papers ADD COLUMN approved INTEGER DEFAULT 0")
         except Exception:
             pass
         try:
+            db.execute("ALTER TABLE previous_year_papers ADD COLUMN department TEXT")
+        except Exception:
+            pass
+        try:
+            db.execute("ALTER TABLE previous_year_papers ADD COLUMN no_of_pages INTEGER DEFAULT 0")
+        except Exception:
+            pass
+            
+        try:
             db.execute("ALTER TABLE outreach_programs ADD COLUMN approved INTEGER DEFAULT 0")
         except Exception:
             pass
+        try:
+            db.execute("ALTER TABLE outreach_programs ADD COLUMN department TEXT")
+        except Exception:
+            pass
+        try:
+            db.execute("ALTER TABLE outreach_programs ADD COLUMN date TEXT")
+        except Exception:
+            pass
+            
         db.execute("""
             CREATE TABLE IF NOT EXISTS paper_photos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -442,20 +477,16 @@ def init_database():
  
 @app.route("/")
 def index():
-    latest_outreach = None
+    latest_outreach = []
     try:
         conn = get_db()
-        row = conn.execute(
-            "SELECT id, title, year, venue, participants, description, photo "
-            "FROM outreach_programs WHERE approved = 1 ORDER BY year DESC, id DESC LIMIT 1"
-        ).fetchone()
+        rows = conn.execute(
+            "SELECT * "
+            "FROM outreach_programs WHERE approved = 1 ORDER BY year DESC, id DESC LIMIT 2"
+        ).fetchall()
         conn.close()
-        if row:
-            latest_outreach = {
-                "id": row[0], "title": row[1], "year": row[2],
-                "venue": row[3], "participants": row[4],
-                "description": row[5], "photo": row[6]
-            }
+        for row in rows:
+            latest_outreach.append(dict(row))
     except Exception as e:
         logger.error(f"Error fetching latest outreach: {e}")
     return render_template("index.html", latest_outreach=latest_outreach)
@@ -463,12 +494,18 @@ def index():
  
 @app.route("/outreach")
 def outreach():
-    return render_template("outreach.html")
+    conn = get_db()
+    programs = conn.execute("SELECT * FROM outreach_programs WHERE approved = 1 ORDER BY year DESC, id DESC").fetchall()
+    conn.close()
+    return render_template("outreach.html", programs=programs, session=session)
  
  
 @app.route("/gallery")
 def gallery():
-    return render_template("gallery.html")
+    conn = get_db()
+    events = conn.execute("SELECT * FROM gallery_events WHERE approved = 1 ORDER BY date DESC, id DESC").fetchall()
+    conn.close()
+    return render_template("gallery.html", events=events, session=session)
  
  
 # ── FIX 6: Added /chat route (was referenced in base.html JS but missing) ────
@@ -551,21 +588,50 @@ def add_outreach_program():
         return "Unauthorized", 403
     title        = request.form['title']
     year         = request.form['year']
+    date         = request.form.get('date', '')
+    department   = request.form.get('department', '')
     venue        = request.form['venue']
     participants = request.form['participants']
     description  = request.form['description']
     file         = request.files['photo']
     filename     = secure_filename(file.filename)
-    file.save(os.path.join('static/outreach', filename))
+    if filename:
+        os.makedirs(os.path.join('static/outreach'), exist_ok=True)
+        file.save(os.path.join('static/outreach', filename))
+        
     conn = get_db()
     conn.execute("""
-        INSERT INTO outreach_programs (title, year, venue, participants, description, photo, approved)
-        VALUES (?, ?, ?, ?, ?, ?, 0)
-    """, (title, year, venue, participants, description, filename))
+        INSERT INTO outreach_programs (title, year, date, department, venue, participants, description, photo, approved)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
+    """, (title, year, date, department, venue, participants, description, filename))
     conn.commit()
     conn.close()
     flash('Outreach program submitted for admin approval.', 'success')
     return redirect(url_for('outreach'))
+
+@app.route('/add_gallery_event', methods=['POST'])
+def add_gallery_event():
+    if session.get('role') != 'faculty':
+        return "Unauthorized", 403
+    title        = request.form.get('title', '')
+    description  = request.form.get('description', '')
+    department   = request.form.get('department', '')
+    date         = request.form.get('date', '')
+    file         = request.files.get('photo')
+    filename     = secure_filename(file.filename) if file else ""
+    if filename:
+        os.makedirs(os.path.join('static/images'), exist_ok=True)
+        file.save(os.path.join('static/images', filename))
+        
+    conn = get_db()
+    conn.execute("""
+        INSERT INTO gallery_events (title, description, department, date, photo, approved, faculty_id)
+        VALUES (?, ?, ?, ?, ?, 0, ?)
+    """, (title, description, department, date, filename, session.get('uid')))
+    conn.commit()
+    conn.close()
+    flash('Gallery event submitted for admin approval.', 'success')
+    return redirect(url_for('gallery'))
  
  
 # -------------------Previous Year Papers-----------------------
@@ -587,19 +653,21 @@ def init_paper_grid_db():
  
 @app.route("/add_paper_grid", methods=["POST"])
 def add_paper_grid():
-    if not session.get("uid"):
+    if session.get("role") != "faculty":
         return redirect(url_for("login"))
     
     branch     = request.form.get("branch", "N/A")
+    department = request.form.get("department", "N/A")
     year       = request.form.get("year", 1)
     semester   = request.form.get("semester", 1)
     subject    = request.form.get("subject", "Unknown")
+    no_of_pages= request.form.get("no_of_pages", 0)
     
     conn = get_db()
     conn.execute("""
-        INSERT INTO previous_year_papers (subject, branch, year, semester, photo_limit, approved)
-        VALUES (?, ?, ?, ?, 10, 0)
-    """, (subject, branch, year, semester))
+        INSERT INTO previous_year_papers (subject, branch, department, year, semester, no_of_pages, photo_limit, approved)
+        VALUES (?, ?, ?, ?, ?, ?, 10, 0)
+    """, (subject, branch, department, year, semester, no_of_pages))
     conn.commit()
     conn.close()
     
@@ -1103,6 +1171,25 @@ def toggle_setting(setting):
 
     return redirect("/admin/settings")
 
+@app.route("/admin/approve_paper/<int:id>")
+def approve_paper(id):
+
+    db = get_db()
+
+    db.execute("""
+    UPDATE papers
+    SET status='approved'
+    WHERE id=?
+    """,(id,))
+
+    db.commit()
+    db.close()
+
+    flash("Paper approved successfully")
+
+    return redirect(
+        url_for("admin_manage_papers")
+    )
 # =====================================================================
 # FORGOT PASSWORD
 # =====================================================================
@@ -1260,184 +1347,6 @@ def generate():
  
     return send_file(io.BytesIO(pdf_content), as_attachment=False,
                      download_name=filename, mimetype="application/pdf")
- 
- 
-# ── FIX 8: Added /ppt_generator route (was missing entirely) ─────────────────
-@app.route("/ppt_generator")
-def ppt_generator():
-    if "uid" not in session:
-        return redirect(url_for("login"))
-    return render_template("ppt_generator.html", session=session)
- 
- 
-# ── FIX 9: Added /generate-ppt route (called from ppt_generator.html) ────────
-@app.route("/generate-ppt", methods=["POST"])
-def generate_ppt():
-    if "uid" not in session:
-        return jsonify({"success": False, "error": "Login required"}), 401
- 
-    file   = request.files.get("file")
-    slides = request.form.get("slides", 20)
-    topics = request.form.get("topics", "General Summary")
-
-    if not file:
-        return jsonify({"success": False, "error": "No file uploaded"}), 400
- 
-    # Read file content for the prompt
-    file_content = ""
-    try:
-        filename_lower = file.filename.lower()
-        if filename_lower.endswith(".txt"):
-            file_content = file.read().decode("utf-8", errors="ignore")
-        elif filename_lower.endswith(".pdf"):
-            import pdfplumber
-            with pdfplumber.open(file) as pdf:
-                file_content = "\n".join(page.extract_text() or "" for page in pdf.pages[:20])
-        else:
-            file_content = file.read().decode("utf-8", errors="ignore")
-    except Exception as e:
-        logger.warning(f"File reading error: {e}")
-        file_content = "Unable to extract text from file."
- 
-    prompt = f"""
-Create a structured outline for a {slides}-slide PowerPoint presentation based ONLY on the following topics: {topics}.
-Extract relevant information from the provided content below. If the content does not contain enough information about the topics, do your best to generate accurate educational material.
- 
-Content:
-{file_content[:6000]}
- 
-Output format (JSON array):
-[
-  {{"slide": 1, "title": "...", "points": ["...", "...", "..."], "image_query": "high quality stock photo of ..."}},
-  ...
-]
- 
-Rules:
-- Return ONLY valid JSON, no markdown.
-- Max 5 bullet points per slide.
-- Keep points concise (under 15 words each).
-- The 'image_query' should be a highly descriptive 3-5 word search query for a relevant background/illustration image (e.g., 'neural network concept art', 'server room dark lighting').
-- Include title slide, agenda, content slides, and conclusion.
-"""
-    try:
-        response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
-        raw = response.text.strip()
-        
-        # Extract json array by finding first [ and last ]
-        start_idx = raw.find('[')
-        end_idx = raw.rfind(']')
-        if start_idx != -1 and end_idx != -1:
-            raw = raw[start_idx:end_idx+1]
-        else:
-            raise Exception("No JSON array found in AI response")
- 
-        slides_data = json.loads(raw)
-        return jsonify({
-            "success": True,
-            "slides_data": slides_data
-            })
- 
-
-    except Exception as e:
-        logger.error(f"PPT generation error: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
-    
-@app.route("/ppt-review", methods=["GET", "POST"])
-def ppt_review():
-    if request.method == "POST":
-        try:
-            slides_data = json.loads(request.form.get("slides_data", "[]"))
-        except:
-            slides_data = []
-    else:
-        return redirect(url_for("faculty_dashboard"))
-
-    if not slides_data:
-        flash("Failed to load slides data.", "error")
-        return redirect(url_for("faculty_dashboard"))
-
-    return render_template(
-        "ppt_review.html",
-        slides=slides_data
-    )
-
-@app.route("/download_ppt", methods=["POST"])
-def download_ppt():
-    if "uid" not in session:
-        return redirect(url_for("login"))
-        
-    text_content = request.form.get("content", "")
-    
-    # Parse back into structured slides
-    slides_data = []
-    current_slide = None
-    for line in text_content.split("\n"):
-        line = line.strip()
-        if not line:
-            continue
-        if line.startswith("Slide:"):
-            if current_slide:
-                slides_data.append(current_slide)
-            current_slide = {"title": line.replace("Slide:", "").strip(), "points": [], "image_query": ""}
-        elif line.startswith("Image:") and current_slide is not None:
-            current_slide["image_query"] = line.replace("Image:", "").strip()
-        elif line.startswith("-") and current_slide is not None:
-            current_slide["points"].append(line[1:].strip())
-            
-    if current_slide:
-        slides_data.append(current_slide)
-        
-    # Build PPT
-    from pptx import Presentation
-    from pptx.util import Inches, Pt
-    
-    prs = Presentation()
-    for slide_info in slides_data:
-        layout     = prs.slide_layouts[1] # Title and Content
-        pptx_slide = prs.slides.add_slide(layout)
-        title_ph   = pptx_slide.shapes.title
-        body_ph    = pptx_slide.placeholders[1]
-
-        title_ph.text = slide_info.get("title", "")
-        tf = body_ph.text_frame
-        tf.clear()
-        for point in slide_info.get("points", []):
-            p = tf.add_paragraph()
-            p.text  = point
-            p.level = 0
-            
-        # Download and insert image if requested
-        query = slide_info.get("image_query")
-        if query and query.strip():
-            try:
-                # Use pollinations.ai for dynamic image generation (free, no auth required)
-                safe_query = urllib.parse.quote(query.strip())
-                img_url = f"https://image.pollinations.ai/prompt/{safe_query}?width=800&height=600&nologo=true"
-                response = requests.get(img_url, timeout=10)
-                if response.status_code == 200:
-                    image_stream = io.BytesIO(response.content)
-                    # Add image to the right side of the slide
-                    left = Inches(5.5)
-                    top = Inches(2.0)
-                    height = Inches(4.5)
-                    pptx_slide.shapes.add_picture(image_stream, left, top, height=height)
-                    
-                    # Shrink text box to make room for image
-                    body_ph.width = Inches(5.0)
-            except Exception as e:
-                logger.warning(f"Failed to fetch image for slide '{slide_info.get('title')}': {e}")
-
-    pptx_buf = io.BytesIO()
-    prs.save(pptx_buf)
-    pptx_buf.seek(0)
-
-    return send_file(
-        pptx_buf,
-        as_attachment=True,
-        download_name=f"presentation_{int(time.time())}.pptx",
-        mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    )
- 
  
 # ── FIX 10: Added /generate-notes route (called from ppt_generator.html) ─────
 @app.route("/generate-notes", methods=["POST"])
@@ -1928,14 +1837,22 @@ def parse_projects_with_bullets(form_data):
     technologies = form_data.get("project_technology", [])
 
     if not isinstance(titles, list):
-        titles = [titles]
+        titles = [titles] if titles else []
     if not isinstance(descriptions, list):
-        descriptions = [descriptions]
+        descriptions = [descriptions] if descriptions else []
     if not isinstance(technologies, list):
-        technologies = [technologies]
+        technologies = [technologies] if technologies else []
 
     projects = []
-    for title, tech, desc in zip(titles, technologies, descriptions):
+    # Use index to avoid zip dropping items if lengths differ
+    for i in range(len(titles)):
+        title = titles[i] if i < len(titles) else ""
+        tech = technologies[i] if i < len(technologies) else ""
+        desc = descriptions[i] if i < len(descriptions) else ""
+        
+        if not title.strip() and not desc.strip():
+            continue
+            
         bullets = [line.strip() for line in str(desc).split("\n") if line.strip()]
         projects.append({
             "title": str(title),
@@ -2217,11 +2134,14 @@ Rules:
 - Return only the bullet points
 """
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
-        return jsonify({"success": True, "description": response.text})
+        from gemini_service import generate_text
+        response_text = generate_text(prompt)
+        if "Error from Gemini API" in response_text:
+            return jsonify({"success": False, "error": response_text}), 503
+        return jsonify({"success": True, "description": response_text})
     except Exception as e:
         logger.error(f"Gemini Error: {str(e)}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": str(e)}), 503
  
  
 # =====================================================================

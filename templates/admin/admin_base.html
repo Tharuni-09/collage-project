@@ -322,11 +322,120 @@
         @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
         select.form-input option { background: #0f172a; }
+        /* =========================
+   MOBILE RESPONSIVE FIXES
+   ========================= */
+
+.mobile-menu-btn{
+    display:none;
+}
+
+@media (max-width: 992px){
+
+    :root{
+        --sidebar-w:260px;
+    }
+
+    .sidebar{
+        transform:translateX(-100%);
+        transition:.3s ease;
+    }
+
+    .sidebar.active{
+        transform:translateX(0);
+    }
+
+    .main-content{
+        margin-left:0;
+        width:100%;
+    }
+
+    .topbar{
+        padding:16px;
+    }
+
+    .page-body{
+        padding:16px;
+    }
+
+    .search-input{
+        width:100%;
+    }
+
+    .mobile-menu-btn{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:42px;
+        height:42px;
+        border:none;
+        border-radius:10px;
+        background:rgba(255,255,255,0.08);
+        color:white;
+        cursor:pointer;
+    }
+
+    .topbar{
+        flex-wrap:wrap;
+        gap:12px;
+    }
+
+    .topbar-actions{
+        width:100%;
+    }
+
+    .glass-card{
+        overflow-x:auto;
+    }
+
+    .admin-table{
+        min-width:700px;
+    }
+}
+
+@media (max-width:768px){
+
+    .page-title{
+        font-size:18px;
+    }
+
+    .page-sub{
+        font-size:12px;
+    }
+
+    .modal-box{
+        width:95%;
+        padding:20px;
+    }
+
+    .modal-actions{
+        flex-direction:column;
+    }
+
+    .btn-primary,
+    .btn-danger,
+    .btn-warn,
+    .btn-cancel{
+        width:100%;
+        justify-content:center;
+    }
+
+    .search-input{
+        width:100%;
+    }
+
+    .toast{
+        right:10px;
+        left:10px;
+        bottom:15px;
+    }
+}
     </style>
     {% block extra_style %}{% endblock %}
 </head>
 <body>
     <!-- Sidebar -->
+     
     <nav class="sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">
@@ -385,6 +494,7 @@
     <!-- Main -->
     <main class="main-content">
         <div class="topbar">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()"> ☰</button>
             <div>
                 <div class="page-title">{% block page_title %}Dashboard{% endblock %}</div>
                 <div class="page-sub">{% block page_sub %}Overview{% endblock %}</div>
@@ -405,6 +515,9 @@
             t.className = 'toast ' + type;
             setTimeout(() => { t.className = 'toast'; }, 3500);
         }
+function toggleSidebar(){
+    document.querySelector('.sidebar').classList.toggle('active');
+}
     </script>
     {% block extra_script %}{% endblock %}
 </body>

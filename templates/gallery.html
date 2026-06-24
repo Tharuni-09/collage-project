@@ -3,55 +3,137 @@
 {% block title %}Gallery{% endblock %}
 
 {% block content %}
+<style>
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+.add-btn {
+    background: #10b981;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 20px;
+}
+.add-btn:hover { background: #059669; }
+.submit-btn {
+    background: #0a1f44;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+.cancel-btn {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+</style>
+
 <section id="news">
-  <h2>Events</h2>
-
-  <div class="news-gallery">
-
-    <div class="news-card">
-      <img src="{{ url_for('static', filename='images/acsml_ach.jpeg') }}" alt="AI Guest Lecture" onerror="this.style.display='none'">
-      <div class="news-tooltip">
-        <h4>1st Prize – Intellexa Hackathon</h4>
-        <p>
-          The Department of AI organized the Intellexa Hackathon in which
-          Prasad, Manohar, and Nitish Reddy secured the 1st prize.
-        </p>
-        <span class="tooltip-date">2025</span>
-      </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <h2>Events Gallery</h2>
+        {% if session.role == 'faculty' %}
+        <button onclick="document.getElementById('gallery-modal').style.display='flex'" class="add-btn">+ Add Event</button>
+        {% endif %}
     </div>
 
-    <div class="news-card">
-      <img src="{{ url_for('static', filename='images/ncsml_ach.jpeg') }}" alt="AI Guest Lecture" onerror="this.style.display='none'">
-      <div class="news-tooltip">
-        <h4>1st Prize – Seek And Find</h4>
-        <p>
-          The Department of CS organized the Seek And Find event in which
-          G.A. Sneha secured the 1st prize.
-        </p>
-        <span class="tooltip-date">2025</span>
-      </div>
+    <div class="news-gallery" style="margin-top: 20px;">
+        {% for event in events %}
+        <div class="news-card">
+            <img src="{{ url_for('static', filename='images/' + event.photo) }}" alt="{{ event.title }}" onerror="this.src='{{ url_for('static', filename='images/acsml_ach.jpeg') }}'">
+            <div class="news-tooltip">
+                <h4>{{ event.title }}</h4>
+                <p>{{ event.description }}</p>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 10px; opacity: 0.8;">
+                    <span>{{ event.department }}</span>
+                    <span>{{ event.date }}</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; color: #666; width: 100%;">
+            No approved gallery events available.
+        </div>
+        {% endfor %}
     </div>
-
-    <div class="news-card">
-      <img src="{{ url_for('static', filename='images/ncsml2_ach.jpeg') }}" alt="AI Guest Lecture" onerror="this.style.display='none'">
-      <div class="news-tooltip">
-        <h4>Vastrakala Event</h4>
-        <span class="tooltip-date">2025</span>
-      </div>
-    </div>
-
-    <div class="news-card">
-      <img src="{{ url_for('static', filename='images/ncsml3_ach.jpeg') }}" alt="AI Guest Lecture" onerror="this.style.display='none'">
-      <div class="news-tooltip">
-        <h4>2nd Prize – Painting Competition</h4>
-        <p>
-          The Department of English organized the Painting Competition in which
-          Hima Bindhu secured the 2nd prize.
-        </p>
-        <span class="tooltip-date">2025</span>
-      </div>
-    </div>
-
-  </div>
 </section>
+
+<!-- Add Gallery Modal -->
+{% if session.role == 'faculty' %}
+<div id="gallery-modal" class="modal">
+    <div class="modal-content">
+        <h3>Add Gallery Event</h3>
+        <form action="{{ url_for('add_gallery_event') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required>
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <select name="department" required>
+                    <option value="ACSML">ACSML</option>
+                    <option value="NCSML">NCSML</option>
+                    <option value="DCSML">DCSML</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Photo</label>
+                <input type="file" name="photo" accept="image/*" required>
+            </div>
+            <button type="submit" class="submit-btn">Submit for Approval</button>
+            <button type="button" onclick="document.getElementById('gallery-modal').style.display='none'" class="cancel-btn">Cancel</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

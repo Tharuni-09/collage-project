@@ -260,31 +260,37 @@
 {% if latest_outreach %}
 <section id="latest-outreach" class="latest-outreach-section">
     <h2>Latest Outreach</h2>
+    <div style="display:flex; flex-direction:column; gap:20px;">
+    {% for outreach in latest_outreach %}
     <div class="latest-outreach-card">
         <div class="outreach-card-image">
-            {% if latest_outreach.photo %}
-                <img src="{{ url_for('static', filename='outreach/' + latest_outreach.photo) }}" 
-                     alt="{{ latest_outreach.title }}" 
+            {% if outreach.photo %}
+                <img src="{{ url_for('static', filename='outreach/' + outreach.photo) }}" 
+                     alt="{{ outreach.title }}" 
                      onerror="this.style.display='none'">
             {% endif %}
         </div>
         <div class="outreach-card-body">
-            <span class="outreach-badge">🌟 Latest</span>
-            <h3>{{ latest_outreach.title }}</h3>
-            <p class="outreach-desc">{{ latest_outreach.description }}</p>
+            {% if loop.index == 1 %}<span class="outreach-badge">🌟 Latest</span>{% endif %}
+            <h3>{{ outreach.title }}</h3>
+            <p class="outreach-desc">{{ outreach.description }}</p>
             <div class="outreach-meta-row">
-                {% if latest_outreach.year %}
-                    <span class="outreach-meta-chip"><i class="fas fa-calendar-alt"></i> {{ latest_outreach.year }}</span>
+                {% if outreach.year %}
+                    <span class="outreach-meta-chip"><i class="fas fa-calendar-alt"></i> {{ outreach.year }}</span>
                 {% endif %}
-                {% if latest_outreach.venue %}
-                    <span class="outreach-meta-chip"><i class="fas fa-map-marker-alt"></i> {{ latest_outreach.venue }}</span>
+                {% if outreach.venue %}
+                    <span class="outreach-meta-chip"><i class="fas fa-map-marker-alt"></i> {{ outreach.venue }}</span>
                 {% endif %}
-                {% if latest_outreach.participants %}
-                    <span class="outreach-meta-chip"><i class="fas fa-users"></i> {{ latest_outreach.participants }}+ Participants</span>
+                {% if outreach.participants %}
+                    <span class="outreach-meta-chip"><i class="fas fa-users"></i> {{ outreach.participants }}</span>
                 {% endif %}
             </div>
+            {% if loop.last %}
             <a href="{{ url_for('outreach') }}" class="outreach-view-all-btn">View All Outreach Programs →</a>
+            {% endif %}
         </div>
+    </div>
+    {% endfor %}
     </div>
 </section>
 {% else %}

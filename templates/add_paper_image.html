@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h3>Add Paper Image</h3>
+
+    <form method="POST"
+          enctype="multipart/form-data">
+
+        <input
+            type="file"
+            name="paper_image"
+            accept="image/*"
+            capture="environment"
+            required>
+
+        <br><br>
+
+        <button type="submit"
+                class="btn-primary">
+            Upload
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

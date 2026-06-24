@@ -1,0 +1,104 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Manage Resumes{% endblock %}
+
+{% block page_title %}Resume Management{% endblock %}
+{% block page_sub %}View and manage student resumes{% endblock %}
+
+{% block content %}
+
+<div class="glass-card">
+
+    <div style="
+        padding:20px 24px;
+        border-bottom:1px solid rgba(255,255,255,0.08);
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:12px;
+    ">
+        <h3 style="
+            font-size:18px;
+            font-weight:700;
+            margin:0;
+        ">
+            Student Resumes
+        </h3>
+
+        <span style="
+            background:rgba(56,189,248,0.12);
+            color:#38bdf8;
+            padding:8px 14px;
+            border-radius:10px;
+            font-size:13px;
+            font-weight:600;
+        ">
+            Total: {{ resumes|length }}
+        </span>
+    </div>
+
+<div style="overflow-x:auto;">
+<table class="admin-table">
+
+    <thead>
+<tr>
+    <th>ID</th>
+    <th>Student Name</th>
+    <th>Student ID</th>
+    <th>Email</th>
+    <th>Resume Title</th>
+    <th>Date</th>
+    <th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for resume in resumes %}
+<tr>
+
+    <td>{{ resume.id }}</td>
+
+    <td>{{ resume.name }}</td>
+
+    <td>{{ resume.roll }}</td>
+
+    <td>{{ resume.email }}</td>
+
+    <td>{{ resume.title }}</td>
+
+    <td>{{ resume.created_at }}</td>
+
+    <td>
+
+        <a href="{{ url_for('view_resume', resume_id=resume.id) }}"
+           class="btn-primary">
+           View
+        </a>
+
+        <form method="POST"
+              action="{{ url_for('delete_resume', resume_id=resume.id) }}"
+              style="display:inline">
+
+            <button type="submit"
+                    class="btn-danger">
+                Delete
+            </button>
+
+        </form>
+
+    </td>
+
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+</div>
+
+</div>
+
+{% endblock %}
+
