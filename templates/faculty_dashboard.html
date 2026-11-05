@@ -2,8 +2,10 @@
 {% block title %}Faculty Dashboard{% endblock %}
 
 {% block content %}
-<!-- Include Lucide Icons -->
+<!-- Include Lucide Icons & Bootstrap -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
     .dashboard-container {
@@ -569,6 +571,74 @@
         </div>
         {% endif %}
     </div>
+</div>
+
+    <!-- ══════════════ ANNOUNCEMENTS ══════════════ -->
+    <div class="section-card" style="margin-top: 40px;">
+        <div class="section-header">
+            <i data-lucide="megaphone" class="w-8 h-8" style="color: #f59e0b;"></i>
+            <h3>Post Announcement</h3>
+        </div>
+
+        <div class="form-wrapper">
+            <form action="/announcements/add" method="POST">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="modern-input" placeholder="e.g. Exam Schedule Updated" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Target Department</label>
+                        <select name="target_dept" class="modern-input" required>
+                            <option value="ALL">📢 All Departments</option>
+                            <option value="ACSML">ACSML Only</option>
+                            <option value="NCSML">NCSML Only</option>
+                            <option value="DCSML">DCSML Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label">Message</label>
+                    <textarea name="message" class="modern-input" rows="3" placeholder="Type your announcement here..." required style="resize: vertical;"></textarea>
+                </div>
+                <button type="submit" class="btn-action" style="background: #f59e0b;">
+                    <i data-lucide="send"></i> Post Announcement
+                </button>
+            </form>
+        </div>
+
+        {% if announcements %}
+        <h4 style="margin-bottom: 16px; color: #0a1f44; font-weight: 600;">Your Announcements</h4>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for ann in announcements %}
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                        <strong style="color: #0a1f44; font-size: 15px;">{{ ann.title }}</strong>
+                        <span style="background: {% if ann.target_dept == 'ALL' %}#dbeafe{% else %}#dcfce7{% endif %}; color: {% if ann.target_dept == 'ALL' %}#1d4ed8{% else %}#15803d{% endif %}; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                            {{ ann.target_dept }}
+                        </span>
+                    </div>
+                    <p style="color: #374151; font-size: 14px; margin-bottom: 6px;">{{ ann.message }}</p>
+                    <small style="color: #9ca3af;">{{ ann.created_at[:16] }}</small>
+                </div>
+                <form action="/announcements/delete/{{ ann.id }}" method="POST" style="margin: 0; flex-shrink: 0;">
+                    <button type="submit" class="btn-icon delete" onclick="return confirm('Delete this announcement?')" title="Delete" style="margin-left: 12px;">
+                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i data-lucide="megaphone"></i>
+            <h4>No Announcements Yet</h4>
+            <p>Post your first announcement above.</p>
+        </div>
+        {% endif %}
+    </div>
+
 </div>
 
 <script>
